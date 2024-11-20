@@ -9,14 +9,14 @@ function SidebarMenu() {
             <li>
                 <NavLink to="/">
                     <HomeSVG />
-                    List of Countries
+                    Dashbord
                 </NavLink>
             </li>
 
             <li>
                 <NavLink to="/State-cooperation">
                     <StateSvg />
-                    State Cooperation
+                    Drinks
                 </NavLink>
             </li>
         </>
