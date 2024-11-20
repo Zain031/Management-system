@@ -1,0 +1,531 @@
+Kontrak API: 
+1.  Users 
+	BaseUrl: "/api/auth"
+		- Create user:
+			method: "POST"
+			path:/register
+			request_body:{
+				"email": "string",
+        			"password": "string",
+        			"name": "string",
+       			 	"role": "SUPER_ADMIN/ADMIN"
+      			}
+			response: {
+        			"id_user": "integer",
+        			"email": "string",
+        			"name": "string",
+        			"role": "SUPER_ADMIN/ADMIN"
+      			}
+		- Get all users:
+			method: "GET"
+			path:/users
+			response: [
+        				{
+          				"id_user": "integer",
+          				"email": "string",
+          				"name": "string",
+          				"role": "SUPER_ADMIN/ADMIN"
+        				}
+      			]
+      		- Get user by id:
+      			method: "GET"
+      			path:"/user/:id_user"
+      			response: {
+        				"id_user": "integer",
+        				"email": "string",
+        				"name": "string",
+        				"role": "SUPER_ADMIN/ADMIN"
+      			}
+      		- Update user by id:
+      			method: "PUT"
+      			path:"/user/:id_user"
+      			request_body: {
+				"email": "string",
+				"password": "string",
+				"name": "string",
+				"role": "SUPER_ADMIN/ADMIN"
+			 }
+			response: {
+				"id_user": "integer",
+				"email": "string",
+				"name": "string",
+				"role": "SUPER_ADMIN/ADMIN"
+			}
+		- Delete user by id:
+			method: "DELETE"
+			path: "/delete/:id_user"
+		- Login User:
+			method: "POST",
+			path:"/login",
+			request_body:{
+					"email": "string",
+					"password": "string"
+			}
+			response: {
+					"id_user": "integer",
+					"email": "string",
+					"name": "string",
+					"role": "SUPER_ADMIN/ADMIN"
+					"token": "string",
+					"expires_in": "integer"
+			}
+2. Foods
+	BaseUrl": "/api/foods",
+		- Create Food
+		      method: "POST",
+		      path: "/create",
+		      request_body: {
+			"food_name": "string",
+			"food_price": "integer",
+			"total_food": "integer",
+			"total_food_price": "integer",
+		      },
+		      response: {
+			"id_food": "integer",
+			"id_user":"integer",
+			"food_name": "string",
+			"food_price": "integer",
+			"total_food": "integer",
+			"total_food_price": "integer",
+		      }
+	    	- Get all foods
+		      method: "GET",
+		      path: "/",
+		      response: [
+			{
+			  "id_food": "integer",
+			  "id_user":"integer",
+			  "food_name": "string",
+			  "food_price": "integer",
+			  "total_food": "integer",
+			  "total_food_price": "integer",
+			}
+		      ]
+	    
+	    	- Get food by id
+		      method: "GET",
+		      path: "/:id_food",
+		      response: {
+			"id_food": "integer",
+			"id_user":"integer",
+			"food_name": "string",
+			"food_price": "integer",
+			"total_food": "integer",
+			"total_food_price": "integer"
+		      }
+		- Update food by id
+		      method: "PUT",
+		      path: "/update/:id_food",
+		      request_body: {
+			"food_name": "string",
+			"food_price": "integer",
+			"total_food": "integer",
+			"total_food_price": "integer",
+		      },
+		      response: {
+			"id_food": "integer",
+			"id_user":"integer",
+			"food_name": "string",
+			"food_price": "integer",
+			"total_food": "integer",
+			"total_food_price": "integer",
+		      }
+		 - Delete food by id
+		      method: "DELETE",
+		      path: "/delete/:id_food"
+3. Drinks
+	BaseUrl": "/api/drinks",
+		- Create Drink
+		      method: "POST",
+		      path: "/create",
+		      request_body: {
+			"drink_name": "string",
+			"drink_price": "integer",
+			"total_drink": "integer",
+			"total_drink_price": "integer",
+		      },
+		      response: {
+			"id_drink": "integer",
+			"id_user":"integer",
+			"drink_name": "string",
+			"drink_price": "integer",
+			"total_drink": "integer",
+			"total_drink_price": "integer",
+		      }
+	    	- Get all drinks
+		      method: "GET",
+		      path: "/",
+		      response: [
+			{
+			  "id_drink": "integer",
+			  "id_user":"integer",
+			  "drink_name": "string",
+			  "drink_price": "integer",
+			  "total_drink": "integer",
+			  "total_drink_price": "integer",
+			  "id_user": "integer"
+			}
+		      ]
+	    
+	    	- Get drink by id
+		      method: "GET",
+		      path: "/:id_drink",
+		      response: {
+			"id_drink": "integer",
+			"drink_name": "string",
+			"drink_price": "integer",
+			"total_drink": "integer",
+			"total_drink_price": "integer",
+		      }
+		- Update drink by id
+		      method: "PUT",
+		      path: "/update/:id_drink",
+		      request_body: {
+			"drink_name": "string",
+			"drink_price": "integer",
+			"total_drink": "integer",
+			"total_drink_price": "integer",
+		      },
+		      response: {
+			"id_drink": "integer",
+			"id_user":"integer",
+			"drink_name": "string",
+			"drink_price": "integer",
+			"total_drink": "integer",
+			"total_drink_price": "integer",
+		      }
+		 - Delete drink by id
+		      method: "DELETE",
+		      path: "/delete/:id_drink"
+4. Sales
+	BaseUrl: "/api/sales",
+	  	- Create Sales
+		      method: "POST",
+		      path: "/create",
+		      request_body: {
+			"id_food": "integer",
+			"id_drink": "integer",
+			"id_user": "integer",
+			"date_price": "date",
+			"total_sales_price": "integer"
+		      },
+		      response: {
+			"id_sales": "integer",
+			"id_food": "integer",
+			"id_drink": "integer",
+			"id_user": "integer",
+			"date_price": "date",
+			"total_sales_price": "integer"
+		      }
+	    	- Get All Sales
+		      method: "GET",
+		      path: "/",
+		      response: [
+			{
+			  "id_sales": "integer",
+			  "id_food": "integer",
+			  "id_drink": "integer",
+			  "id_user": "integer",
+			  "date_price": "date",
+			  "total_sales_price": "integer"
+			}
+		      ]
+	    	- Get Sales By Date
+		      method: "GET",
+		      path: "/date/:date_sales",
+		      response: {
+			"id_sales": "integer",
+			"id_food": "integer",
+			"id_drink": "integer",
+			"id_user": "integer",
+			"date_sale": "date",
+			"total_sales_price": "integer"
+		      }
+	    	- Update Sales By Id
+		      method: "PUT",
+		      path: "/update/:id_sales",
+		      request_body": {
+			"id_food": "integer",
+			"id_drink": "integer",
+			"id_user": "integer",
+			"date_price": "date",
+			"total_sales_price": "integer"
+		      },
+		      "response": {
+			"id_sales": "integer",
+			"id_food": "integer",
+			"id_drink": "integer",
+			"id_user": "integer",
+			"date_price": "date",
+			"total_sales_price": "integer"
+		      }
+	    
+		 - Delete Sales By Id
+		      method: "DELETE",
+		      path: "/:id_sales",
+		      
+5. Tools
+	BaseUrl: "/api/tools",
+	   - Create Tool
+	      method: "POST",
+	      path: "/create",
+	      request_body: {
+		"tool_name": "string",
+		"tool_price_unit": "integer",
+		"tool_quantity": "integer",
+		"tool_discount": "integer",
+		"tool_price_discount": "integer",
+		"tool_total_price": "integer",
+		"date_tool_buy": "date",
+		"id_user": "integer"
+	      },
+	      response: {
+		"id_tool": "integer",
+		"id_user":"integer",
+		"tool_name": "string",
+		"tool_price_unit": "integer",
+		"tool_quantity": "integer",
+		"tool_discount": "integer",
+		"tool_price_discount": "integer",
+		"tool_total_price": "integer",
+		"date_tool_buy": "date"
+	      }
+	   - Get All Tools
+	      method: "GET",
+	      path: "/",
+	      response: [
+		{
+		  "id_tool": "integer",
+		  "id_user":"integer",
+		  "tool_name": "string",
+		  "tool_price_unit": "integer",
+		  "tool_quantity": "integer",
+		  "tool_discount": "integer",
+		  "tool_price_discount": "integer",
+		  "tool_total_price": "integer",
+		  "date_tool_buy": "date"
+		}
+	      ]
+	   - Get Tool By Id
+	      method: "GET",
+	      path: "/:id_tool",
+	      response: {
+		"id_tool": "integer",
+		"id_user":"integer",
+		"tool_name": "string",
+		"tool_price_unit": "integer",
+		"tool_quantity": "integer",
+		"tool_discount": "integer",
+		"tool_price_discount": "integer",
+		"tool_total_price": "integer",
+		"date_tool_buy": "date"
+	      }
+	   - Update Tool By Id
+	      method: "PUT",
+	      path: "/update/:id_tool",
+	      request_body: {
+		"tool_name": "string",
+		"tool_price_unit": "integer",
+		"tool_quantity": "integer",
+		"tool_discount": "integer",
+		"tool_price_discount": "integer",
+		"tool_total_price": "integer",
+		"date_tool_buy": "date"
+	      },
+	      response: {
+		"id_tool": "integer",
+		"id_user":"integer",
+		"tool_name": "string",
+		"tool_price_unit": "integer",
+		"tool_quantity": "integer",
+		"tool_discount": "integer",
+		"tool_price_discount": "integer",
+		"tool_total_price": "integer",
+		"date_tool_buy": "date"
+	      }
+	   - Delete Tool By Id
+	      method: "DELETE",
+	      path: "/delete/:id_tool"
+6. Foodstuffs
+	BaseUrl: "/api/foodstuffs",
+	   - Create Foodstuff
+	      method: "POST",
+	      path: "/create",
+	      request_body: {
+		"foodstuff_name": "string",
+		"foodstuff_price_unit": "integer",
+		"foodstuff_quantity": "integer",
+		"foodstuff_discount": "integer",
+		"foodstuff_price_discount": "integer",
+		"foodstuff_total_price": "integer",
+		"date_foodstuff_buy": "date"
+	      },
+	      response: {
+		"id_foodstuff": "integer",
+		"id_user":"integer",
+		"foodstuff_name": "string",
+		"foodstuff_price_unit": "integer",
+		"foodstuff_quantity": "integer",
+		"foodstuff_discount": "integer",
+		"foodstuff_price_discount": "integer",
+		"foodstuff_total_price": "integer",
+		"date_foodstuff_buy": "date"
+	      }
+	   - Get All Foodstuffs
+	      method: "GET",
+	      path: "/",
+	      response: [
+		{
+		  "id_foodstuff": "integer",
+		  "id_user": "integer"
+		  "foodstuff_name": "string",
+		  "foodstuff_price_unit": "integer",
+		  "foodstuff_quantity": "integer",
+		  "foodstuff_discount": "integer",
+		  "foodstuff_price_discount": "integer",
+		  "foodstuff_total_price": "integer",
+		  "date_foodstuff_buy": "date",
+		}
+	      ]
+	   - Get Foodstuff By Id
+	      method: "GET",
+	      path: "/:id_foodstuff",
+	      response: {
+		"id_foodstuff": "integer",
+		"id_user": "integer",
+		"foodstuff_name": "string",
+		"foodstuff_price_unit": "integer",
+		"foodstuff_quantity": "integer",
+		"foodstuff_discount": "integer",
+		"foodstuff_price_discount": "integer",
+		"foodstuff_total_price": "integer",
+		"date_foodstuff_buy": "date"
+	      }
+	   - Update Foodstuff By Id
+	      method: "PUT",
+	      path: "/update/:id_foodstuff",
+	      request_body: {
+		"foodstuff_name": "string",
+		"foodstuff_price_unit": "integer",
+		"foodstuff_quantity": "integer",
+		"foodstuff_discount": "integer",
+		"foodstuff_price_discount": "integer",
+		"foodstuff_total_price": "integer",
+		"date_foodstuff_buy": "date"
+	      },
+	      response: {
+		"id_foodstuff": "integer",
+		"id_user": "integer"
+		"foodstuff_name": "string",
+		"foodstuff_price_unit": "integer",
+		"foodstuff_quantity": "integer",
+		"foodstuff_discount": "integer",
+		"foodstuff_price_discount": "integer",
+		"foodstuff_total_price": "integer",
+		"date_foodstuff_buy": "date"
+	      }
+	   - Delete Foodstuff By Id
+	      method: "DELETE",
+	      path: "/delete/:id_foodstuff"
+7. Purchase
+	BaseUrl: "/api/purchases",
+	   - Create Purchase
+	      method: "POST",
+	      path: "/create",
+	      request_body: {
+		"id_foodstuff": "integer",
+		"id_tool": "integer"
+		"date_purchase": "date",
+		"purchase_total_price": "integer"	
+	      },
+	      response: {
+		"id_purchase": "integer",
+		"id_foodstuff": "integer",
+		"id_user": "integer"
+		"id_tool": "integer",
+		"date_purchase": "date",
+		"purchase_total_price": "integer",
+	      }
+	   - Get All Purchases
+	      method: "GET",
+	      path: "/",
+	      response: [
+		{
+		  "id_purchase": "integer",
+		  "id_foodstuff": "integer",
+		  "id_tool": "integer",
+		  "id_user": "integer"
+		  "date_purchase": "date",
+		  "purchase_total_price": "integer"
+		}
+	      ]
+	   - Get Purchase By Date
+	      method: "GET",
+	      path: "/date/:date_purchase",
+	      response: [
+		{
+		  "id_purchase": "integer",
+		  "id_foodstuff": "integer",
+		  "id_tool": "integer",
+		  "id_user": "integer",
+		  "date_purchase": "date",
+		  "purchase_total_price": "integer"	  
+		}
+	      ]
+	      - Update Purchase By Id
+		      method: "PUT",
+		      path: "/update/:id_purchase",
+		      request_body: {
+			"id_foodstuff": "integer",
+			"id_tool": "integer",
+			"id_user": "integer",
+			"date_purchase": "date",
+			"purchase_total_price": "integer"
+			
+		      },
+		      response: {
+			"id_purchase": "integer",
+			"id_foodstuff": "integer",
+			"id_tool": "integer",
+			"id_user": "integer",
+			"date_purchase": "date",
+			"purchase_total_price": "integer",
+		      }
+	     - Delete Purchase By Id
+		       method: "DELETE",
+		       path: "/delete/:id_purchase"
+8. Profits
+	BaseUrl: "/api/profits",
+	   - Get All Profits
+	      method: "GET",
+	      path: "/",
+	      response: [
+		{
+		  "id_profit": "integer",
+		  "id_purchase": "integer",
+		  "id_sales": "integer",
+		  "id_user": "integer",
+		  "date_profit": "date",
+		  "total_profits": "integer"
+		}
+	      ]
+	   - Get Profit By Date
+	      method: "GET",
+	      path: "/date/:date_profit",
+	      response: {
+		"id_profit": "integer",
+		"id_purchase": "integer",
+		"id_sales": "integer",
+		"id_user": "integer",
+		"date_profit": "date",
+		"total_profits": "integer"
+	      }
+
+
+
+
+Rumus : 
+1. total_sales_price= food_total_price+drink_total_price
+2. total_purchase_price= material_total_price+tool_total_price
+2. total_profits= total_sales-total_purchase
+
