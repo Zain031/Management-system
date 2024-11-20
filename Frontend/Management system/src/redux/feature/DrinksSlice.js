@@ -5,7 +5,7 @@ export const fetchDrinks = createAsyncThunk(
   'drinks/fetchDrinks',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('/protected/drinks', { params })
+      const response = await axiosInstance.get('/drinks', { params })
       return response.data
     } catch (e) {
       return rejectWithValue(e || 'Failed to fetch drinks')
@@ -13,130 +13,107 @@ export const fetchDrinks = createAsyncThunk(
   },
 )
 
-export const fetchWeddingPackageById = createAsyncThunk(
-  'weddingPackages/fetchById',
+export const fetchDrinkById = createAsyncThunk(
+  'drinks/fetchById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`/public/wedding-packages/${id}`)
+      const response = await axiosInstance.get(`/drinks/${id}`)
       return response.data
     } catch (e) {
-      return rejectWithValue(e || 'Failed to fetch wedding package by ID')
+      return rejectWithValue(e || 'Failed to fetch drink by ID')
     }
   },
 )
 
-export const createWeddingPackage = createAsyncThunk(
-  'weddingPackages/createWeddingPackage',
-  async (weddingPackage, { rejectWithValue }) => {
+export const createDrink = createAsyncThunk(
+  'drinks/createDrink',
+  async (drink, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post(`/protected/wedding-packages`, weddingPackage)
+      const response = await axiosInstance.post(`/drinks`, drink)
       return response.data
     } catch (e) {
-      return rejectWithValue(e || 'Failed to create wedding package')
+      return rejectWithValue(e || 'Failed to create drink')
     }
   },
 )
 
-export const updateWeddingPackage = createAsyncThunk(
-  'weddingPackages/updateWeddingPackage',
-  async (weddingPackage, { rejectWithValue }) => {
+export const updateDrink = createAsyncThunk(
+  'drinks/updateDrink',
+  async (drink, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`/protected/wedding-packages`, weddingPackage)
+      const response = await axiosInstance.put(`/drinks`, drink)
       return response.data
     } catch (e) {
-      return rejectWithValue(e || 'Failed to update wedding package')
+      return rejectWithValue(e || 'Failed to update drink')
     }
   },
 )
 
-export const deleteWeddingPackage = createAsyncThunk(
-  'weddingPackages/deleteWeddingPackage',
+export const deleteDrink = createAsyncThunk(
+  'drinks/deleteDrink',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.delete(`/protected/wedding-packages/${id}`)
+      const response = await axiosInstance.delete(`/drinks/${id}`)
       return response.data
     } catch (e) {
       console.log(e)
-      return rejectWithValue(e || 'Failed to delete wedding package')
+      return rejectWithValue(e || 'Failed to delete drink')
     }
   },
 )
 
-export const updateWeddingPackageImage = createAsyncThunk(
-  'weddingPackages/updateWeddingPackageImage',
-  async ({ id, image }, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.put(`/protected/wedding-packages/${id}/images`, image)
-      return response.data
-    } catch (e) {
-      return rejectWithValue(e || 'Failed to update wedding package image')
-    }
-  },
-)
 
-export const deleteWeddingPackageImage = createAsyncThunk(
-  'weddingPackages/deleteWeddingPackageImage',
-  async ({ id, imageId }, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.delete(`/protected/wedding-packages/${id}/images/${imageId}`)
-      return response.data
-    } catch (e) {
-      return rejectWithValue(e || 'Failed to delete wedding package image')
-    }
-  },
-)
-
-const WeddingPackageSlice = createSlice({
-  name: 'weddingPackage',
+const DrinkSlice = createSlice({
+  name: 'drink',
   initialState: {
-    weddingPackages: [],
-    weddingPackageById: null,
+    drinks: [],
+    drinkById: null,
     status: null,
   },
 
   extraReducers: (builder) => {
     builder
-      .addCase(fetchWeddingPackages.fulfilled, (state, action) => {
-        state.weddingPackages = action.payload.data || []
+      .addCase(fetchDrinks.fulfilled, (state, action) => {
+        state.drinks = action.payload.data || []
         state.paging = action.payload.paging
         state.status = 'succeeded'
       })
-      .addCase(fetchWeddingPackages.rejected, (state, action) => {
+      .addCase(fetchDrinks.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.payload
       })
-      .addCase(fetchWeddingPackageById.fulfilled, (state, action) => {
+      .addCase(fetchDrinkById.fulfilled, (state, action) => {
         const packageWeddingById = action.payload.data
-        state.weddingPackageById = packageWeddingById
+        state.drinkById = packageWeddingById
         state.status = 'succeeded'
       })
-      .addCase(createWeddingPackage.fulfilled, (state, action) => {
-        state.weddingPackages.push(action.payload)
+      .addCase(createDrink.fulfilled, (state, action) => {
+        state.drinks.push(action.payload)
         state.status = 'succeeded'
       })
-      .addCase(updateWeddingPackage.fulfilled, (state, action) => {
-        const index = state.weddingPackages.findIndex((pkg) => pkg.id === action.payload.id)
+      .addCase(updateDrink.fulfilled, (state, action) => {
+        const index = state.drinks.findIndex((pkg) => pkg.id === action.payload.id)
         if (index !== -1) {
-          state.weddingPackages[index] = action.payload
+          state.drinks[index] = action.payload
         }
         state.status = 'succeeded'
       })
-      .addCase(updateWeddingPackageImage.fulfilled, (state, action) => {
-        const index = state.weddingPackages.findIndex((pkg) => pkg.id === action.payload.id)
+      .addCase(updateDrinkImage.fulfilled, (state, action) => {
+        const index = state.drinks.findIndex((pkg) => pkg.id === action.payload.id)
         if (index !== -1) {
-          state.weddingPackages[index] = action.payload
+          state.drinks[index] = action.payload
         }
         state.status = 'succeeded'
       })
-      .addCase(deleteWeddingPackageImage.fulfilled, (state, action) => {
-        const index = state.weddingPackages.findIndex((pkg) => pkg.id === action.payload.id)
+      .addCase(deleteDrinkImage.fulfilled, (state, action) => {
+        const index = state.drinks.findIndex((pkg) => pkg.id === action.payload.id)
         if (index !== -1) {
-          state.weddingPackages[index] = action.payload
+          state.drinks[index] = action.payload
         }
         state.status = 'succeeded'
       })
-      .addCase(deleteWeddingPackage.fulfilled, (state, action) => {
-        state.weddingPackages = state.weddingPackages.filter((pkg) => pkg.id !== action.payload.id)
+      .addCase(deleteDrink.fulfilled, (state, action) => {
+        state.drinks = state.drinks.filter((pkg) => pkg.id !== action.payload.id)
         state.status = 'succeeded'
       })
       .addMatcher(
@@ -149,4 +126,5 @@ const WeddingPackageSlice = createSlice({
   },
 })
 
-export default WeddingPackageSlice.reducer
+export default DrinkSlice.reducer
+
