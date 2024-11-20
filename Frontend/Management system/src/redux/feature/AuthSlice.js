@@ -74,7 +74,14 @@ const authSlice = createSlice({
         token: localStorage.getItem("token") || null,
         role: localStorage.getItem("role") || null,
         user: JSON.parse(localStorage.getItem("user")) || null,
-        status: null,
+        users: [], // List of users
+        status: {
+            login: null,
+            register: null,
+            fetchUsers: null,
+            fetchUserById: null,
+            updateUserById: null,
+        },
         error: null,
     },
     reducers: {
@@ -84,6 +91,11 @@ const authSlice = createSlice({
             state.isLogin = !!token;
             state.role = role;
             state.user = user;
+            localStorage.setItem("token", token);
+            localStorage.setItem("role", role);
+            if (user) {
+                localStorage.setItem("user", JSON.stringify(user));
+            }
         },
         logout: (state) => {
             state.isLogin = false;
@@ -97,8 +109,9 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Login
             .addCase(login.pending, (state) => {
-                state.status = "loading";
+                state.status.login = "loading";
             })
             .addCase(login.fulfilled, (state, action) => {
                 const { token, role, user } = action.payload.data;
@@ -106,33 +119,61 @@ const authSlice = createSlice({
                 state.token = token;
                 state.role = role;
                 state.user = user;
-                state.status = "succeeded";
-                localStorage.setItem("token", token);
-                localStorage.setItem("role", role);
-                if (user) {
-                    localStorage.setItem("user", JSON.stringify(user));
-                }
+                state.status.login = "succeeded";
             })
+            .addCase(login.rejected, (state, action) => {
+                state.status.login = "failed";
+                state.error = action.payload;
+            })
+            // Register
             .addCase(register.pending, (state) => {
-                state.status = "loading";
+                state.status.register = "loading";
             })
             .addCase(register.fulfilled, (state) => {
-                state.status = "succeeded";
+                state.status.register = "succeeded";
             })
+            .addCase(register.rejected, (state, action) => {
+                state.status.register = "failed";
+                state.error = action.payload;
+            })
+            // Fetch Users
             .addCase(fetchUsers.pending, (state) => {
-                state.status = "loading";
+                state.status.fetchUsers = "loading";
             })
             .addCase(fetchUsers.fulfilled, (state, action) => {
-                state.status = "succeeded";
+                state.status.fetchUsers = "succeeded";
                 state.users = action.payload.data;
             })
-            .addMatcher(
-                (action) => action.type.endsWith("/rejected"),
-                (state, action) => {
-                    state.error = action.payload;
-                    state.status = "failed";
+            .addCase(fetchUsers.rejected, (state, action) => {
+                state.status.fetchUsers = "failed";
+                state.error = action.payload;
+            })
+            // Fetch User By ID
+            .addCase(fetchUsersById.pending, (state) => {
+                state.status.fetchUserById = "loading";
+            })
+            .addCase(fetchUsersById.fulfilled, (state, action) => {
+                state.status.fetchUserById = "succeeded";
+                state.user = action.payload;
+            })
+            .addCase(fetchUsersById.rejected, (state, action) => {
+                state.status.fetchUserById = "failed";
+                state.error = action.payload;
+            })
+            // Update User By ID
+            .addCase(updateUserById.pending, (state) => {
+                state.status.updateUserById = "loading";
+            })
+            .addCase(updateUserById.fulfilled, (state, action) => {
+                state.status.updateUserById = "succeeded";
+                if (state.user?.id === action.payload.id) {
+                    state.user = { ...state.user, ...action.payload };
                 }
-            );
+            })
+            .addCase(updateUserById.rejected, (state, action) => {
+                state.status.updateUserById = "failed";
+                state.error = action.payload;
+            });
     },
 });
 
