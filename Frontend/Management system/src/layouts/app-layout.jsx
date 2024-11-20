@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import { CloseSVG } from "../assets/svgs";
 import Navbar from "./partials/navbar";
 import SidebarMenu from "./partials/sidebar-menu";
+import { LogOut } from "lucide-react";
 
 function AppLayout() {
     const [isDark, setIsDark] = useState(
@@ -39,7 +40,7 @@ function AppLayout() {
 
             <div className="drawer-side ">
                 <label htmlFor="my-drawer-3" className="drawer-overlay"></label>
-                <ul className="menu menu-lg min-h-full w-80 space-y-4 bg-[#c23a22] p-4 text-neutral-content">
+                <ul className="menu menu-lg min-h-full w-80 space-y-4 bg-primary p-4 text-neutral-content">
                     <div className="flex items-start justify-center rounded-lg">
                         <div className="my-5 "></div>
                         <button
@@ -50,6 +51,12 @@ function AppLayout() {
                         </button>
                     </div>
                     <SidebarMenu />
+                    <li className="flex-1 justify-end">
+              <NavLink to="/premium">
+              <LogOut size={30} strokeWidth={1.5} />
+                <span className="font-bold">Logout</span>
+              </NavLink>
+            </li>
                 </ul>
             </div>
         </div>

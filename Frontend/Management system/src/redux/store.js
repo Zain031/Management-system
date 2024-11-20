@@ -1,13 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-
-import authSlice from "./AuthSlice";
-import foodStuffsSlice from "./FoodStuffsSlice";
-import purchaseSlice from "./PurchasesSlice";
-import drinksSlice from "./DrinksSlice";
-import profitsSlice from "./ProfitsSlice";
-import salesSlice from "./SalesSlice";
-import toolsSlice from "./ToolsSlice";
-import foodSlice from "./FoodsSlice";
+import authSlice from "../redux/feature/AuthSlice";
+import foodStuffsSlice from "../redux/feature/FoodStuffsSlice";
+import purchaseSlice from "../redux/feature/PurchaseSlice";
+import drinksSlice from "../redux/feature/DrinksSlice";
+import profitsSlice from "../redux/feature/ProfitsSlice";
+import salesSlice from "../redux/feature/SalesSlice";
+import toolsSlice from "../redux/feature/ToolsSlice";
+import foodSlice from "../redux/feature/FoodsSlice";
 
 const store = configureStore({
     reducer: {
