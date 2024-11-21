@@ -44,6 +44,12 @@ function SidebarMenu() {
                     FoodStuff
                 </NavLink>
             </li>
+            <li>
+                <NavLink to="/State-cooperation">
+                    <HandPlatter size={30} strokeWidth={1.5} />
+                    Create Users
+                </NavLink>
+            </li>
         </>
     );
 }

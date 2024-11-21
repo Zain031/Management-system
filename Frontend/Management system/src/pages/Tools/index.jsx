@@ -2,7 +2,7 @@ import React from "react";
 import Container from "../../components/container";
 import Header from "../../layouts/partials/header";
 
-const Drinks = () => {
+const Tools = () => {
     const data = [
         {
             id: 1,
@@ -123,4 +123,5 @@ const Drinks = () => {
     );
 };
 
-export default Drinks;
+export default Tools;
+
