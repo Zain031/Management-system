@@ -38,7 +38,7 @@ Kontrak API:
       			}
       		- Update user by id:
       			method: "PUT"
-      			path:"/user/:id_user"
+      			path:"/user/update/:id_user"
       			request_body: {
 				"email": "string",
 				"password": "string",
