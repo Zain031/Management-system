@@ -18,11 +18,11 @@ import java.util.Map;
 
 @Component
 public class JWTUtils {
-    @Value("${app.tokonyadia.jwt.secret-key}")
+    @Value("${app.managementsystem.jwt.secret-key}")
     private String jwtSecret;
-    @Value("${app.tokonyadia.jwt.app-name}")
+    @Value("${app.managementsystem.jwt.app-name}")
     private String appName;
-    @Value("${app.tokonyadia.jwt.expire-time}")
+    @Value("${app.managementsystem.jwt.expire-time}")
     private long jwtExpired;
 
     private Algorithm algorithm;

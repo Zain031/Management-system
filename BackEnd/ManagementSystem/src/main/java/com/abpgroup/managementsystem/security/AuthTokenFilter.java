@@ -1,5 +1,8 @@
 package com.abpgroup.managementsystem.security;
 
+import com.abpgroup.managementsystem.model.entity.AppUser;
+import com.abpgroup.managementsystem.model.entity.Users;
+import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.UserService;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.servlet.FilterChain;
@@ -17,12 +20,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
     private final JWTUtils jwtUtil;
-    private final UserService userService;
+//    private final UserService userService;
+    private final UsersRepository usersRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -34,7 +39,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 if (jwtUtil.verifyJwtToken(clientToken)) {
                     Map<String, String> userInfo = jwtUtil.getUserInfoByToken(clientToken);
-                    UserDetails user = userService.loadUserById(Long.valueOf(userInfo.get("idUser")));
+                    Optional<Users> userData = usersRepository.findById(Long.parseLong(userInfo.get("idUser")));
+                    if (userData.isEmpty()) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: User not found");
+                        return;
+                    }
+                    UserDetails user = AppUser.builder()
+                            .email(userData.get().getEmail())
+                            .password(userData.get().getPassword())
+                            .build();
 
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
