@@ -1,25 +1,18 @@
 package com.abpgroup.managementsystem.service.impl;
 
-import com.abpgroup.managementsystem.model.dto.request.LoginRequestDTO;
 import com.abpgroup.managementsystem.model.dto.request.UsersRequestDTO;
-import com.abpgroup.managementsystem.model.dto.response.LoginResponseDTO;
 import com.abpgroup.managementsystem.model.dto.response.UsersResponseDTO;
 import com.abpgroup.managementsystem.model.entity.AppUser;
 import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.UsersRepository;
-import com.abpgroup.managementsystem.security.JWTUtils;
 import com.abpgroup.managementsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

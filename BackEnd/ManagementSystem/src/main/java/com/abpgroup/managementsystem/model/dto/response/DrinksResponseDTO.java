@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 public class DrinksResponseDTO {
     @JsonProperty("id_drink")
     private Long idDrink;
-    @JsonProperty("id_user")
-    private Long idUser;
+    @JsonProperty("user")
+    private UsersResponseDTO usersResponseDTO;
     @JsonProperty("drink_name")
     private String drinkName;
     @JsonProperty("drink_price")

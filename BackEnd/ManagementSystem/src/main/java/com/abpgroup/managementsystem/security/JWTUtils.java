@@ -1,6 +1,7 @@
 package com.abpgroup.managementsystem.security;
 
 import com.abpgroup.managementsystem.model.entity.AppUser;
+import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.utils.exeptions.AuthenticationExeption;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -32,12 +33,14 @@ public class JWTUtils {
         this.algorithm = Algorithm.HMAC256(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(AppUser appUser) {
+    public String generateToken(AppUser appUser, Users users) {
         return JWT.create()
                 .withIssuer(appName)
                 .withSubject(String.valueOf(appUser.getId()))
                 .withExpiresAt(Instant.now().plusSeconds(jwtExpired))
                 .withIssuedAt(Instant.now())
+                .withClaim("idUser", users.getIdUser())
+                .withClaim("name", users.getName())
                 .withClaim("role", appUser.getRole().name())
                 .sign(algorithm);
     }

@@ -11,27 +11,28 @@ Kontrak API:
        			 	"role": "SUPER_ADMIN/ADMIN"
       			}
 			response: {
-        			"id_user": "integer",
-        			"email": "string",
-        			"name": "string",
-        			"role": "SUPER_ADMIN/ADMIN"
-      			}
+				  "id_user": "long",
+				  "email": "string",
+				  "name": "string",
+				  "role": "SUPER_ADMIN/ADMIN"
+			}
+
 		- Get all users:
 			method: "GET"
 			path:/users
 			response: [
         				{
-          				"id_user": "integer",
-          				"email": "string",
-          				"name": "string",
-          				"role": "SUPER_ADMIN/ADMIN"
+          				    "id_user": "long",
+					    "email": "string",
+					    "name": "string",
+					    "role": "SUPER_ADMIN/ADMIN"
         				}
       			]
       		- Get user by id:
       			method: "GET"
       			path:"/user/:id_user"
       			response: {
-        				"id_user": "integer",
+        				"id_user": "long",
         				"email": "string",
         				"name": "string",
         				"role": "SUPER_ADMIN/ADMIN"
@@ -46,7 +47,7 @@ Kontrak API:
 				"role": "SUPER_ADMIN/ADMIN"
 			 }
 			response: {
-				"id_user": "integer",
+				"id_user": "long",
 				"email": "string",
 				"name": "string",
 				"role": "SUPER_ADMIN/ADMIN"
@@ -62,12 +63,13 @@ Kontrak API:
 					"password": "string"
 			}
 			response: {
-					"id_user": "integer",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-					"token": "string",
-					"expires_in": "integer"
+					"token": "code",
+					"user": {
+						      "id_user":"long",
+						      "email"  :"string",
+						      "name"   :"string",
+						      "role"   :"SUPER_ADMIN"
+					}
 			}
 2. Foods
 	BaseUrl": "/api/foods",
@@ -75,30 +77,30 @@ Kontrak API:
 		      method: "POST",
 		      path: "/create",
 		      request_body: {
+		        "id_user":long,
 			"food_name": "string",
-			"food_price": "integer",
-			"total_food": "integer",
-			"total_food_price": "integer",
+			"food_price": "long",
+			"total_food": "long"
 		      },
 		      response: {
-			"id_food": "integer",
-			"id_user":"integer",
+			"id_food": "long",
+			"name"   : "string",
 			"food_name": "string",
-			"food_price": "integer",
-			"total_food": "integer",
-			"total_food_price": "integer",
+			"food_price": "long",
+			"total_food": "long",
+			"total_food_price": "long",
 		      }
 	    	- Get all foods
 		      method: "GET",
 		      path: "/",
 		      response: [
 			{
-			  "id_food": "integer",
-			  "id_user":"integer",
-			  "food_name": "string",
-			  "food_price": "integer",
-			  "total_food": "integer",
-			  "total_food_price": "integer",
+			        "id_food": "long",
+				"name"   : "string",
+				"food_name": "string",
+				"food_price": "long",
+				"total_food": "long",
+				"total_food_price": "long",
 			}
 		      ]
 	    
@@ -106,29 +108,29 @@ Kontrak API:
 		      method: "GET",
 		      path: "/:id_food",
 		      response: {
-			"id_food": "integer",
-			"id_user":"integer",
-			"food_name": "string",
-			"food_price": "integer",
-			"total_food": "integer",
-			"total_food_price": "integer"
+			        "id_food": "long",
+				"name"   : "string",
+				"food_name": "string",
+				"food_price": "long",
+				"total_food": "long",
+				"total_food_price": "long",
 		      }
 		- Update food by id
 		      method: "PUT",
 		      path: "/update/:id_food",
 		      request_body: {
+		        "id_user":long,
 			"food_name": "string",
-			"food_price": "integer",
-			"total_food": "integer",
-			"total_food_price": "integer",
+			"food_price": "long",
+			"total_food": "long"
 		      },
 		      response: {
-			"id_food": "integer",
-			"id_user":"integer",
-			"food_name": "string",
-			"food_price": "integer",
-			"total_food": "integer",
-			"total_food_price": "integer",
+			        "id_food": "long",
+				"name"   : "string",
+				"food_name": "string",
+				"food_price": "long",
+				"total_food": "long",
+				"total_food_price": "long",
 		      }
 		 - Delete food by id
 		      method: "DELETE",
@@ -139,31 +141,31 @@ Kontrak API:
 		      method: "POST",
 		      path: "/create",
 		      request_body: {
+		        "id_user":long,
 			"drink_name": "string",
-			"drink_price": "integer",
-			"total_drink": "integer",
-			"total_drink_price": "integer",
+			"drink_price": "long",
+			"total_drink": "long"
 		      },
 		      response: {
-			"id_drink": "integer",
-			"id_user":"integer",
+			"id_drink": "long",
+			"name":"string",
 			"drink_name": "string",
-			"drink_price": "integer",
-			"total_drink": "integer",
-			"total_drink_price": "integer",
+			"drink_price": "long",
+			"total_drink": "long",
+			"total_drink_price": "long",
 		      }
 	    	- Get all drinks
 		      method: "GET",
 		      path: "/",
 		      response: [
 			{
-			  "id_drink": "integer",
-			  "id_user":"integer",
-			  "drink_name": "string",
-			  "drink_price": "integer",
-			  "total_drink": "integer",
-			  "total_drink_price": "integer",
-			  "id_user": "integer"
+				
+			        "id_drink": "long",
+				"name":"string",
+				"drink_name": "string",
+				"drink_price": "long",
+				"total_drink": "long",
+				"total_drink_price": "long",
 			}
 		      ]
 	    
@@ -171,28 +173,29 @@ Kontrak API:
 		      method: "GET",
 		      path: "/:id_drink",
 		      response: {
-			"id_drink": "integer",
+			"id_drink": "long",
+			"name":"string",
 			"drink_name": "string",
-			"drink_price": "integer",
-			"total_drink": "integer",
-			"total_drink_price": "integer",
+			"drink_price": "long",
+			"total_drink": "long",
+			"total_drink_price": "long",
 		      }
 		- Update drink by id
 		      method: "PUT",
 		      path: "/update/:id_drink",
 		      request_body: {
+		        "id_user":long,
 			"drink_name": "string",
-			"drink_price": "integer",
-			"total_drink": "integer",
-			"total_drink_price": "integer",
+			"drink_price": "long",
+			"total_drink": "long"
 		      },
 		      response: {
-			"id_drink": "integer",
-			"id_user":"integer",
+			"id_drink": "long",
+			"name":"string",
 			"drink_name": "string",
-			"drink_price": "integer",
-			"total_drink": "integer",
-			"total_drink_price": "integer",
+			"drink_price": "long",
+			"total_drink": "long",
+			"total_drink_price": "long",
 		      }
 		 - Delete drink by id
 		      method: "DELETE",
@@ -203,61 +206,112 @@ Kontrak API:
 		      method: "POST",
 		      path: "/create",
 		      request_body: {
-			"id_food": "integer",
-			"id_drink": "integer",
-			"id_user": "integer",
-			"date_price": "date",
-			"total_sales_price": "integer"
+		        "id_user": "long",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"total_sales_drinks_price":"long",
+			"date_sales": "date"
 		      },
 		      response: {
-			"id_sales": "integer",
-			"id_food": "integer",
-			"id_drink": "integer",
-			"id_user": "integer",
-			"date_price": "date",
-			"total_sales_price": "integer"
+			"id_sales": "long",
+			"name": "String",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"leftover_food_sale": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"leftover_drink_sale":"long",
+			"total_sales_drinks_price":"long",
+			"total_sales_price": "long",
+			"date_sales": "date",
+			"period": "month"
 		      }
 	    	- Get All Sales
 		      method: "GET",
 		      path: "/",
-		      response: [
-			{
-			  "id_sales": "integer",
-			  "id_food": "integer",
-			  "id_drink": "integer",
-			  "id_user": "integer",
-			  "date_price": "date",
-			  "total_sales_price": "integer"
-			}
-		      ]
+		      response: [{
+			"id_sales": "long",
+			"name": "String",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"leftover_food_sale": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"leftover_drink_sale":"long",
+			"total_sales_drinks_price":"long",
+			"total_sales_price": "long",
+			"date_sales": "date",
+			"period": "month"
+		      }]
 	    	- Get Sales By Date
 		      method: "GET",
 		      path: "/date/:date_sales",
 		      response: {
-			"id_sales": "integer",
-			"id_food": "integer",
-			"id_drink": "integer",
-			"id_user": "integer",
-			"date_sale": "date",
-			"total_sales_price": "integer"
+			"id_sales": "long",
+			"name": "String",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"leftover_food_sale": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"leftover_drink_sale":"long",
+			"total_sales_drinks_price":"long",
+			"total_sales_price": "long",
+			"date_sales": "date",
+			"period": "month"
 		      }
+		 - Get Sales By Month
+		      method: "GET",
+		      path: "/month/:period",
+		      response: [{
+			"id_sales": "long",
+			"name": "String",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"leftover_food_sale": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"leftover_drink_sale":"long",
+			"total_sales_drinks_price":"long",
+			"total_sales_price": "long",
+			"date_sales": "date",
+			"period": "month"
+		      }]
+		
 	    	- Update Sales By Id
 		      method: "PUT",
 		      path: "/update/:id_sales",
-		      request_body": {
-			"id_food": "integer",
-			"id_drink": "integer",
-			"id_user": "integer",
-			"date_price": "date",
-			"total_sales_price": "integer"
+		      request_body: {
+		        "id_user": "long",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"total_sales_drinks_price":"long",
+			"date_sales": "date"
 		      },
-		      "response": {
-			"id_sales": "integer",
-			"id_food": "integer",
-			"id_drink": "integer",
-			"id_user": "integer",
-			"date_price": "date",
-			"total_sales_price": "integer"
+		      response: {
+			"id_sales": "long",
+			"name": "String",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"leftover_food_sale": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"leftover_drink_sale":"long",
+			"total_sales_drinks_price":"long",
+			"total_sales_price": "long",
+			"date_sales": "date",
+			"period": "month"
 		      }
 	    
 		 - Delete Sales By Id
@@ -270,78 +324,111 @@ Kontrak API:
 	      method: "POST",
 	      path: "/create",
 	      request_body: {
+	        "id_user": "long"
 		"tool_name": "string",
-		"tool_price_unit": "integer",
-		"tool_quantity": "integer",
-		"tool_discount": "integer",
-		"tool_price_discount": "integer",
-		"tool_total_price": "integer",
-		"date_tool_buy": "date",
-		"id_user": "integer"
+		"tool_price_unit": "long",
+		"tool_quantity": "long",
+		"tool_discount": "long",
+		"tool_price_discount": "long",
+		"tool_total_price": "long",
+		"date_tool_buy": "date",		
 	      },
 	      response: {
-		"id_tool": "integer",
-		"id_user":"integer",
+		"id_tool": "long",
+		"name":"string",
 		"tool_name": "string",
-		"tool_price_unit": "integer",
-		"tool_quantity": "integer",
-		"tool_discount": "integer",
-		"tool_price_discount": "integer",
-		"tool_total_price": "integer",
-		"date_tool_buy": "date"
+		"tool_price_unit": "long",
+		"tool_quantity": "long",
+		"tool_discount": "long",
+		"tool_price_discount": "long",
+		"tool_total_price": "long",
+		"date_tool_buy": "date",
+		"period":"month"
 	      }
 	   - Get All Tools
 	      method: "GET",
 	      path: "/",
-	      response: [
-		{
-		  "id_tool": "integer",
-		  "id_user":"integer",
-		  "tool_name": "string",
-		  "tool_price_unit": "integer",
-		  "tool_quantity": "integer",
-		  "tool_discount": "integer",
-		  "tool_price_discount": "integer",
-		  "tool_total_price": "integer",
-		  "date_tool_buy": "date"
-		}
-	      ]
+	      response: [{
+		"id_tool": "long",
+		"name":"string",
+		"tool_name": "string",
+		"tool_price_unit": "long",
+		"tool_quantity": "long",
+		"tool_discount": "long",
+		"tool_price_discount": "long",
+		"tool_total_price": "long",
+		"date_tool_buy": "date",
+		"period":"month"
+	      }]
 	   - Get Tool By Id
 	      method: "GET",
 	      path: "/:id_tool",
 	      response: {
-		"id_tool": "integer",
-		"id_user":"integer",
+		"id_tool": "long",
+		"name":"string",
 		"tool_name": "string",
-		"tool_price_unit": "integer",
-		"tool_quantity": "integer",
-		"tool_discount": "integer",
-		"tool_price_discount": "integer",
-		"tool_total_price": "integer",
-		"date_tool_buy": "date"
+		"tool_price_unit": "long",
+		"tool_quantity": "long",
+		"tool_discount": "long",
+		"tool_price_discount": "long",
+		"tool_total_price": "long",
+		"date_tool_buy": "date",
+		"period":"month"
 	      }
+	   - Get Tool By Date Buy
+	      method: "GET",
+	      path: "/date/:date_tool_buy",
+	      response: [{
+		"id_tool": "long",
+		"name":"string",
+		"tool_name": "string",
+		"tool_price_unit": "long",
+		"tool_quantity": "long",
+		"tool_discount": "long",
+		"tool_price_discount": "long",
+		"tool_total_price": "long",
+		"date_tool_buy": "date",
+		"period":"month"
+	      }]
+	   - Get Tool By Month
+	      method: "GET",
+	      path: "/month/:period",
+	      response: [{
+		"id_tool": "long",
+		"name":"string",
+		"tool_name": "string",
+		"tool_price_unit": "long",
+		"tool_quantity": "long",
+		"tool_discount": "long",
+		"tool_price_discount": "long",
+		"tool_total_price": "long",
+		"date_tool_buy": "date",
+		"period":"month"
+	      }]
 	   - Update Tool By Id
 	      method: "PUT",
 	      path: "/update/:id_tool",
 	      request_body: {
+	        "id_user": "long"
 		"tool_name": "string",
-		"tool_price_unit": "integer",
-		"tool_quantity": "integer",
-		"tool_discount": "integer",
-		"tool_price_discount": "integer",
-		"tool_total_price": "integer",
-		"date_tool_buy": "date"
+		"tool_price_unit": "long",
+		"tool_quantity": "long",
+		"tool_discount": "long",
+		"tool_price_discount": "long",
+		"tool_total_price": "long",
+		"date_tool_buy": "date",		
 	      },
 	      response: {
-		"id_tool": "integer",
-		"id_user":"integer",
+		"id_tool": "long",
+		"name":"string",
 		"tool_name": "string",
-		"tool_price_unit": "integer",
-		"tool_quantity": "integer",
-		"tool_discount": "integer",
-		"tool_price_discount": "integer",
-		"tool_total_price": "integer",
-		"date_tool_buy": "date"
+		"tool_price_unit": "long",
+		"tool_quantity": "long",
+		"tool_discount": "long",
+		"tool_price_discount": "long",
+		"tool_total_price": "long",
+		"date_tool_buy": "date",
+		"period":"month"
 	      }
 	   - Delete Tool By Id
 	      method: "DELETE",
@@ -352,148 +439,222 @@ Kontrak API:
 	      method: "POST",
 	      path: "/create",
 	      request_body: {
+	        "id_user": "long"
 		"foodstuff_name": "string",
-		"foodstuff_price_unit": "integer",
-		"foodstuff_quantity": "integer",
-		"foodstuff_discount": "integer",
-		"foodstuff_price_discount": "integer",
-		"foodstuff_total_price": "integer",
-		"date_foodstuff_buy": "date"
+		"foodstuff_price_unit": "long",
+		"foodstuff_quantity": "long",
+		"foodstuff_discount": "long",
+		"foodstuff_price_discount": "long",
+		"foodstuff_total_price": "long",
+		"date_foodstuff_buy": "date",		
 	      },
 	      response: {
-		"id_foodstuff": "integer",
-		"id_user":"integer",
+		"id_foodstuff": "long",
+		"name": "string",
 		"foodstuff_name": "string",
-		"foodstuff_price_unit": "integer",
-		"foodstuff_quantity": "integer",
-		"foodstuff_discount": "integer",
-		"foodstuff_price_discount": "integer",
-		"foodstuff_total_price": "integer",
-		"date_foodstuff_buy": "date"
+		"foodstuff_price_unit": "long",
+		"foodstuff_quantity": "long",
+		"foodstuff_discount": "long",
+		"foodstuff_price_discount": "long",
+		"foodstuff_total_price": "long",
+		"date_foodstuff_buy": "date",
+		"period": "month"
 	      }
 	   - Get All Foodstuffs
 	      method: "GET",
 	      path: "/",
-	      response: [
-		{
-		  "id_foodstuff": "integer",
-		  "id_user": "integer"
-		  "foodstuff_name": "string",
-		  "foodstuff_price_unit": "integer",
-		  "foodstuff_quantity": "integer",
-		  "foodstuff_discount": "integer",
-		  "foodstuff_price_discount": "integer",
-		  "foodstuff_total_price": "integer",
-		  "date_foodstuff_buy": "date",
-		}
-	      ]
+	      response: [{
+		"id_foodstuff": "long",
+		"name": "string",
+		"foodstuff_name": "string",
+		"foodstuff_price_unit": "long",
+		"foodstuff_quantity": "long",
+		"foodstuff_discount": "long",
+		"foodstuff_price_discount": "long",
+		"foodstuff_total_price": "long",
+		"date_foodstuff_buy": "date",
+		"period": "month"
+	      }]
 	   - Get Foodstuff By Id
 	      method: "GET",
 	      path: "/:id_foodstuff",
 	      response: {
-		"id_foodstuff": "integer",
-		"id_user": "integer",
+		"id_foodstuff": "long",
+		"name": "string",
 		"foodstuff_name": "string",
-		"foodstuff_price_unit": "integer",
-		"foodstuff_quantity": "integer",
-		"foodstuff_discount": "integer",
-		"foodstuff_price_discount": "integer",
-		"foodstuff_total_price": "integer",
-		"date_foodstuff_buy": "date"
+		"foodstuff_price_unit": "long",
+		"foodstuff_quantity": "long",
+		"foodstuff_discount": "long",
+		"foodstuff_price_discount": "long",
+		"foodstuff_total_price": "long",
+		"date_foodstuff_buy": "date",
+		"period": "month"
 	      }
+	   - Get Foodstuff By Date Buy
+	      method: "GET",
+	      path: "/date/:date_foodstuff_buy",
+	      response: [{
+		"id_foodstuff": "long",
+		"name": "string",
+		"foodstuff_name": "string",
+		"foodstuff_price_unit": "long",
+		"foodstuff_quantity": "long",
+		"foodstuff_discount": "long",
+		"foodstuff_price_discount": "long",
+		"foodstuff_total_price": "long",
+		"date_foodstuff_buy": "date",
+		"period": "month"
+	      }]
+	   - Get Foodstuff By Month
+	      method: "GET",
+	      path: "/month/:period",
+	      response: [{
+		"id_foodstuff": "long",
+		"name": "string",
+		"foodstuff_name": "string",
+		"foodstuff_price_unit": "long",
+		"foodstuff_quantity": "long",
+		"foodstuff_discount": "long",
+		"foodstuff_price_discount": "long",
+		"foodstuff_total_price": "long",
+		"date_foodstuff_buy": "date",
+		"period": "month"
+	      }]
 	   - Update Foodstuff By Id
 	      method: "PUT",
 	      path: "/update/:id_foodstuff",
 	      request_body: {
+	        "id_user": "long"
 		"foodstuff_name": "string",
-		"foodstuff_price_unit": "integer",
-		"foodstuff_quantity": "integer",
-		"foodstuff_discount": "integer",
-		"foodstuff_price_discount": "integer",
-		"foodstuff_total_price": "integer",
-		"date_foodstuff_buy": "date"
+		"foodstuff_price_unit": "long",
+		"foodstuff_quantity": "long",
+		"foodstuff_discount": "long",
+		"foodstuff_price_discount": "long",
+		"foodstuff_total_price": "long",
+		"date_foodstuff_buy": "date",		
 	      },
 	      response: {
-		"id_foodstuff": "integer",
-		"id_user": "integer"
+		"id_foodstuff": "long",
+		"name": "string",
 		"foodstuff_name": "string",
-		"foodstuff_price_unit": "integer",
-		"foodstuff_quantity": "integer",
-		"foodstuff_discount": "integer",
-		"foodstuff_price_discount": "integer",
-		"foodstuff_total_price": "integer",
-		"date_foodstuff_buy": "date"
+		"foodstuff_price_unit": "long",
+		"foodstuff_quantity": "long",
+		"foodstuff_discount": "long",
+		"foodstuff_price_discount": "long",
+		"foodstuff_total_price": "long",
+		"date_foodstuff_buy": "date",
+		"period": "month"
 	      }
 	   - Delete Foodstuff By Id
 	      method: "DELETE",
 	      path: "/delete/:id_foodstuff"
+
 7. Purchase
 	BaseUrl: "/api/purchases",
-	   - Create Purchase
-	      method: "POST",
-	      path: "/create",
-	      request_body: {
-		"id_foodstuff": "integer",
-		"id_tool": "integer"
-		"date_purchase": "date",
-		"purchase_total_price": "integer"	
-	      },
-	      response: {
-		"id_purchase": "integer",
-		"id_foodstuff": "integer",
-		"id_user": "integer"
-		"id_tool": "integer",
-		"date_purchase": "date",
-		"purchase_total_price": "integer",
-	      }
 	   - Get All Purchases
 	      method: "GET",
 	      path: "/",
 	      response: [
 		{
-		  "id_purchase": "integer",
-		  "id_foodstuff": "integer",
-		  "id_tool": "integer",
-		  "id_user": "integer"
+		  "id_purchase": "long",
+		  "foodstuff":{
+		  	"id_foodstuff": "long",
+			"name": "string",
+			"foodstuff_name": "string",
+			"foodstuff_price_unit": "long",
+			"foodstuff_quantity": "long",
+			"foodstuff_discount": "long",
+			"foodstuff_price_discount": "long",
+			"foodstuff_total_price": "long",
+			"date_foodstuff_buy": "date",
+			"period": "month"
+		  },
+		  "tool":{
+			"id_tool": "long",
+			"name":"string",
+			"tool_name": "string",
+			"tool_price_unit": "long",
+			"tool_quantity": "long",
+			"tool_discount": "long",
+			"tool_price_discount": "long",
+			"tool_total_price": "long",
+			"date_tool_buy": "date",
+			"period":"month"
+		  },
+		  "name": "string",
+		  "purchase_total_price": "long",
 		  "date_purchase": "date",
-		  "purchase_total_price": "integer"
+		  "period": "month"
 		}
 	      ]
 	   - Get Purchase By Date
 	      method: "GET",
 	      path: "/date/:date_purchase",
-	      response: [
-		{
-		  "id_purchase": "integer",
-		  "id_foodstuff": "integer",
-		  "id_tool": "integer",
-		  "id_user": "integer",
+	      response: {
+		  "id_purchase": "long",
+		  "foodstuff":{
+		  	"id_foodstuff": "long",
+			"name": "string",
+			"foodstuff_name": "string",
+			"foodstuff_price_unit": "long",
+			"foodstuff_quantity": "long",
+			"foodstuff_discount": "long",
+			"foodstuff_price_discount": "long",
+			"foodstuff_total_price": "long",
+			"date_foodstuff_buy": "date",
+			"period": "month"
+		  },
+		  "tool":{
+			"id_tool": "long",
+			"name":"string",
+			"tool_name": "string",
+			"tool_price_unit": "long",
+			"tool_quantity": "long",
+			"tool_discount": "long",
+			"tool_price_discount": "long",
+			"tool_total_price": "long",
+			"date_tool_buy": "date",
+			"period":"month"
+		  },
+		  "name": "string",
+		  "purchase_total_price": "long",
 		  "date_purchase": "date",
-		  "purchase_total_price": "integer"	  
+		  "period": "month"
 		}
-	      ]
-	      - Update Purchase By Id
-		      method: "PUT",
-		      path: "/update/:id_purchase",
-		      request_body: {
-			"id_foodstuff": "integer",
-			"id_tool": "integer",
-			"id_user": "integer",
-			"date_purchase": "date",
-			"purchase_total_price": "integer"
-			
-		      },
-		      response: {
-			"id_purchase": "integer",
-			"id_foodstuff": "integer",
-			"id_tool": "integer",
-			"id_user": "integer",
-			"date_purchase": "date",
-			"purchase_total_price": "integer",
-		      }
-	     - Delete Purchase By Id
-		       method: "DELETE",
-		       path: "/delete/:id_purchase"
+	- Get Purchase By Month
+	      method: "GET",
+	      path: "/month/:period",
+	      response: {
+		  "id_purchase": "long",
+		  "foodstuff":{
+		  	"id_foodstuff": "long",
+			"name": "string",
+			"foodstuff_name": "string",
+			"foodstuff_price_unit": "long",
+			"foodstuff_quantity": "long",
+			"foodstuff_discount": "long",
+			"foodstuff_price_discount": "long",
+			"foodstuff_total_price": "long",
+			"date_foodstuff_buy": "date",
+			"period": "month"
+		  },
+		  "tool":{
+			"id_tool": "long",
+			"name":"string",
+			"tool_name": "string",
+			"tool_price_unit": "long",
+			"tool_quantity": "long",
+			"tool_discount": "long",
+			"tool_price_discount": "long",
+			"tool_total_price": "long",
+			"date_tool_buy": "date",
+			"period":"month"
+		  },
+		  "name": "string",
+		  "purchase_total_price": "long",
+		  "date_purchase": "date",
+		  "period": "month"
+	     }
 8. Profits
 	BaseUrl: "/api/profits",
 	   - Get All Profits
@@ -501,31 +662,145 @@ Kontrak API:
 	      path: "/",
 	      response: [
 		{
-		  "id_profit": "integer",
-		  "id_purchase": "integer",
-		  "id_sales": "integer",
-		  "id_user": "integer",
+		  "id_profit": "long",
+		  "purchases":{
+			  "id_purchase": "long",
+			  "foodstuff":{
+			  	"id_foodstuff": "long",
+				"name": "string",
+				"foodstuff_name": "string",
+				"foodstuff_price_unit": "long",
+				"foodstuff_quantity": "long",
+				"foodstuff_discount": "long",
+				"foodstuff_price_discount": "long",
+				"foodstuff_total_price": "long",
+				"date_foodstuff_buy": "date",
+				"period": "month"
+			  },
+			  "tool":{
+				"id_tool": "long",
+				"name":"string",
+				"tool_name": "string",
+				"tool_price_unit": "long",
+				"tool_quantity": "long",
+				"tool_discount": "long",
+				"tool_price_discount": "long",
+				"tool_total_price": "long",
+				"date_tool_buy": "date",
+				"period":"month"
+			  },
+			  "name": "string",
+			  "purchase_total_price": "long",
+			  "date_purchase": "date",
+			  "period": "month"
+		  },
+		  "sales":{
+		  	"id_sales": "long",
+			"name": "String",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"leftover_food_sale": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"leftover_drink_sale":"long",
+			"total_sales_drinks_price":"long",
+			"total_sales_price": "long",
+			"date_sales": "date",
+			"period": "month"
+		  },
+		  "name": "string",
+		  "total_profits": "long",
+		  "total_loss": "long",
 		  "date_profit": "date",
-		  "total_profits": "integer"
+		  "period": "month"
 		}
 	      ]
 	   - Get Profit By Date
 	      method: "GET",
 	      path: "/date/:date_profit",
 	      response: {
-		"id_profit": "integer",
-		"id_purchase": "integer",
-		"id_sales": "integer",
-		"id_user": "integer",
-		"date_profit": "date",
-		"total_profits": "integer"
-	      }
+		  "id_profit": "long",
+		  "purchases":{
+			  "id_purchase": "long",
+			  "foodstuff":{
+			  	"id_foodstuff": "long",
+				"name": "string",
+				"foodstuff_name": "string",
+				"foodstuff_price_unit": "long",
+				"foodstuff_quantity": "long",
+				"foodstuff_discount": "long",
+				"foodstuff_price_discount": "long",
+				"foodstuff_total_price": "long",
+				"date_foodstuff_buy": "date",
+				"period": "month"
+			  },
+			  "tool":{
+				"id_tool": "long",
+				"name":"string",
+				"tool_name": "string",
+				"tool_price_unit": "long",
+				"tool_quantity": "long",
+				"tool_discount": "long",
+				"tool_price_discount": "long",
+				"tool_total_price": "long",
+				"date_tool_buy": "date",
+				"period":"month"
+			  },
+			  "name": "string",
+			  "purchase_total_price": "long",
+			  "date_purchase": "date",
+			  "period": "month"
+		  },
+		  "sales":{
+		  	"id_sales": "long",
+			"name": "String",
+			"food_name": "string",
+			"total_sales_foods": "long",
+			"leftover_food_sale": "long",
+			"total_sales_foods_price":"long",
+			"drink_name": "string",
+			"total_sales_drinks":"long",
+			"leftover_drink_sale":"long",
+			"total_sales_drinks_price":"long",
+			"total_sales_price": "long",
+			"date_sales": "date",
+			"period": "month"
+		  },
+		  "name": "string",
+		  "total_profits": "long",
+		  "total_loss": "long",
+		  "date_profit": "date",
+		  "period": "month"
+	}
 
 
 
 
 Rumus : 
-1. total_sales_price= food_total_price+drink_total_price
-2. total_purchase_price= material_total_price+tool_total_price
-2. total_profits= total_sales-total_purchase
+    1. Harga Total Setelah Diskon untuk Foodstuff:
+       foodstuff_total_price = (foodstuff_price_unit - foodstuff_price_discount) × foodstuff_quantity
+    2. Harga Total Setelah Diskon untuk Tool:
+       tool_total_price = (tool_price_unit - tool_price_discount) × tool_quantity
+    3. Total Harga Pembelian (purchase_total_price):
+        purchase_total_price = foodstuff_total_price + tool_total_price
+    4. Total Harga Penjualan Makanan (food):
+       total_sales_foods_price = total_sales_foods × food_price_unit
+       (dimana food_price_unit adalah harga per unit makanan yang dijual)
+    5. Total Harga Penjualan Minuman (drinks):
+       total_sales_drinks_price = total_sales_drinks × drink_price_unit
+       (dimana drink_price_unit adalah harga per unit minuman yang dijual)
+    6. Total Harga Penjualan (total_sales_price):
+       total_sales_price = total_sales_foods_price + total_sales_drinks_price
+    7. Total Profits
+       total_profits = total_sales_price - purchase_total_price
+    8. Total Loss
+    	- Kerugian Penjualan Makanan (food):
+    	  food_loss = leftover_food_sale × food_price
+    	- Kerugian Penjualan Minuman (drinks):
+	  drink_loss = leftover_drink_sale × drink_price
+	- Total Loss
+	  total_loss= food_loss + drink_loss
+
+
 
