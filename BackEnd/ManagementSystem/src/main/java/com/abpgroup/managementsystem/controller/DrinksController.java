@@ -48,6 +48,50 @@ public class DrinksController {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve drinks: " + e.getMessage());
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CommonResponse<?>> getDrinksById(@PathVariable Long id) {
+        try {
+            DrinksResponseDTO drinksResponseDTO = drinksService.getDrinksById(id);
+            CommonResponse<DrinksResponseDTO> commonResponse = CommonResponse.<DrinksResponseDTO>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully retrieved drinks")
+                    .data(Optional.of(drinksResponseDTO))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve drinks: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<CommonResponse<?>> updateDrinks(@PathVariable Long id, @RequestBody DrinksRequestDTO drinksRequestDTO) {
+        try {
+            DrinksResponseDTO drinksResponseDTO = drinksService.updateDrinks(id, drinksRequestDTO);
+            CommonResponse<DrinksResponseDTO> commonResponse = CommonResponse.<DrinksResponseDTO>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully updated drinks")
+                    .data(Optional.of(drinksResponseDTO))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update drinks: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CommonResponse<?>> deleteDrinks(@PathVariable Long id) {
+        try {
+            drinksService.deleteDrinks(id);
+            CommonResponse<?> commonResponse = CommonResponse.builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully deleted drinks")
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete drinks: " + e.getMessage());
+        }
+    }
     private ResponseEntity<CommonResponse<?>> createErrorResponse(HttpStatus status, String errorMessage) {
         CommonResponse<?> errorResponse = CommonResponse.builder()
                 .statusCode(status.value())

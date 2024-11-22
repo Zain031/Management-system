@@ -48,8 +48,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UsersResponseDTO register(UsersRequestDTO userRequest) {
+        if (userRequest.getEmail() == null || userRequest.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+
+        if (userRequest.getPassword() == null || userRequest.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+
+        if (userRequest.getName() == null || userRequest.getName().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
+        if (userRequest.getRole() == null || userRequest.getRole().isEmpty()) {
+            throw new IllegalArgumentException("Role cannot be empty");
+        }
+
         if (!isValidRole(userRequest.getRole())) {
-            throw new IllegalArgumentException("Invalid role specified");
+            throw new IllegalArgumentException("Invalid role specified, must be SUPER_ADMIN or ADMIN");
         }
 
         Users user = Users.builder()

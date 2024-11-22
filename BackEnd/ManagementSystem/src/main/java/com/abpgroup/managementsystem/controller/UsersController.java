@@ -101,21 +101,6 @@ public class UsersController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<CommonResponse<?>> loginUser(@RequestBody LoginRequestDTO loginRequestDTO) {
-        try {
-            LoginResponseDTO loginResponseDTO = authService.login(loginRequestDTO);
-            CommonResponse<LoginResponseDTO> commonResponse = CommonResponse.<LoginResponseDTO>builder()
-                    .statusCode(HttpStatus.OK.value())
-                    .message("Successfully logged in")
-                    .data(Optional.of(loginResponseDTO))
-                    .build();
-            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-        } catch (Exception e) {
-            return createErrorResponse(HttpStatus.BAD_REQUEST, "Failed to login: " + e.getMessage());
-        }
-    }
-
     private ResponseEntity<CommonResponse<?>> createErrorResponse(HttpStatus status, String errorMessage) {
         CommonResponse<?> errorResponse = CommonResponse.builder()
                 .statusCode(status.value())
