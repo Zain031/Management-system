@@ -28,8 +28,4 @@ public class DrinksRequestDTO {
     @JsonProperty("drink_price")
     private Long drinkPrice;
 
-    @NotNull(message = "Total drink is required")
-    @Positive(message = "Total drink must be a positive number")
-    @JsonProperty("total_drink")
-    private Long totalDrink;
 }

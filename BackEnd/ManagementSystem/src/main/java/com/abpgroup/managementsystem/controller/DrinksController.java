@@ -34,7 +34,7 @@ public class DrinksController {
             return createErrorResponse(HttpStatus.BAD_REQUEST, "Failed to create drinks: " + e.getMessage());
         }
     }
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<CommonResponse<?>> getAllDrinks() {
         try {
             List<DrinksResponseDTO> drinksResponseDTOList = drinksService.getAllDrinks();
@@ -79,7 +79,7 @@ public class DrinksController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<CommonResponse<?>> deleteDrinks(@PathVariable Long id) {
         try {
             drinksService.deleteDrinks(id);

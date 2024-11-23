@@ -19,8 +19,4 @@ public class DrinksResponseDTO {
     private String drinkName;
     @JsonProperty("drink_price")
     private Long drinkPrice;
-    @JsonProperty("total_drink")
-    private Long totalDrink;
-    @JsonProperty("total_drink_price")
-    private Long totalDrinkPrice;
 }

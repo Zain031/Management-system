@@ -1,6 +1,7 @@
 package com.abpgroup.managementsystem.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -22,16 +23,20 @@ public class Sales {
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name = "id_food", nullable = false)
-    private Foods food;
+    @JoinColumn(name = "id_food_sales", nullable = false)
+    private FoodSales foodSales;
 
     @ManyToOne
-    @JoinColumn(name = "id_drink", nullable = false)
-    private Drinks drink;
+    @JoinColumn(name = "id_drink_sales", nullable = false)
+    private DrinkSales drinkSales;
 
     @Column(name="total_sales_price", nullable = false)
     private Long totalSalesPrice;
 
     @Column(name = "date_price", nullable = false)
-    private LocalDate datePrice;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateSalesPrice;
+
+    @Column(name="period", nullable = false)
+    private String period;
 }

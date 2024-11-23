@@ -26,9 +26,4 @@ public class Drinks {
     @Column(name = "drink_price", nullable = false)
     private Long drinkPrice;
 
-    @Column(name = "total_drink" ,nullable = false)
-    private Long totalDrink;
-
-    @Column(name = "total_drink_price", nullable = false)
-    private Long totalDrinkPrice;
 }

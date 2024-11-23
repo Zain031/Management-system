@@ -30,6 +30,8 @@ public class SecurityConfiguration {
             APIUrl.BASE_URL_PURCHASE+"/**",
             APIUrl.BASE_URL_PROFIT+"/**",
             APIUrl.BASE_URL_SALES+"/**",
+            APIUrl.BASE_URL_SALES_FOODS+"/**",
+            APIUrl.BASE_URL_SALES_DRINKS+"/**",
             APIUrl.BASE_URL_TOOL+"/**",
             "/swagger-ui/**",
             "/docs/**",
@@ -50,6 +52,7 @@ public class SecurityConfiguration {
         HttpSecurity httpSecurity = http
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URL).permitAll()

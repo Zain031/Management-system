@@ -25,10 +25,4 @@ public class Foods {
 
     @Column(name = "food_price", nullable = false)
     private Long foodPrice;
-
-    @Column(name = "total_food", nullable = false)
-    private Long totalFood;
-
-    @Column(name = "total_food_price", nullable = false)
-    private Long totalFoodPrice;
 }

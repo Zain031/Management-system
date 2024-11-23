@@ -29,10 +29,6 @@ public class DrinksServiceImpl implements DrinksService {
             throw new IllegalArgumentException("Drink price must be greater than zero");
         }
 
-        if (drinksRequestDTO.getTotalDrink() <= 0) {
-            throw new IllegalArgumentException("Total drink quantity must be greater than zero");
-        }
-
         Users user = usersRepository.findById(drinksRequestDTO.getIdUser())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -40,8 +36,6 @@ public class DrinksServiceImpl implements DrinksService {
                 .user(user)
                 .drinkName(drinksRequestDTO.getDrinkName())
                 .drinkPrice(drinksRequestDTO.getDrinkPrice())
-                .totalDrink(drinksRequestDTO.getTotalDrink())
-                .totalDrinkPrice(drinksRequestDTO.getDrinkPrice() * drinksRequestDTO.getTotalDrink())
                 .build();
 
         drinksRepository.save(drinks);
@@ -69,8 +63,6 @@ public class DrinksServiceImpl implements DrinksService {
         drinks.setUser(user);
         drinks.setDrinkName(drinksRequestDTO.getDrinkName());
         drinks.setDrinkPrice(drinksRequestDTO.getDrinkPrice());
-        drinks.setTotalDrink(drinksRequestDTO.getTotalDrink());
-        drinks.setTotalDrinkPrice(drinksRequestDTO.getDrinkPrice() * drinksRequestDTO.getTotalDrink());
         drinksRepository.save(drinks);
         return convertToResponse(drinks);
     }
@@ -89,8 +81,6 @@ public class DrinksServiceImpl implements DrinksService {
                 .usersResponseDTO(convertToUsersResponseDTO(drinks.getUser()))
                 .drinkName(drinks.getDrinkName())
                 .drinkPrice(drinks.getDrinkPrice())
-                .totalDrink(drinks.getTotalDrink())
-                .totalDrinkPrice(drinks.getTotalDrinkPrice())
                 .build();
     }
 

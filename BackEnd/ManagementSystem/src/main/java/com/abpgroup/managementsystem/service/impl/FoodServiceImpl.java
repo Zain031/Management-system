@@ -2,6 +2,7 @@ package com.abpgroup.managementsystem.service.impl;
 
 import com.abpgroup.managementsystem.model.dto.request.FoodsRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.FoodsResponseDTO;
+import com.abpgroup.managementsystem.model.dto.response.UsersResponseDTO;
 import com.abpgroup.managementsystem.model.entity.Foods;
 import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.FoodsRepository;
@@ -27,18 +28,12 @@ public class FoodServiceImpl implements FoodService {
             throw new IllegalArgumentException("Food price must be greater than zero");
         }
 
-        if (foodsRequestDTO.getTotalFood() <= 0) {
-            throw new IllegalArgumentException("Total food quantity must be greater than zero");
-        }
-
         Users user = usersRepository.findById(foodsRequestDTO.getIdUser())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Foods foods = Foods.builder()
                 .user(user)
                 .foodName(foodsRequestDTO.getFoodName())
                 .foodPrice(foodsRequestDTO.getFoodPrice())
-                .totalFood(foodsRequestDTO.getTotalFood())
-                .totalFoodPrice(foodsRequestDTO.getFoodPrice() * foodsRequestDTO.getTotalFood())
                 .build();
         foodsRepository.save(foods);
         return convertToResponse(foods);
@@ -60,8 +55,6 @@ public class FoodServiceImpl implements FoodService {
                 .orElseThrow(() -> new IllegalArgumentException("Foods not found"));
         foods.setFoodName(foodsRequestDTO.getFoodName());
         foods.setFoodPrice(foodsRequestDTO.getFoodPrice());
-        foods.setTotalFood(foodsRequestDTO.getTotalFood());
-        foods.setTotalFoodPrice(foodsRequestDTO.getFoodPrice() * foodsRequestDTO.getTotalFood());
         foodsRepository.save(foods);
         return convertToResponse(foods);
     }
@@ -76,11 +69,19 @@ public class FoodServiceImpl implements FoodService {
 
     private FoodsResponseDTO convertToResponse(Foods foods) {
         return FoodsResponseDTO.builder()
+                .usersResponseDTO(convertToResponse(foods.getUser()))
                 .idFood(foods.getIdFood())
                 .foodName(foods.getFoodName())
                 .foodPrice(foods.getFoodPrice())
-                .totalFood(foods.getTotalFood())
-                .totalFoodPrice(foods.getTotalFoodPrice())
+                .build();
+    }
+
+    private UsersResponseDTO convertToResponse(Users user) {
+        return UsersResponseDTO.builder()
+                .idUser(user.getIdUser())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole().name())
                 .build();
     }
 }

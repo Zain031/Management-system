@@ -34,7 +34,7 @@ public class FoodsController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<CommonResponse<?>> getAllFoods() {
         try {
             List<FoodsResponseDTO> foodResponseDTOList = foodsService.getAllFoods();

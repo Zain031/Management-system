@@ -28,8 +28,4 @@ public class FoodsRequestDTO {
     @JsonProperty("food_price")
     private Long foodPrice;
 
-    @NotNull(message = "Total food is required")
-    @Positive(message = "Total food must be a positive number")
-    @JsonProperty("total_food")
-    private Long totalFood;
 }
