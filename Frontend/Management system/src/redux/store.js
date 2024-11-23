@@ -1,23 +1,23 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authSlice from "../redux/feature/AuthSlice";
-import foodStuffsSlice from "../redux/feature/FoodStuffsSlice";
-import purchaseSlice from "../redux/feature/PurchaseSlice";
-import drinksSlice from "../redux/feature/DrinksSlice";
-import profitsSlice from "../redux/feature/ProfitsSlice";
-import salesSlice from "../redux/feature/SalesSlice";
-import toolsSlice from "../redux/feature/ToolsSlice";
-import foodSlice from "../redux/feature/FoodsSlice";
+import authReducer from "../redux/feature/AuthSlice";
+import foodStuffsReducer from "../redux/feature/FoodStuffsSlice";
+import purchaseReducer from "../redux/feature/PurchaseSlice";
+import drinksReducer from "../redux/feature/DrinksSlice";
+import profitsReducer from "../redux/feature/ProfitsSlice";
+import salesReducer from "../redux/feature/SalesSlice";
+import toolsReducer from "../redux/feature/ToolsSlice";
+import foodsReducer from "../redux/feature/FoodsSlice";
 
 const store = configureStore({
     reducer: {
-        auth: authSlice.reducer,
-        foodStuffs: foodStuffsSlice.reducer,
-        purchases: purchaseSlice.reducer,
-        drinks: drinksSlice.reducer,
-        profits: profitsSlice.reducer,
-        sales: salesSlice.reducer,
-        tools: toolsSlice.reducer,
-        foods: foodSlice.reducer,
+        auth: authReducer,
+        foodStuffs: foodStuffsReducer,
+        purchases: purchaseReducer,
+        drinks: drinksReducer,
+        profits: profitsReducer,
+        sales: salesReducer,
+        tools: toolsReducer,
+        foods: foodsReducer,
     },
 });
 

@@ -7,6 +7,7 @@ import {
     Coffee,
     HandPlatter,
     LayoutDashboard,
+    UserPlus,
     Utensils,
     UtensilsCrossed,
 } from "lucide-react";
@@ -42,6 +43,12 @@ function SidebarMenu() {
                 <NavLink to="/State-cooperation">
                     <HandPlatter size={30} strokeWidth={1.5} />
                     FoodStuff
+                </NavLink>
+            </li>
+            <li>
+                <NavLink to="/State-cooperation">
+                    <UserPlus  size={30} strokeWidth={1.5} />
+                    Create Users
                 </NavLink>
             </li>
         </>

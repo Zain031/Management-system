@@ -1,15 +1,27 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/axios";
 
+// Helper functions
+const saveToLocalStorage = (key, value) => {
+    if (value) {
+        localStorage.setItem(key, JSON.stringify(value));
+    } else {
+        localStorage.removeItem(key);
+    }
+};
+
 // Login action
 export const login = createAsyncThunk(
     "auth/login",
     async (data, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.post(`/auth/login`, data);
-            return response.data;
+
+            console.log("🚀 ~ response:", response);
+
+            return response
         } catch (e) {
-            return rejectWithValue(e.response?.data || "Login failed");
+            return rejectWithValue(e || "Login failed");
         }
     }
 );
@@ -22,7 +34,9 @@ export const register = createAsyncThunk(
             const response = await axiosInstance.post(`/auth/register`, data);
             return response.data;
         } catch (e) {
-            return rejectWithValue(e.response?.data || "Registration failed");
+            return rejectWithValue(
+                e.response?.data?.message || "Registration failed"
+            );
         }
     }
 );
@@ -35,7 +49,9 @@ export const fetchUsers = createAsyncThunk(
             const response = await axiosInstance.get(`/auth/users`);
             return response.data;
         } catch (e) {
-            return rejectWithValue(e.response?.data || "Failed to fetch users");
+            return rejectWithValue(
+                e.response?.data?.message || "Failed to fetch users"
+            );
         }
     }
 );
@@ -48,7 +64,10 @@ export const fetchUsersById = createAsyncThunk(
             const response = await axiosInstance.get(`/auth/users/${id}`);
             return response.data;
         } catch (e) {
-            return rejectWithValue(e.response?.data || `Failed to fetch user with ID ${id}`);
+            return rejectWithValue(
+                e.response?.data?.message ||
+                    `Failed to fetch user with ID ${id}`
+            );
         }
     }
 );
@@ -61,7 +80,10 @@ export const updateUserById = createAsyncThunk(
             const response = await axiosInstance.put(`/auth/users/${id}`, data);
             return response.data;
         } catch (e) {
-            return rejectWithValue(e.response?.data || `Failed to update user with ID ${id}`);
+            return rejectWithValue(
+                e.response?.data?.message ||
+                    `Failed to update user with ID ${id}`
+            );
         }
     }
 );
@@ -91,20 +113,18 @@ const authSlice = createSlice({
             state.isLogin = !!token;
             state.role = role;
             state.user = user;
-            localStorage.setItem("token", token);
-            localStorage.setItem("role", role);
-            if (user) {
-                localStorage.setItem("user", JSON.stringify(user));
-            }
+            saveToLocalStorage("token", token);
+            saveToLocalStorage("role", role);
+            saveToLocalStorage("user", user);
         },
         logout: (state) => {
             state.isLogin = false;
             state.token = null;
             state.role = null;
             state.user = null;
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-            localStorage.removeItem("user");
+            saveToLocalStorage("token", null);
+            saveToLocalStorage("role", null);
+            saveToLocalStorage("user", null);
         },
     },
     extraReducers: (builder) => {
