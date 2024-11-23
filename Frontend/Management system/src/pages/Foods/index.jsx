@@ -1,80 +1,50 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Container from "../../components/container";
 import Header from "../../layouts/partials/header";
+import { useDispatch } from "react-redux";
+import { fetchFoods } from "../../redux/feature/FoodsSlice";
+import { useSelector } from "react-redux";
+import { deleteFood } from "../../redux/feature/FoodsSlice";
+import Swal from "sweetalert2";
 
 const Foods = () => {
-    const data = [
-        {
-            id: 1,
-            name: "Foods 1",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 2,
-            name: "Foods 2",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 3,
-            name: "Foods 3",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 4,
-            name: "Foods 4",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 5,
-            name: "Foods 5",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 6,
-            name: "Foods 6",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 7,
-            name: "Foods 7",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 8,
-            name: "Foods 8",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 9,
-            name: "Foods 9",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 10,
-            name: "Foods 10",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-    ];
+    const { foods } = useSelector((state) => state.foods);
+    console.log("🚀 ~ Foods ~ foods================.:", foods);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchFoods());
+    }, [dispatch]);
+
+    const handleDelete = async (id) => {
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await dispatch(deleteFood(id)).unwrap();
+
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Food has been deleted",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+
+                dispatch(fetchFoods());
+            } catch (error) {
+                console.error("Deleting Failed", error);
+            }
+        }
+    };
 
     return (
         <>
@@ -98,23 +68,37 @@ const Foods = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {data.map((item) => (
-                                <tr key={item.id}>
-                                    <th>{item.id}</th>
-                                    <td>{item.name}</td>
-                                    <td>{item.price}</td>
-                                    <td>{item.total_item}</td>
-                                    <td>{item.total_food_price}</td>
-                                    <td  className="flex gap-2" >
-                                        <button className="btn btn-primary">
-                                            Edit
-                                        </button>
-                                        <button className="btn btn-error text-white">
-                                            Delete
-                                        </button>
+                            {/* Check if foods is an array before mapping */}
+                            {Array.isArray(foods) && foods.length > 0 ? (
+                                foods.map((item, index) => (
+                                    <tr key={item.id_food}>
+                                        <th>{++index}</th>
+                                        <td>{item.name}</td>
+                                        <td>{item.food_price}</td>
+                                        <td>{item.total_food}</td>
+                                        <td>{item.total_food_price}</td>
+                                        <td className="flex gap-2">
+                                            <button className="btn btn-primary">
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(item.id_food)
+                                                }
+                                                className="btn btn-error text-white"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="text-center">
+                                        No foods available
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

@@ -1,40 +1,130 @@
-import React from "react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { login } from "../../redux/feature/AuthSlice";
 
 const Login = () => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [errorPassword, setErrorPassword] = useState("");
+    const [errorEmail, setErrorEmail] = useState("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const validateInputs = () => {
+        let isValid = true;
+        setErrorPassword("");
+        setErrorEmail("");
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.trim()) {
+            setErrorEmail("Email cannot be blank");
+            isValid = false;
+        } else if (!emailPattern.test(email)) {
+            setErrorEmail("Invalid email format");
+            isValid = false;
+        }
+
+        if (!password.trim()) {
+            setErrorPassword("Password cannot be blank");
+            isValid = false;
+        } else if (password.length < 6) {
+            setErrorPassword("Password must be at least 6 characters long");
+            isValid = false;
+        }
+
+        return isValid;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateInputs()) return;
+
+        try {
+            const authData = { email, password };
+            await dispatch(login(authData)).unwrap();
+
+            Swal.fire({
+                icon: "success",
+                title: "Signed in successfully",
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+            });
+
+            navigate("/");
+        } catch (err) {
+            console.log(err);
+        }
+
+        setErrorPassword(err.error);
+    };
+
     return (
-        <>
-            <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
-                <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
-                    <h1 className="font-bold text-center text-2xl mb-5">
-                        Logo/Company Name
-                    </h1>
-                    <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-                        <div className="px-5 py-7">
-                            <label className="font-semibold text-sm text-gray-600 pb-1 block">
-                                E-mail
-                            </label>
+        <div className="flex h-screen w-full bg-white">
+            <div className="mb-64 mt-40 flex items-center px-8 text-center md:px-12 lg:w-1/2 lg:text-left">
+                <div>
+                    <h2 className="py-4 text-5xl font-semibold text-gray-800">
+                        Join{" "}
+                        <span className="font-extrabold text-blue-700">
+                            Enigwed
+                        </span>{" "}
+                        and Take Your Wedding Business to the{" "}
+                        <span className="text-blue-700 underline">
+                            Next Level!
+                        </span>
+                    </h2>
+                    <p className="mt-2 text-sm text-gray-500">
+                        As a trusted wedding planner at Enigwed, you can offer
+                        unique packages to couples ready to start their journey.
+                    </p>
+
+                    <div className="xs:p-0 mx-auto mt-10 rounded-lg bg-white bg-opacity-80 p-4 shadow-md outline outline-1 outline-gray-300 md:w-3/4">
+                        <h1 className="mb-5 text-center text-2xl font-bold">
+                            Login
+                        </h1>
+                        <form className="px-5 py-7" onSubmit={handleSubmit}>
                             <input
                                 type="text"
-                                className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+                                className="mb-2 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                                placeholder="Email"
+                                value={email}
+                                required
+                                onChange={(e) => setEmail(e.target.value)}
+                                autoComplete="off"
                             />
-                            <label className="font-semibold text-sm text-gray-600 pb-1 block">
-                                Password
-                            </label>
+                            {errorEmail && (
+                                <p className="mb-4 text-center text-sm text-red-600">
+                                    {errorEmail}
+                                </p>
+                            )}
+
                             <input
-                                type="text"
-                                className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+                                type="password"
+                                className="mb-2 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                                placeholder="Password"
+                                value={password}
+                                required
+                                onChange={(e) => setPassword(e.target.value)}
+                                autoComplete="off"
                             />
-                            <button
-                                type="button"
-                                className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
-                            >
-                                <span className="inline-block mr-2">Login</span>
+                            {errorPassword && (
+                                <p className="mb-4 text-center text-sm text-red-600">
+                                    {errorPassword}
+                                </p>
+                            )}
+
+                            <button className="w-full rounded-lg bg-blue-500 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-blue-600">
+                                <span className="mr-2">Login</span>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
-                                    className="w-4 h-4 inline-block"
+                                    className="inline-block h-4 w-4"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -44,11 +134,35 @@ const Login = () => {
                                     />
                                 </svg>
                             </button>
-                        </div>
+
+                            <p className="mt-5">
+                                Don’t have an account?
+                                <Link
+                                    to="/register"
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    {" "}
+                                    Register
+                                </Link>
+                            </p>
+                        </form>
                     </div>
                 </div>
             </div>
-        </>
+
+            <div
+                className="relative hidden items-center justify-center lg:flex lg:w-1/2"
+                style={{
+                    clipPath: "polygon(10% 0, 100% 0%, 100% 100%, 0 100%)",
+                    backgroundImage:
+                        "url(https://img.freepik.com/free-psd/3d-female-character-holding-tablet-pointing-pie-chart_23-2148938905.jpg)",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                }}
+            >
+                <div className="absolute inset-0 bg-black opacity-30" />
+            </div>
+        </div>
     );
 };
 

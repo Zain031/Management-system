@@ -1,80 +1,51 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Container from "../../components/container";
 import Header from "../../layouts/partials/header";
+import { useDispatch } from "react-redux";
+import { deleteDrink, fetchDrinks } from "../../redux/feature/DrinksSlice";
+import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
+
 
 const Drinks = () => {
-    const data = [
-        {
-            id: 1,
-            name: "Drinks 1",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 2,
-            name: "Drinks 2",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 3,
-            name: "Drinks 3",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 4,
-            name: "Drinks 4",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 5,
-            name: "Drinks 5",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 6,
-            name: "Drinks 6",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 7,
-            name: "Drinks 7",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 8,
-            name: "Drinks 8",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 9,
-            name: "Drinks 9",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-        {
-            id: 10,
-            name: "Drinks 10",
-            price: 10000,
-            total_item: 10,
-            total_food_price: 100000,
-        },
-    ];
+    const { drinks } = useSelector((state) => state.drinks);
+    console.log(drinks, "=============>");
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchDrinks());
+    }, [dispatch]);
+
+
+    const handleDelete = async (id) => {
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await dispatch(deleteDrink(id)).unwrap();
+
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Drink has been deleted",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+
+                dispatch(fetchDrinks());
+            } catch (error) {
+                console.error("Deleting Failed", error);
+            }
+        }
+    };
+
 
     return (
         <>
@@ -98,23 +69,33 @@ const Drinks = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {data.map((item) => (
-                                <tr key={item.id}>
-                                    <th>{item.id}</th>
-                                    <td>{item.name}</td>
-                                    <td>{item.price}</td>
-                                    <td>{item.total_item}</td>
-                                    <td>{item.total_food_price}</td>
-                                    <td className="flex gap-2">
-                                        <button className="btn btn-primary">
-                                            Edit
-                                        </button>
-                                        <button className="btn btn-error text-white">
-                                            Delete
-                                        </button>
+                            {/* Check if drinks.data is an array before mapping */}
+                            {Array.isArray(drinks.data) &&
+                            drinks.data.length > 0 ? (
+                                drinks.data.map((item, index) => (
+                                    <tr key={item.id_drink}>
+                                        <th>{++index}</th>
+                                        <td>{item.drink_name}</td>
+                                        <td>{item.drink_price}</td>
+                                        <td>{item.total_drink}</td>
+                                        <td>{item.total_drink_price}</td>
+                                        <td className="flex gap-2">
+                                            <button className="btn btn-primary">
+                                                Edit
+                                            </button>
+                                            <button onClick={() => handleDelete(item.id_drink)} className="btn btn-error text-white">
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="text-center">
+                                        No drinks available
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
