@@ -1,5 +1,5 @@
-Kontrak API: 
-1.  Users 
+Kontrak API:
+1.  Users
 	BaseUrl: "/api/auth"
 		- Create user:
 			method: "POST"
@@ -103,7 +103,6 @@ Kontrak API:
 				"total_food_price": "long",
 			}
 		      ]
-	    
 	    	- Get food by id
 		      method: "GET",
 		      path: "/:id_food",
@@ -159,7 +158,7 @@ Kontrak API:
 		      path: "/",
 		      response: [
 			{
-				
+
 			        "id_drink": "long",
 				"name":"string",
 				"drink_name": "string",
@@ -168,7 +167,7 @@ Kontrak API:
 				"total_drink_price": "long",
 			}
 		      ]
-	    
+
 	    	- Get drink by id
 		      method: "GET",
 		      path: "/:id_drink",
@@ -284,7 +283,7 @@ Kontrak API:
 			"date_sales": "date",
 			"period": "month"
 		      }]
-		
+
 	    	- Update Sales By Id
 		      method: "PUT",
 		      path: "/update/:id_sales",
@@ -313,11 +312,11 @@ Kontrak API:
 			"date_sales": "date",
 			"period": "month"
 		      }
-	    
+
 		 - Delete Sales By Id
 		      method: "DELETE",
 		      path: "/:id_sales",
-		      
+
 5. Tools
 	BaseUrl: "/api/tools",
 	   - Create Tool
@@ -331,7 +330,7 @@ Kontrak API:
 		"tool_discount": "long",
 		"tool_price_discount": "long",
 		"tool_total_price": "long",
-		"date_tool_buy": "date",		
+		"date_tool_buy": "date",
 	      },
 	      response: {
 		"id_tool": "long",
@@ -416,7 +415,7 @@ Kontrak API:
 		"tool_discount": "long",
 		"tool_price_discount": "long",
 		"tool_total_price": "long",
-		"date_tool_buy": "date",		
+		"date_tool_buy": "date",
 	      },
 	      response: {
 		"id_tool": "long",
@@ -446,7 +445,7 @@ Kontrak API:
 		"foodstuff_discount": "long",
 		"foodstuff_price_discount": "long",
 		"foodstuff_total_price": "long",
-		"date_foodstuff_buy": "date",		
+		"date_foodstuff_buy": "date",
 	      },
 	      response: {
 		"id_foodstuff": "long",
@@ -531,7 +530,7 @@ Kontrak API:
 		"foodstuff_discount": "long",
 		"foodstuff_price_discount": "long",
 		"foodstuff_total_price": "long",
-		"date_foodstuff_buy": "date",		
+		"date_foodstuff_buy": "date",
 	      },
 	      response: {
 		"id_foodstuff": "long",
@@ -551,6 +550,23 @@ Kontrak API:
 
 7. Purchase
 	BaseUrl: "/api/purchases",
+	   - Create Purchase
+	      method: "POST",
+	      path: "/create",
+	      request_body: {
+		"id_foodstuff": "integer",
+		"id_tool": "integer"
+		"date_purchase": "date",
+		"purchase_total_price": "integer"
+	      },
+	      response: {
+		"id_purchase": "integer",
+		"id_foodstuff": "integer",
+		"id_user": "integer"
+		"id_tool": "integer",
+		"date_purchase": "date",
+		"purchase_total_price": "integer",
+	      }
 	   - Get All Purchases
 	      method: "GET",
 	      path: "/",
@@ -619,8 +635,32 @@ Kontrak API:
 		  "name": "string",
 		  "purchase_total_price": "long",
 		  "date_purchase": "date",
+		  "purchase_total_price": "integer"
 		  "period": "month"
 		}
+	      ]
+	      - Update Purchase By Id
+		      method: "PUT",
+		      path: "/update/:id_purchase",
+		      request_body: {
+			"id_foodstuff": "integer",
+			"id_tool": "integer",
+			"id_user": "integer",
+			"date_purchase": "date",
+			"purchase_total_price": "integer"
+
+		      },
+		      response: {
+			"id_purchase": "integer",
+			"id_foodstuff": "integer",
+			"id_tool": "integer",
+			"id_user": "integer",
+			"date_purchase": "date",
+			"purchase_total_price": "integer",
+		      }
+	     - Delete Purchase By Id
+		       method: "DELETE",
+		       path: "/delete/:id_purchase"
 	- Get Purchase By Month
 	      method: "GET",
 	      path: "/month/:period",
@@ -777,7 +817,7 @@ Kontrak API:
 
 
 
-Rumus : 
+Rumus :
     1. Harga Total Setelah Diskon untuk Foodstuff:
        foodstuff_total_price = (foodstuff_price_unit - foodstuff_price_discount) × foodstuff_quantity
     2. Harga Total Setelah Diskon untuk Tool:
