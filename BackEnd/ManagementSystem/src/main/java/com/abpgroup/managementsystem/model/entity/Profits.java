@@ -23,7 +23,7 @@ public class Profits {
 
     @OneToOne
     @JoinColumn(name = "id_sales", nullable = false)
-    private Sales sales;
+    private ProductSales sales;
 
     @OneToOne
     @JoinColumn(name = "id_purchase", nullable = false)

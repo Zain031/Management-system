@@ -6,17 +6,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FoodsResponseDTO {
-    @JsonProperty("id_food")
-    private Long idFood;
+@Builder
+public class ProductResponseDTO {
+    @JsonProperty("id_product")
+    private Long idProduct;
+
     @JsonProperty("user")
     private UsersResponseDTO usersResponseDTO;
-    @JsonProperty("food_name")
-    private String foodName;
-    @JsonProperty("food_price")
-    private Long foodPrice;
+
+    @JsonProperty("product_name")
+    private String productName;
+
+    @JsonProperty("product_price")
+    private Long productPrice;
+
+    @JsonProperty("categories")
+    private String categories;
 }
