@@ -520,30 +520,19 @@ Kontrak API:
 	      response: [
 		{
 		  "id_purchase": "long",
-		  "foodstuff":{
-		  	"id_foodstuff": "long",
+		  "inventory":{
+		  	"id_inventory": "long",
 			"name": "string",
-			"foodstuff_name": "string",
-			"foodstuff_price_unit": "long",
-			"foodstuff_quantity": "long",
-			"foodstuff_discount": "long",
-			"foodstuff_price_discount": "long",
-			"foodstuff_total_price": "long",
-			"date_foodstuff_buy": "date",
-			"period": "month"
-		  },
-		  "tool":{
-			"id_tool": "long",
-			"name":"string",
-			"tool_name": "string",
-			"tool_price_unit": "long",
-			"tool_quantity": "long",
-			"tool_discount": "long",
-			"tool_price_discount": "long",
-			"tool_total_price": "long",
-			"date_tool_buy": "date",
-			"period":"month"
-		  },
+			"inventory_name": "string",
+			"inventory_price_unit": "long",
+			"inventory_quantity": "long",
+			"inventory_discount": "long",
+			"inventory_price_discount": "long",
+			"inventory_total_price": "long",
+			"date_inventory_buy": "date",
+			"period": "month",
+			"category": "FOODSTUFF/TOOL"
+		  }
 		  "name": "string",
 		  "purchase_total_price": "long",
 		  "date_purchase": "date",
@@ -555,30 +544,19 @@ Kontrak API:
 	      path: "/date/:date_purchase",
 	      response: {
 		  "id_purchase": "long",
-		  "foodstuff":{
-		  	"id_foodstuff": "long",
+		  "inventory":{
+		  	"id_inventory": "long",
 			"name": "string",
-			"foodstuff_name": "string",
-			"foodstuff_price_unit": "long",
-			"foodstuff_quantity": "long",
-			"foodstuff_discount": "long",
-			"foodstuff_price_discount": "long",
-			"foodstuff_total_price": "long",
-			"date_foodstuff_buy": "date",
-			"period": "month"
-		  },
-		  "tool":{
-			"id_tool": "long",
-			"name":"string",
-			"tool_name": "string",
-			"tool_price_unit": "long",
-			"tool_quantity": "long",
-			"tool_discount": "long",
-			"tool_price_discount": "long",
-			"tool_total_price": "long",
-			"date_tool_buy": "date",
-			"period":"month"
-		  },
+			"inventory_name": "string",
+			"inventory_price_unit": "long",
+			"inventory_quantity": "long",
+			"inventory_discount": "long",
+			"inventory_price_discount": "long",
+			"inventory_total_price": "long",
+			"date_inventory_buy": "date",
+			"period": "month",
+			"category": "FOODSTUFF/TOOL"
+		  }
 		  "name": "string",
 		  "purchase_total_price": "long",
 		  "date_purchase": "date",
@@ -589,29 +567,18 @@ Kontrak API:
 	      path: "/month/:period",
 	      response: {
 		  "id_purchase": "long",
-		  "foodstuff":{
-		  	"id_foodstuff": "long",
+		  "inventory":{
+		  	"id_inventory": "long",
 			"name": "string",
-			"foodstuff_name": "string",
-			"foodstuff_price_unit": "long",
-			"foodstuff_quantity": "long",
-			"foodstuff_discount": "long",
-			"foodstuff_price_discount": "long",
-			"foodstuff_total_price": "long",
-			"date_foodstuff_buy": "date",
-			"period": "month"
-		  },
-		  "tool":{
-			"id_tool": "long",
-			"name":"string",
-			"tool_name": "string",
-			"tool_price_unit": "long",
-			"tool_quantity": "long",
-			"tool_discount": "long",
-			"tool_price_discount": "long",
-			"tool_total_price": "long",
-			"date_tool_buy": "date",
-			"period":"month"
+			"inventory_name": "string",
+			"inventory_price_unit": "long",
+			"inventory_quantity": "long",
+			"inventory_discount": "long",
+			"inventory_price_discount": "long",
+			"inventory_total_price": "long",
+			"date_inventory_buy": "date",
+			"period": "month",
+			"category": "FOODSTUFF/TOOL"
 		  },
 		  "name": "string",
 		  "purchase_total_price": "long",
