@@ -71,544 +71,323 @@ Kontrak API:
 						      "role"   :"SUPER_ADMIN"
 					}
 			}
-2. Foods
-	BaseUrl": "/api/foods",
-		- Create Food
+2. Products
+	BaseUrl": "/api/products",
+		- Create Product
 		      method: "POST",
 		      path: "/create",
 		      request_body: {
-		        "id_user":long,
-			"food_name": "string",
-			"food_price": "long"
+		        "id_user": long,
+		        "product_name": "string",
+		        "product_price": "long",
+		        "categories": "FOODS/DRINKS"
 		      },
 		      response: {
-			"id_food": "long",
-			"user"   : {
+		        "id_product": "long",
+		        "user"   : {
 				 	"id_user": "long",
 					"email": "string",
 					"name": "string",
 					"role": "SUPER_ADMIN/ADMIN"
-			 },
-			"food_name": "string",
-			"food_price": "long"
+			    },
+		        "product_name": "string",
+		        "product_price": "long",
+		        "categories": "FOODS/DRINKS"
 		      }
-	    	- Get all foods
+	    	- Get all products
 		      method: "GET",
-		      path: "/",
+		      path: "",
 		      response: [
 			{
-			        "id_food": "long",
-				"user"   : {
+			        "id_product": "long",
+			        "user"   : {
 				 	"id_user": "long",
 					"email": "string",
 					"name": "string",
 					"role": "SUPER_ADMIN/ADMIN"
 			 	},
-				"food_name": "string",
-				"food_price": "long"
+			        "product_name": "string",
+			        "product_price": "long",
+			        "categories": "FOODS/DRINKS"
 			}
 		      ]
 	    
-	    	- Get food by id
+	    	- Get product by id
 		      method: "GET",
-		      path: "/:id_food",
+		      path: "/:id_product",
 		      response: {
-			        "id_food": "long",
-				"user"   : {
+			        "id_product": "long",
+			        "user"   : {
 				 	"id_user": "long",
 					"email": "string",
 					"name": "string",
 					"role": "SUPER_ADMIN/ADMIN"
 			 	},
-				"food_name": "string",
-				"food_price": "long"
+			        "product_name": "string",
+			        "product_price": "long",
+			        "categories": "FOODS/DRINKS"
 		      }
-		- Update food by id
-		      method: "PUT",
-		      path: "/update/:id_food",
-		      request_body: {
-		        "id_user":long,
-			"food_name": "string",
-			"food_price": "long"
-		      },
-		      response: {
-			        "id_food": "long",
-				"user"   : {
-				 	"id_user": "long",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-			 	},
-				"food_name": "string",
-				"food_price": "long"
-		      }
-		 - Delete food by id
-		      method: "DELETE",
-		      path: "/delete/:id_food"
-3. Drinks
-	BaseUrl": "/api/drinks",
-		- Create Drink
-		      method: "POST",
-		      path: "/create",
-		      request_body: {
-		        "id_user":long,
-			"drink_name": "string",
-			"drink_price": "long"
-		      },
-		      response: {
-			"id_drink": "long",
-			"user"   : {
-				 	"id_user": "long",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-			 },
-			"drink_name": "string",
-			"drink_price": "long"
-		      }
-	    	- Get all drinks
+
+	    	- Get product by product_name
 		      method: "GET",
-		      path: "/",
+		      path: "/search/product_name"
 		      response: [
 			{
-				
-			        "id_drink": "long",
-				"user"   : {
+			        "id_product": "long",
+			        "user"   : {
 				 	"id_user": "long",
 					"email": "string",
 					"name": "string",
 					"role": "SUPER_ADMIN/ADMIN"
 			 	},
-				"drink_name": "string",
-				"drink_price": "long"
+			        "product_name": "string",
+			        "product_price": "long",
+			        "categories": "FOODS/DRINKS"
 			}
 		      ]
-	    
-	    	- Get drink by id
+
+	    	- Get product by categories
 		      method: "GET",
-		      path: "/:id_drink",
-		      response: {
-			"id_drink": "long",
-			"user"   : {
+		      path: "/filter/categories",
+		      response: [
+			{
+			        "id_product": "long",
+			        "user"   : {
 				 	"id_user": "long",
 					"email": "string",
 					"name": "string",
 					"role": "SUPER_ADMIN/ADMIN"
-			 },
-			"drink_name": "string",
-			"drink_price": "long"
-		      }
-		- Update drink by id
+			 	},
+			        "product_name": "string",
+			        "product_price": "long",
+			        "categories": "FOODS/DRINKS"
+			}
+		      ]
+
+		- Update product by id
 		      method: "PUT",
-		      path: "/update/:id_drink",
+		      path: "/update/:id_product",
 		      request_body: {
-		        "id_user":long,
-			"drink_name": "string",
-			"drink_price": "long"
+		        "id_user": long,
+		        "product_name": "string",
+		        "product_price": "long",
+		        "categories": "FOODS/DRINKS"
 		      },
 		      response: {
-			"id_drink": "long",
-			"user"   : {
+			        "id_product": "long",
+			        "user"   : {
 				 	"id_user": "long",
 					"email": "string",
 					"name": "string",
 					"role": "SUPER_ADMIN/ADMIN"
-			 },
-			"drink_name": "string",
-			"drink_price": "long"
+			 	},
+			        "product_name": "string",
+			        "product_price": "long",
+			        "categories": "FOODS/DRINKS"
 		      }
-		 - Delete drink by id
+
+		 - Delete product by id
 		      method: "DELETE",
-		      path: "/delete/:id_drink"
-4. Drink Sales
-	BaseUrl: "/api/sales/drinks",
-	  	- Create Drink Sales
+		      path: "/delete/:id_product"
+
+4. Product Sales
+	BaseUrl: "/api/sales/products",
+	  	- Create Product Sales
 		      method: "POST",
 		      path: "/create",
 		      request_body: {
 		        "id_user": "long",
-			"id_drink":"long",
-			"total_drink":"long",
-			"leftover_drink_sales":"long",
-			"date_drink_sales": "date"
+		        "id_product": "long",
+		        "total_product": "long",
+		        "leftover_product_sales": "long",
+		        "date_product_sales": "date"
 		      },
 		      response: {
-			"id_drink_sales": "long",
-			"user":{
+		        "id_product_sales": "long",
+		        "user": {
 					"id_user": "long",
 					"email": "string",
 					"name": "string",
 					"role": "SUPER_ADMIN/ADMIN"
-			},
-			"drink":{
-				"id_drink": "long",
-				"user"   : {
-					 	"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				 },
-				"drink_name": "string",
-				"drink_price": "long"
-			},
-			"total_drink":"long",
-			"leftover_drink_sales":"long",
-			"total_drink_sales_price":"long",
-			"date_drink_sales": "date",
-			"period": "month"
-		      }
-	    	- Get All Drinks Sales
-		      method: "GET",
-		      path: "/",
-		      response: [{
-			"id_drink_sales": "long",
-			"user":{
-					"id_user": "long",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-			},
-			"drink":{
-				"id_drink": "long",
-				"user"   : {
-					 	"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				 },
-				"drink_name": "string",
-				"drink_price": "long"
-			},
-			"total_drink":"long",
-			"leftover_drink_sales":"long",
-			"total_drink_sales_price":"long",
-			"date_drink_sales": "date",
-			"period": "month"
-		      }]
-	    	- Get Drinks Sales By Date
-		      method: "GET",
-		      path: "/date/:date_drink_sales",
-		      response: {
-			"id_drink_sales": "long",
-			"user":{
-					"id_user": "long",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-			},
-			"drink":{
-				"id_drink": "long",
-				"user"   : {
-					 	"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				 },
-				"drink_name": "string",
-				"drink_price": "long"
-			},
-			"total_drink":"long",
-			"leftover_drink_sales":"long",
-			"total_drink_sales_price":"long",
-			"date_drink_sales": "date",
-			"period": "month"
-		      }
-		 - Get Drinks Sales By Month
-		      method: "GET",
-		      path: "/month/:period",
-		      response: [{
-				"id_drink_sales": "long",
-				"user":{
+			    },
+		        "product": {
+					"id_product": "long",
+					"user": {
 						"id_user": "long",
 						"email": "string",
 						"name": "string",
 						"role": "SUPER_ADMIN/ADMIN"
-				},
-				"drink":{
-					"id_drink": "long",
-					"user"   : {
-						 	"id_user": "long",
-							"email": "string",
-							"name": "string",
-							"role": "SUPER_ADMIN/ADMIN"
-					 },
-					"drink_name": "string",
-					"drink_price": "long"
-				},
-				"total_drink":"long",
-				"leftover_drink_sales":"long",
-				"total_drink_sales_price":"long",
-				"date_drink_sales": "date",
-				"period": "month"
+					},
+					"product_name": "string",
+					"product_price": "long",
+					"categories": "FOODS/DRINKS"
+			    },
+		        "total_product": "long",
+		        "leftover_product_sales": "long",
+		        "total_product_sales_price": "long",
+		        "date_product_sales": "date",
+		        "period": "month"
+		      }
+	    	- Get All Product Sales
+		      method: "GET",
+		      path: "/",
+		      response: [{
+		        "id_product_sales": "long",
+		        "user": {
+					"id_user": "long",
+					"email": "string",
+					"name": "string",
+					"role": "SUPER_ADMIN/ADMIN"
+			    },
+		        "product": {
+					"id_product": "long",
+					"user": {
+						"id_user": "long",
+						"email": "string",
+						"name": "string",
+						"role": "SUPER_ADMIN/ADMIN"
+					},
+					"product_name": "string",
+					"product_price": "long",
+					"categories": "FOODS/DRINKS"
+			    },
+		        "total_product": "long",
+		        "leftover_product_sales": "long",
+		        "total_product_sales_price": "long",
+		        "date_product_sales": "date",
+		        "period": "month"
+		      }]
+	    	- Get Product Sales By Date
+		      method: "GET",
+		      path: "/date/:date_product_sales",
+		      response: {
+		        "id_product_sales": "long",
+		        "user": {
+					"id_user": "long",
+					"email": "string",
+					"name": "string",
+					"role": "SUPER_ADMIN/ADMIN"
+			    },
+		        "product": {
+					"id_product": "long",
+					"user": {
+						"id_user": "long",
+						"email": "string",
+						"name": "string",
+						"role": "SUPER_ADMIN/ADMIN"
+					},
+					"product_name": "string",
+					"product_price": "long",
+					"categories": "FOODS/DRINKS"
+			    },
+		        "total_product": "long",
+		        "leftover_product_sales": "long",
+		        "total_product_sales_price": "long",
+		        "date_product_sales": "date",
+		        "period": "month"
+		      }
+		 - Get Product Sales By Month
+		      method: "GET",
+		      path: "/month/:period",
+		      response: [{
+		        "id_product_sales": "long",
+		        "user": {
+					"id_user": "long",
+					"email": "string",
+					"name": "string",
+					"role": "SUPER_ADMIN/ADMIN"
+			    },
+		        "product": {
+					"id_product": "long",
+					"user": {
+						"id_user": "long",
+						"email": "string",
+						"name": "string",
+						"role": "SUPER_ADMIN/ADMIN"
+					},
+					"product_name": "string",
+					"product_price": "long",
+					"categories": "FOODS/DRINKS"
+			    },
+		        "total_product": "long",
+		        "leftover_product_sales": "long",
+		        "total_product_sales_price": "long",
+		        "date_product_sales": "date",
+		        "period": "month"
+		      }]
+		      
+		- Get Product Sales By Categories
+		      method: "GET",
+		      path: "/categories/:categories",
+		      response: [{
+		        "id_product_sales": "long",
+		        "user": {
+					"id_user": "long",
+					"email": "string",
+					"name": "string",
+					"role": "SUPER_ADMIN/ADMIN"
+			    },
+		        "product": {
+					"id_product": "long",
+					"user": {
+						"id_user": "long",
+						"email": "string",
+						"name": "string",
+						"role": "SUPER_ADMIN/ADMIN"
+					},
+					"product_name": "string",
+					"product_price": "long",
+					"categories": "FOODS/DRINKS"
+			    },
+		        "total_product": "long",
+		        "leftover_product_sales": "long",
+		        "total_product_sales_price": "long",
+		        "date_product_sales": "date",
+		        "period": "month"
 		      }]
 		
-	    	- Update Drink Sales By Id
+	    	- Update Product Sales By Id
 		      method: "PUT",
 		      path: "/update/:id_sales",
 		      request_body: {
 		        "id_user": "long",
-			"id_drink":"long",
-			"total_drink":"long",
-			"leftover_drink_sales":"long",
-			"date_drink_sales": "date"
+		        "id_product": "long",
+		        "total_product": "long",
+		        "leftover_product_sales": "long",
+		        "date_product_sales": "date"
 		      },
 		      response: {
-			"id_drink_sales": "long",
-			"user":{
+		        "id_product_sales": "long",
+		        "user": {
 					"id_user": "long",
 					"email": "string",
 					"name": "string",
 					"role": "SUPER_ADMIN/ADMIN"
-			},
-			"drink":{
-				"id_drink": "long",
-				"user"   : {
-					 	"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				 },
-				"drink_name": "string",
-				"drink_price": "long"
-			},
-			"total_drink":"long",
-			"leftover_drink_sales":"long",
-			"total_drink_sales_price":"long",
-			"date_drink_sales": "date",
-			"period": "month"
-		      }
-	    
-		 - Delete Sales By Id
-		      method: "DELETE",
-		      path: "/delete/:id_drink_sales",
-5.Food Sales
-	BaseUrl: "/api/sales/foods",
-	  	- Create Food Sales
-		      method: "POST",
-		      path: "/create",
-		      request_body: {
-		        "id_user": "long",
-			"id_food":"long",
-			"total_food_sales":"long",
-			"leftover_food_sales":"long",
-			"date_food_sales": "date"
-		      },
-		      response: {
-			"id_food_sales": "long",
-			"user":{
-					"id_user": "long",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-			},
-			"food":{
-				"id_food": "long",
-				"user"   : {
-					 	"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				 },
-				"food_name": "string",
-				"food_price": "long"
-			},
-			"total_food":"long",
-			"leftover_food_sales":"long",
-			"total_food_sales_price":"long",
-			"date_food_sales": "date",
-			"period": "month"
-		      }
-	    	- Get All Foods Sales
-		      method: "GET",
-		      path: "/",
-		      response: [{
-			"id_food_sales": "long",
-			"user":{
-					"id_user": "long",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-			},
-			"food":{
-				"id_food": "long",
-				"user"   : {
-					 	"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				 },
-				"food_name": "string",
-				"food_price": "long"
-			},
-			"total_food":"long",
-			"leftover_food_sales":"long",
-			"total_food_sales_price":"long",
-			"date_food_sales": "date",
-			"period": "month"
-		      }]
-	    	- Get Foods Sales By Date
-		      method: "GET",
-		      path: "/date/:date_food_sales",
-		      response: {
-			"id_food_sales": "long",
-			"user":{
-					"id_user": "long",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-			},
-			"food":{
-				"id_food": "long",
-				"user"   : {
-					 	"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				 },
-				"food_name": "string",
-				"food_price": "long"
-			},
-			"total_food":"long",
-			"leftover_food_sales":"long",
-			"total_food_sales_price":"long",
-			"date_food_sales": "date",
-			"period": "month"
-		      }
-		 - Get Foods Sales By Month
-		      method: "GET",
-		      path: "/month/:period",
-		      response: [{
-				"id_food_sales": "long",
-				"user":{
+			    },
+		        "product": {
+					"id_product": "long",
+					"user": {
 						"id_user": "long",
 						"email": "string",
 						"name": "string",
 						"role": "SUPER_ADMIN/ADMIN"
-				},
-				"food":{
-					"id_food": "long",
-					"user"   : {
-						 	"id_user": "long",
-							"email": "string",
-							"name": "string",
-							"role": "SUPER_ADMIN/ADMIN"
-					 },
-					"food_name": "string",
-					"food_price": "long"
-				},
-				"total_food":"long",
-				"leftover_food_sales":"long",
-				"total_food_sales_price":"long",
-				"date_food_sales": "date",
-				"period": "month"
-		      }]
-		
-	    	- Update Food Sales By Id
-		      method: "PUT",
-		      path: "/update/:id_sales",
-		      request_body: {
-		        "id_user": "long",
-			"id_food":"long",
-			"total_food":"long",
-			"leftover_food_sales":"long",
-			"date_food_sales": "date"
-		      },
-		      response: {
-			"id_food_sales": "long",
-			"user":{
-					"id_user": "long",
-					"email": "string",
-					"name": "string",
-					"role": "SUPER_ADMIN/ADMIN"
-			},
-			"food":{
-				"id_food": "long",
-				"user"   : {
-					 	"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				 },
-				"food_name": "string",
-				"food_price": "long"
-			},
-			"total_food":"long",
-			"leftover_food_sales":"long",
-			"total_food_sales_price":"long",
-			"date_food_sales": "date",
-			"period": "month"
+					},
+					"product_name": "string",
+					"product_price": "long",
+					"categories": "FOODS/DRINKS"
+			    },
+		        "total_product": "long",
+		        "leftover_product_sales": "long",
+		        "total_product_sales_price": "long",
+		        "date_product_sales": "date",
+		        "period": "month"
 		      }
 	    
 		 - Delete Sales By Id
 		      method: "DELETE",
-		      path: "/delete/:id_food_sales",
-6. Sales
-	BaseUrl: "/api/sales
-	 - Get Foods Sales By Month
-		      method: "GET",
-		      path: "/month/:period",
-		      response: [{
-				"id_food_sales": "long",
-				"user":{
-						"id_user": "long",
-						"email": "string",
-						"name": "string",
-						"role": "SUPER_ADMIN/ADMIN"
-				},
-				"foods_sales":{
-					"id_food_sales": "long",
-					"user":{
-							"id_user": "long",
-							"email": "string",
-							"name": "string",
-							"role": "SUPER_ADMIN/ADMIN"
-					},
-					"food":{
-						"id_food": "long",
-						"user"   : {
-							 	"id_user": "long",
-								"email": "string",
-								"name": "string",
-								"role": "SUPER_ADMIN/ADMIN"
-						 },
-						"food_name": "string",
-						"food_price": "long"
-					},
-					"total_food":"long",
-					"leftover_food_sales":"long",
-					"total_food_sales_price":"long",
-					"date_food_sales": "date",
-					"period": "month"
-				},
-				"drinks_sales":{
-					"id_drink_sales": "long",
-					"user":{
-							"id_user": "long",
-							"email": "string",
-							"name": "string",
-							"role": "SUPER_ADMIN/ADMIN"
-					},
-					"drink":{
-						"id_drink": "long",
-						"user"   : {
-							 	"id_user": "long",
-								"email": "string",
-								"name": "string",
-								"role": "SUPER_ADMIN/ADMIN"
-						 },
-						"drink_name": "string",
-						"drink_price": "long"
-					},
-					"total_drink":"long",
-					"leftover_drink_sales":"long",
-					"total_drink_sales_price":"long",
-					"date_drink_sales": "date",
-					"period": "month"
-				},
-				"total_sales_price":"long",
-				"date_sales_price":"date",
-				"period": "month"
-		      }]	      
+		      path: "/delete/:id_product_sales",
+
+
 7. Tools
 	BaseUrl: "/api/tools",
 	   - Create Tool
