@@ -23,7 +23,7 @@ public class Purchases {
 
     @OneToOne
     @JoinColumn(name = "id_foodstuff", nullable = false)
-    private Foodstuffs foodstuff;
+    private Inventory foodstuff;
 
     @OneToOne
     @JoinColumn(name = "id_tool", nullable = false)
