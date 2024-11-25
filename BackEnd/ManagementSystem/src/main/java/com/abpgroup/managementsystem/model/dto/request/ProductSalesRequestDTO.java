@@ -14,26 +14,25 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoodSalesRequestDTO {
+public class ProductSalesRequestDTO {
     @NotNull(message = "User ID is required")
     @JsonProperty("id_user")
     private Long idUser;
 
-    @NotNull(message = "Food ID is required")
-    @JsonProperty("id_food")
-    private Long idFood;
+    @NotNull(message = "Product ID is required")
+    @JsonProperty("id_product")
+    private Long idProduct;
 
-    @NotNull(message = "Total food sales is required")
-    @JsonProperty("total_food_sales")
-    private Long totalFoodSales;
+    @NotNull(message = "Total product sales is required")
+    @JsonProperty("total_product_sales")
+    private Long totalProductSales;
 
-    @NotNull(message = "Leftover food sales is required")
-    @JsonProperty("leftover_food_sales")
-    private Long leftoverFoodSales;
+    @NotNull(message = "Leftover product sales is required")
+    @JsonProperty("leftover_product_sales")
+    private Long leftoverProductSales;
 
-    @NotNull(message = "Date food sales is required")
-    @JsonProperty("date_food_sales")
+    @NotNull(message = "Date product sales is required")
+    @JsonProperty("date_product_sales")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate dateFoodSales;
-
+    private LocalDate dateProductSales;
 }

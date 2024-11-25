@@ -13,24 +13,29 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoodSalesResponseDTO {
-    @JsonProperty("id_food_sales")
-    private Long idFoodSales;
+public class ProductSalesResponseDTO {
+    @JsonProperty("id_product_sales")
+    private Long idProductSales;
 
     @JsonProperty("user")
     private UsersResponseDTO usersResponseDTO;
 
-    @JsonProperty("foods")
-    private FoodsResponseDTO foodsResponseDTO;
+    @JsonProperty("product")
+    private ProductResponseDTO productResponseDTO;
 
-    @JsonProperty("total_food_sales_price")
-    private long totalFoodSalesPrice;
+    @JsonProperty("total_product")
+    private long totalProduct;
 
-    @JsonProperty("date_food_sales")
+    @JsonProperty("leftover_product_sales")
+    private long leftoverProductSales;
+
+    @JsonProperty("total_product_sales_price")
+    private long totalProductSalesPrice;
+
+    @JsonProperty("date_product_sales")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate dateFoodSales;
+    private LocalDate dateProductSales;
 
     @JsonProperty("period")
     private String period;
-
 }
