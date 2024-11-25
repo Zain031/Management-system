@@ -21,7 +21,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UsersController {
     private final UserService userService;
-    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<CommonResponse<?>> registerUser(@RequestBody UsersRequestDTO usersRequestDTO) {
@@ -71,7 +70,7 @@ public class UsersController {
         }
     }
 
-    @PutMapping("/user/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<CommonResponse<?>> updateUser(@PathVariable Long id, @RequestBody UsersRequestDTO usersRequestDTO) {
         try {
             UsersResponseDTO usersResponseDTO = userService.update(id, usersRequestDTO);

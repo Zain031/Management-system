@@ -8,4 +8,5 @@ public class APIUrl {
     public static final String BASE_URL_FOODSTUFF = "/api/foodstuffs";
     public static final String BASE_URL_PURCHASE = "/api/purchases";
     public static final String BASE_URL_PROFIT = "/api/profits";
+    public static final String BASE_URL_SALES = "/api/sales";
 }

@@ -32,6 +32,7 @@ public class ProductSalesMapper {
                     .productName(data.getProduct().getProductName())
                     .productPrice(data.getProduct().getProductPrice())
                     .usersResponseDTO(productCreator)
+                    .categories(data.getProduct().getCategories().name())
                     .build();
 
             result.add(ProductSalesResponseDTO.builder()

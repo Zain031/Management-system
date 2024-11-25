@@ -1,8 +1,6 @@
 package com.abpgroup.managementsystem.service;
 
-import com.abpgroup.managementsystem.model.dto.request.LoginRequestDTO;
 import com.abpgroup.managementsystem.model.dto.request.UsersRequestDTO;
-import com.abpgroup.managementsystem.model.dto.response.LoginResponseDTO;
 import com.abpgroup.managementsystem.model.dto.response.UsersResponseDTO;
 import com.abpgroup.managementsystem.model.entity.AppUser;
 import org.springframework.security.core.userdetails.UserDetailsService;

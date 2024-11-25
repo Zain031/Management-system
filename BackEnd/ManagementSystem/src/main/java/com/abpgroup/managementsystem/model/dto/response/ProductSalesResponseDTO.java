@@ -29,6 +29,9 @@ public class ProductSalesResponseDTO {
     @JsonProperty("leftover_product_sales")
     private long leftoverProductSales;
 
+    @JsonProperty("total_leftover_product_sales_price")
+    private Long totalLeftoverProductSalesPrice;
+
     @JsonProperty("total_product_sales_price")
     private long totalProductSalesPrice;
 

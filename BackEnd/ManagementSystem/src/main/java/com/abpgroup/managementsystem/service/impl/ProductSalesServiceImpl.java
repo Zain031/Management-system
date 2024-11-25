@@ -50,6 +50,8 @@ public class ProductSalesServiceImpl implements ProductSalesService {
                 .product(product)
                 .totalProductSales(productSalesRequestDTO.getTotalProductSales())
                 .leftoverProductSales(productSalesRequestDTO.getLeftoverProductSales())
+                .totalLeftoverProductSalesPrice((productSalesRequestDTO.getLeftoverProductSales() * product.getProductPrice()))
+                .totalProductSalesPrice((productSalesRequestDTO.getTotalProductSales() * product.getProductPrice())-(productSalesRequestDTO.getLeftoverProductSales() * product.getProductPrice()))
                 .dateProductSales(productSalesRequestDTO.getDateProductSales())
                 .period(dateProductSales.getMonth().name())
                 .build();
@@ -71,7 +73,7 @@ public class ProductSalesServiceImpl implements ProductSalesService {
 
     @Override
     public List<ProductSalesResponseDTO> getProductSalesByPeriod(String period) {
-        return ProductSalesMapper.toListProductSalesResponseDTO(productSalesRepository.findByPeriod(period));
+        return ProductSalesMapper.toListProductSalesResponseDTO(productSalesRepository.findByPeriod(period.toUpperCase()));
     }
 
     @Override
@@ -122,32 +124,41 @@ public class ProductSalesServiceImpl implements ProductSalesService {
         return convertToResponse(productSales);
     }
 
+
     private ProductSalesResponseDTO convertToResponse(ProductSales productSales) {
         return ProductSalesResponseDTO.builder()
                 .idProductSales(productSales.getIdProductSales())
-                .totalProductSalesPrice(productSales.getTotalProductSales())
-                .dateProductSales(productSales.getDateProductSales())
-                .period(productSales.getPeriod())
-                .usersResponseDTO(UsersResponseDTO.builder()
-                        .idUser(productSales.getUser().getIdUser())
-                        .email(productSales.getUser().getEmail())
-                        .name(productSales.getUser().getName())
-                        .role(productSales.getUser().getRole().name())
-                        .build())
-                .productResponseDTO(ProductResponseDTO.builder()
-                        .idProduct(productSales.getProduct().getIdProduct())
-                        .productName(productSales.getProduct().getProductName())
-                        .productPrice(productSales.getProduct().getProductPrice())
-                        .usersResponseDTO(UsersResponseDTO.builder()
-                                .idUser(productSales.getProduct().getUser().getIdUser())
-                                .email(productSales.getProduct().getUser().getEmail())
-                                .name(productSales.getProduct().getUser().getName())
-                                .role(productSales.getProduct().getUser().getRole().name())
-                                .build())
-                        .build())
+                .usersResponseDTO(convertToUsersResponseDTO(productSales.getUser()))
+                .productResponseDTO(convertToResponse(productSales.getProduct()))
                 .totalProduct(productSales.getTotalProductSales())
                 .leftoverProductSales(productSales.getLeftoverProductSales())
-                .totalProductSalesPrice((productSales.getTotalProductSales()*productSales.getProduct().getProductPrice())-(productSales.getLeftoverProductSales()*productSales.getProduct().getProductPrice()))
+                .totalLeftoverProductSalesPrice(productSales.getTotalLeftoverProductSalesPrice())
+                .totalProductSalesPrice(productSales.getTotalProductSalesPrice())
+                .dateProductSales(productSales.getDateProductSales())
+                .period(productSales.getPeriod())
+                .build();
+    }
+    private ProductResponseDTO convertToResponse(Products product) {
+        return ProductResponseDTO.builder()
+                .idProduct(product.getIdProduct())
+                .productName(product.getProductName())
+                .productPrice(product.getProductPrice())
+                .categories(product.getCategories().name())
+                .usersResponseDTO(UsersResponseDTO.builder()
+                        .idUser(product.getUser().getIdUser())
+                        .email(product.getUser().getEmail())
+                        .name(product.getUser().getName())
+                        .role(product.getUser().getRole().name())
+                        .build())
+                .build();
+    }
+
+    private UsersResponseDTO convertToUsersResponseDTO(Users user) {
+        return UsersResponseDTO.builder()
+                .idUser(user.getIdUser())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole().name())
                 .build();
     }
 

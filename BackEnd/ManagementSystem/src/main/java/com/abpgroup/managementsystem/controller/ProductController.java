@@ -6,11 +6,12 @@ import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.ProductResponseDTO;
 import com.abpgroup.managementsystem.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -35,21 +36,6 @@ public class ProductController {
         }
     }
 
-    @GetMapping("")
-    public ResponseEntity<CommonResponse<?>> getAllProducts() {
-        try {
-            List<ProductResponseDTO> productResponseDTOList = productService.getAllProducts();
-            CommonResponse<List<ProductResponseDTO>> commonResponse = CommonResponse.<List<ProductResponseDTO>>builder()
-                    .statusCode(HttpStatus.OK.value())
-                    .message("Successfully retrieved all products")
-                    .data(Optional.ofNullable(productResponseDTOList))
-                    .build();
-            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-        } catch (Exception e) {
-            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve products: " + e.getMessage());
-        }
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse<?>> getProductById(@PathVariable Long id) {
         try {
@@ -66,13 +52,14 @@ public class ProductController {
     }
 
     @GetMapping("/category/{category}")
-    public ResponseEntity<CommonResponse<?>> getProductByCategory(@PathVariable String category) {
+    public ResponseEntity<CommonResponse<?>> getProductByCategory(@PathVariable String category,@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
         try {
-            List<ProductResponseDTO> productResponseDTOList = productService.getProductByCategory(category);
-            CommonResponse<List<ProductResponseDTO>> commonResponse = CommonResponse.<List<ProductResponseDTO>>builder()
+            PageRequest pageable = PageRequest.of(page, size);
+            Page<ProductResponseDTO> productResponseDTOList = productService.getProductByCategory(category, pageable);
+            CommonResponse<Page<ProductResponseDTO>> commonResponse = CommonResponse.<Page<ProductResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved products")
-                    .data(Optional.ofNullable(productResponseDTOList))
+                    .data(Optional.of(productResponseDTOList))
                     .build();
             return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
         } catch (Exception e) {
@@ -106,6 +93,26 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
         } catch (Exception e) {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete product: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("")
+    public ResponseEntity<CommonResponse<?>> getAllProductsByPage(@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
+        try {
+            PageRequest pageable = PageRequest.of(page, size);
+            Page<ProductResponseDTO> productResponseDTOList = productService.getAllProductsByPage(pageable);
+            if (productResponseDTOList.isEmpty()) {
+                return createErrorResponse(HttpStatus.NOT_FOUND, "No products found");
+            } else {
+                CommonResponse<Page<ProductResponseDTO>> commonResponse = CommonResponse.<Page<ProductResponseDTO>>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Successfully retrieved products")
+                        .data(Optional.of(productResponseDTOList))
+                        .build();
+                return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+            }
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve products: " + e.getMessage());
         }
     }
 

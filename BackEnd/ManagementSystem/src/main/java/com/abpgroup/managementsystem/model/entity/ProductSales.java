@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "product_sales")
@@ -35,10 +36,18 @@ public class ProductSales {
     @Column(name = "leftover_product_sales", nullable = false)
     private Long leftoverProductSales;
 
+    @Column(name = "total_leftover_product_sales_price", nullable = false)
+    private Long totalLeftoverProductSalesPrice;
+
+    @Column(name = "total_product_sales_price", nullable = false)
+    private Long totalProductSalesPrice;
+
     @Column(name = "date_product_sales", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateProductSales;
 
     @Column(name = "period", nullable = false)
     private String period;
+
+
 }

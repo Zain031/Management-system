@@ -30,6 +30,7 @@ public class SecurityConfiguration {
             APIUrl.BASE_URL_PROFIT+"/**",
             APIUrl.BASE_URL_SALES_PRODUCT+"/**",
             APIUrl.BASE_URL_TOOL+"/**",
+            APIUrl.BASE_URL_SALES+"/**",
             "/swagger-ui/**",
             "/docs/**",
     };

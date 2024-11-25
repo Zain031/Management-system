@@ -9,6 +9,8 @@ import com.abpgroup.managementsystem.repository.ProductsRepository;
 import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -83,6 +85,18 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         productRepository.delete(product);
         return convertToResponse(product);
+    }
+
+    @Override
+    public Page<ProductResponseDTO> getAllProductsByPage(Pageable pageable) {
+        Page<Products> products = productRepository.findAll(pageable);
+        return products.map(this::convertToResponse);
+    }
+
+    @Override
+    public Page<ProductResponseDTO> getProductByCategory(String category, Pageable pageable) {
+        Page<Products> products = productRepository.findProductsByCategories(Products.ProductCategory.valueOf(category.toUpperCase()), pageable);
+        return products.map(this::convertToResponse);
     }
 
     private ProductResponseDTO convertToResponse(Products product) {

@@ -22,7 +22,7 @@ public class Products {
     @JoinColumn(name = "id_user", nullable = false)
     private Users user;
 
-    @Column(name = "product_name", nullable = false)
+    @Column(name = "product_name", nullable = false, unique = true)
     private String productName;
 
     @Column(name = "product_price", nullable = false)
