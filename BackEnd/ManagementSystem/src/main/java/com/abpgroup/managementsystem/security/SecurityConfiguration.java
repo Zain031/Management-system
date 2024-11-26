@@ -25,7 +25,7 @@ public class SecurityConfiguration {
     private final String [] WHITE_LIST_URL={
             APIUrl.BASE_URL_USER+"/**",
             APIUrl.BASE_URL_PRODUCT+"/**",
-            APIUrl.BASE_URL_FOODSTUFF+"/**",
+            APIUrl.BASE_URL_INVENTORY+"/**",
             APIUrl.BASE_URL_PURCHASE+"/**",
             APIUrl.BASE_URL_PROFIT+"/**",
             APIUrl.BASE_URL_SALES_PRODUCT+"/**",

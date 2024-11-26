@@ -26,6 +26,11 @@ public class InventoryRequestDTO {
     @JsonProperty("material_name")
     private String materialName;
 
+    @NotNull(message = "Material category is required")
+    @Size(min = 1, max = 100, message = "Material category must be between 1 and 100 characters")
+    @JsonProperty("material_category")
+    private String materialCategory;
+
     @NotNull(message = "Material price unit is required")
     @Positive(message = "Material price unit must be a positive number")
     @JsonProperty("material_price_unit")
