@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -31,6 +33,21 @@ public class InventoryController {
             return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
         }catch (Exception e){
             return createErrorResponse(HttpStatus.BAD_REQUEST, "Failed to create inventory: " + e.getMessage());
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponse<?>> getAllInventory() {
+        try {
+            List<InventoryResponseDTO> inventoryResponseDTOList = inventoryService.getAllInventory();
+            CommonResponse<List<InventoryResponseDTO>> commonResponse = CommonResponse.<List<InventoryResponseDTO>>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully retrieved all inventory")
+                    .data(Optional.ofNullable(inventoryResponseDTOList))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve inventory: " + e.getMessage());
         }
     }
 

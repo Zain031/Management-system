@@ -10,10 +10,10 @@ import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,18 +51,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> getAllProducts() {
-        return productRepository.findAll().stream().map(this::convertToResponse).toList();
-    }
-
-    @Override
     public ProductResponseDTO getProductById(Long id) {
         return productRepository.findById(id).map(this::convertToResponse).orElse(null);
-    }
-
-    @Override
-    public List<ProductResponseDTO> getProductByCategory(String category) {
-        return productRepository.findProductsByCategories(Products.ProductCategory.valueOf(category.toUpperCase())).stream().map(this::convertToResponse).toList();
     }
 
     @Override
@@ -89,15 +79,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductResponseDTO> getAllProductsByPage(Pageable pageable) {
-        Page<Products> products = productRepository.findAll(pageable);
+        Pageable sortedByPrice = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "productPrice"));
+        Page<Products> products = productRepository.findAll(sortedByPrice);
         return products.map(this::convertToResponse);
     }
 
+
     @Override
     public Page<ProductResponseDTO> getProductByCategory(String category, Pageable pageable) {
-        Page<Products> products = productRepository.findProductsByCategories(Products.ProductCategory.valueOf(category.toUpperCase()), pageable);
+        Pageable sortedByPrice = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "productPrice"));
+        Page<Products> products = productRepository.findProductsByCategories(Products.ProductCategory.valueOf(category.toUpperCase()), sortedByPrice);
         return products.map(this::convertToResponse);
     }
+
 
     private ProductResponseDTO convertToResponse(Products product) {
         return ProductResponseDTO.builder()

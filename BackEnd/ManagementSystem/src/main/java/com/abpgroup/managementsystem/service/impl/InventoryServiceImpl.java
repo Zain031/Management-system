@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -23,7 +24,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public List<InventoryResponseDTO> getAllInventory() {
-        return inventoryRepository.findAll().stream().map(this::toInventoryResponseDTO).toList();
+        return inventoryRepository.findAll().stream().sorted(Comparator.comparingLong(Inventory::getMaterialTotalPrice)).map(this::toInventoryResponseDTO).toList();
     }
 
     @Override

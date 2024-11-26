@@ -1,0 +1,28 @@
+1.Query Insert Product
+INSERT INTO products (id_user, product_name, product_price, categories)
+VALUES
+    (1, 'Burger', 25000, 'FOODS'),
+    (1, 'Pizza', 75000, 'FOODS'),
+    (1, 'Pasta', 50000, 'FOODS'),
+    (1, 'Fried Chicken', 30000, 'FOODS'),
+    (1, 'Nasi Goreng', 20000, 'FOODS'),
+    (1, 'Coca Cola', 10000, 'DRINKS'),
+    (1, 'Orange Juice', 15000, 'DRINKS'),
+    (1, 'Mineral Water', 5000, 'DRINKS'),
+    (1, 'Iced Tea', 8000, 'DRINKS'),
+    (1, 'Milkshake', 20000, 'DRINKS');
+2. Query Insert Product Sales
+
+INSERT INTO product_sales (id_user, id_product, total_product_sales, leftover_product_sales, total_leftover_product_sales_price, total_product_sales_price, date_product_sales, period)
+VALUES
+(1, 1, 100, 10, 250000, (100 * 25000) - 250000, '2024-11-01', 'NOVEMBER'),
+(1, 2, 50, 5, 375000, (50 * 75000) - 375000, '2024-11-02', 'NOVEMBER'),
+(1, 3, 70, 7, 350000, (70 * 50000) - 350000, '2024-11-03', 'NOVEMBER'),
+(1, 4, 80, 8, 240000, (80 * 30000) - 240000, '2024-11-04', 'NOVEMBER'),
+(1, 5, 120, 12, 240000, (120 * 20000) - 240000, '2024-11-05', 'NOVEMBER'),
+(1, 6, 200, 20, 200000, (200 * 10000) - 200000, '2024-11-06', 'NOVEMBER'),
+(1, 7, 150, 15, 225000, (150 * 15000) - 225000, '2024-11-07', 'NOVEMBER'),
+(1, 8, 300, 30, 150000, (300 * 5000) - 150000, '2024-11-08', 'NOVEMBER'),
+(1, 9, 250, 25, 200000, (250 * 8000) - 200000, '2024-11-09', 'NOVEMBER'),
+(1, 10, 180, 18, 360000, (180 * 20000) - 360000, '2024-11-10', 'NOVEMBER');
+

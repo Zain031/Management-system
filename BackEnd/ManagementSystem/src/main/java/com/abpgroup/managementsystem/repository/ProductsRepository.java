@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public interface ProductsRepository extends JpaRepository<Products, Long> {
-    List<Products> findProductsByCategories(Products.ProductCategory categories);
-
     Page<Products> findProductsByCategories(Products.ProductCategory categories, Pageable pageable);
 
+    Page<Products> findProductsByCategoriesOrderByProductPriceAsc(Products.ProductCategory categories, Pageable pageable);
 }
