@@ -15,9 +15,6 @@ import java.time.LocalDate;
 @Builder
 public class SalesResponseDTO {
 
-    @JsonProperty("id_sales")
-    private Long idSales;
-
     @JsonProperty("total_leftover_sales")
     private Long totalLeftoverSales;
 
@@ -36,5 +33,8 @@ public class SalesResponseDTO {
 
     @JsonProperty("period")
     private String period;
+
+    @JsonProperty("years")
+    private Long years;
 
 }

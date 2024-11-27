@@ -1,6 +1,5 @@
 package com.abpgroup.managementsystem.service.impl;
 
-import com.abpgroup.managementsystem.mapper.ProductSalesMapper;
 import com.abpgroup.managementsystem.model.dto.request.ProductSalesRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.ProductResponseDTO;
 import com.abpgroup.managementsystem.model.dto.response.ProductSalesResponseDTO;
@@ -13,10 +12,13 @@ import com.abpgroup.managementsystem.repository.ProductsRepository;
 import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.ProductSalesService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +56,7 @@ public class ProductSalesServiceImpl implements ProductSalesService {
                 .totalProductSalesPrice((productSalesRequestDTO.getTotalProductSales() * product.getProductPrice())-(productSalesRequestDTO.getLeftoverProductSales() * product.getProductPrice()))
                 .dateProductSales(productSalesRequestDTO.getDateProductSales())
                 .period(dateProductSales.getMonth().name())
+                .years(Long.valueOf(dateProductSales.getYear()))
                 .build();
 
         productSalesRepository.save(productSales);
@@ -62,23 +65,30 @@ public class ProductSalesServiceImpl implements ProductSalesService {
     }
 
     @Override
-    public List<ProductSalesResponseDTO> getAllProductSales() {
-        return productSalesRepository.findAll().stream().map(this::convertToResponse).toList();
+    public Page<ProductSalesResponseDTO> getAllProductSales(Pageable pageable) {
+        Pageable sortedByDateProductSales = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "dateProductSales"));
+        return productSalesRepository.findAll(sortedByDateProductSales)
+                .map(this::convertToResponse);
     }
 
     @Override
-    public List<ProductSalesResponseDTO> getProductSalesByDate(LocalDate dateProductSales) {
-        return ProductSalesMapper.toListProductSalesResponseDTO(productSalesRepository.findByDateProductSales(dateProductSales));
+    public Page<ProductSalesResponseDTO> getProductSalesByDate(LocalDate dateProductSales, Pageable pageable) {
+       Page<ProductSales> productSales = productSalesRepository.findProductSalesByDateProductSales(dateProductSales, pageable);
+       return productSales.map(this::convertToResponse);
     }
 
     @Override
-    public List<ProductSalesResponseDTO> getProductSalesByPeriod(String period) {
-        return ProductSalesMapper.toListProductSalesResponseDTO(productSalesRepository.findByPeriod(period.toUpperCase()));
+    public Page<ProductSalesResponseDTO> getProductSalesByPeriodAndYears(String period,Long years, Pageable pageable) {
+        Pageable sortedByDateProductSales = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "dateProductSales"));
+        Page<ProductSales> productSales = productSalesRepository.findProductSalesByPeriodAndYears(period.toUpperCase(),years, sortedByDateProductSales);
+        return productSales.map(this::convertToResponse);
     }
 
     @Override
-    public List<ProductSalesResponseDTO> getProductSalesByProductCategories(String productCategories) {
-        return ProductSalesMapper.toListProductSalesResponseDTO(productSalesRepository.findByProduct_Categories(Products.ProductCategory.valueOf(productCategories.toUpperCase())));
+    public Page<ProductSalesResponseDTO> getProductSalesByProductCategories(String productCategories, Pageable pageable) {
+        Pageable sortedByDateProductSales = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "dateProductSales"));
+        Page<ProductSales> productSales = productSalesRepository.findProductSalesByProductCategories(productCategories.toUpperCase(), sortedByDateProductSales);
+        return productSales.map(this::convertToResponse);
     }
 
     @Override
@@ -111,6 +121,7 @@ public class ProductSalesServiceImpl implements ProductSalesService {
                 .leftoverProductSales(productSalesRequestDTO.getLeftoverProductSales())
                 .dateProductSales(dateProductSales)
                 .period(dateProductSales.getMonth().name())
+                .years(Long.valueOf(dateProductSales.getYear()))
                 .build();
         productSalesRepository.save(updatedProductSales);
         return convertToResponse(updatedProductSales);
@@ -136,6 +147,7 @@ public class ProductSalesServiceImpl implements ProductSalesService {
                 .totalProductSalesPrice(productSales.getTotalProductSalesPrice())
                 .dateProductSales(productSales.getDateProductSales())
                 .period(productSales.getPeriod())
+                .years(productSales.getYears())
                 .build();
     }
     private ProductResponseDTO convertToResponse(Products product) {

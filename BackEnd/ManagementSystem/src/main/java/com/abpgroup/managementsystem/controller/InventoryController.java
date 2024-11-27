@@ -37,17 +37,18 @@ public class InventoryController {
     }
 
     @GetMapping
-    public ResponseEntity<CommonResponse<?>> getAllInventory() {
+    public ResponseEntity<CommonResponse<?>> getAllInventory(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
-            List<InventoryResponseDTO> inventoryResponseDTOList = inventoryService.getAllInventory();
-            CommonResponse<List<InventoryResponseDTO>> commonResponse = CommonResponse.<List<InventoryResponseDTO>>builder()
+            PageRequest pageable = PageRequest.of(page, size);
+            Page<InventoryResponseDTO> inventoryResponseDTOList = inventoryService.getAllInventory(pageable);
+            CommonResponse<Page<InventoryResponseDTO>> commonResponse = CommonResponse.<Page<InventoryResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
-                    .message("Successfully retrieved all inventory")
-                    .data(Optional.ofNullable(inventoryResponseDTOList))
+                    .message("Successfully retrieved all inventories")
+                    .data(Optional.of(inventoryResponseDTOList))
                     .build();
             return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
         } catch (Exception e) {
-            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve inventory: " + e.getMessage());
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve inventories: " + e.getMessage());
         }
     }
 

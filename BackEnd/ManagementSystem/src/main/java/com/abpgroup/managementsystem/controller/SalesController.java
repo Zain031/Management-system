@@ -7,10 +7,7 @@ import com.abpgroup.managementsystem.service.SalesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,10 +34,10 @@ public class SalesController {
         }
     }
 
-    @GetMapping("/period/{period}")
-    public ResponseEntity<CommonResponse<?>> getSalesByPeriod(@PathVariable String period) {
+    @GetMapping("/month/{period}")
+    public ResponseEntity<CommonResponse<?>> getSalesByPeriod(@PathVariable String period, @RequestParam (name = "years", required = false) Long years) {
         try {
-            SalesResponseDTO salesResponseDTOList = salesService.getSalesByPeriod(period);
+            SalesResponseDTO salesResponseDTOList = salesService.getSalesByPeriodAndYears(period, years);
             CommonResponse<SalesResponseDTO> commonResponse = CommonResponse.<SalesResponseDTO>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved sales")

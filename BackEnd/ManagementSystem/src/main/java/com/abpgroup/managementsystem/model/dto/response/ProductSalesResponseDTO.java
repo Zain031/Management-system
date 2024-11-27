@@ -41,4 +41,7 @@ public class ProductSalesResponseDTO {
 
     @JsonProperty("period")
     private String period;
+
+    @JsonProperty("years")
+    private Long years;
 }

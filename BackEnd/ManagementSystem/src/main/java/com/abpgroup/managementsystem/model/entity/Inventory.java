@@ -1,6 +1,7 @@
 package com.abpgroup.managementsystem.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -10,7 +11,7 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @Entity
-@Table(name = "materials")
+@Table(name = "inventory")
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,25 +30,32 @@ public class Inventory {
     private String materialName;
 
     @Column(name="material_price_unit", nullable = false)
-    private Long materialPriceUnit;
+    private Double materialPriceUnit;
 
     @Column(name = "material_quantity", nullable = false)
-    private Long materialQuantity;
+    private Double materialQuantity;
 
     @Column(name = "material_discount", nullable = false)
-    private Long materialDiscount;
+    private Double materialDiscount;
 
     @Column(name="material_price_discount", nullable = false)
-    private Long materialPriceDiscount;
+    private Double materialPriceDiscount;
 
     @Column(name = "material_total_price", nullable = false)
-    private Long materialTotalPrice;
+    private Double materialTotalPrice;
 
     @Column(name = "date_material_buy", nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateMaterialBuy;
+
+    @Column(name = "period", nullable = false)
+    private String period;
+
+    @Column(name = "years", nullable = false)
+    private Long years;
 
     // Enum Role
     public enum Category {
-        FOODSTUFF, TOOL
+        FOODSTUFF, TOOL, ETC
     }
 }

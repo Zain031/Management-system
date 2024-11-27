@@ -16,25 +16,27 @@ import java.time.LocalDate;
 public class InventoryResponseDTO {
     @JsonProperty("id_material")
     private Long idMaterial;
-    @JsonProperty("id_user")
-    private Long idUser;
-
+    @JsonProperty("user")
+    private UsersResponseDTO usersResponseDTO;
     @JsonProperty("material_category")
     private String materialCategory;
-
     @JsonProperty("material_name")
     private String materialName;
     @JsonProperty("material_price_unit")
-    private Long materialPriceUnit;
+    private Double materialPriceUnit;
     @JsonProperty("material_quantity")
-    private Long materialQuantity;
+    private Double materialQuantity;
     @JsonProperty("material_discount")
-    private Long materialDiscount;
+    private Double materialDiscount;
     @JsonProperty("material_price_discount")
-    private Long materialPriceDiscount;
+    private Double materialPriceDiscount;
     @JsonProperty("material_total_price")
-    private Long materialTotalPrice;
+    private Double materialTotalPrice;
     @JsonProperty("date_material_buy")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateMaterialBuy;
+    @JsonProperty("period")
+    private String period;
+    @JsonProperty("years")
+    private Long years;
 }

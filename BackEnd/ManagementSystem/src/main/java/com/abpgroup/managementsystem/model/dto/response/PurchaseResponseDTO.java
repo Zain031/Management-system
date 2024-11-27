@@ -14,17 +14,15 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseResponseDTO {
-    @JsonProperty("id_purchase")
-    private Long idPurchase;
-    @JsonProperty("id_user")
-    private Long idUser;
-    @JsonProperty("id_foodstuff")
-    private Long idFoodstuff;
-    @JsonProperty("id_tool")
-    private Long idTool;
+    @JsonProperty("purchase_total_quantity")
+    private Double purchaseTotalQuantity;
     @JsonProperty("purchase_total_price")
-    private Long purchaseTotalPrice;
+    private Double purchaseTotalPrice;
     @JsonProperty("date_purchase")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate datePurchase;
+    @JsonProperty("period")
+    private String period;
+    @JsonProperty("years")
+    private Long years;
 }

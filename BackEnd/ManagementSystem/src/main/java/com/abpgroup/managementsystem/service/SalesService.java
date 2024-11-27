@@ -8,5 +8,5 @@ import java.time.LocalDate;
 public interface SalesService {
     SalesResponseDTO getSalesByDate(LocalDate date);
 
-    SalesResponseDTO getSalesByPeriod(String period);
+    SalesResponseDTO getSalesByPeriodAndYears(String period, Long years);
 }

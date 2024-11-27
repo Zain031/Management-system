@@ -2,6 +2,7 @@ package com.abpgroup.managementsystem.service.impl;
 
 import com.abpgroup.managementsystem.model.dto.request.InventoryRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.InventoryResponseDTO;
+import com.abpgroup.managementsystem.model.dto.response.UsersResponseDTO;
 import com.abpgroup.managementsystem.model.entity.Inventory;
 import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.InventoryRepository;
@@ -9,12 +10,10 @@ import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-
-import java.util.Comparator;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,13 +22,16 @@ public class InventoryServiceImpl implements InventoryService {
     public final UsersRepository usersRepository;
 
     @Override
-    public List<InventoryResponseDTO> getAllInventory() {
-        return inventoryRepository.findAll().stream().sorted(Comparator.comparingLong(Inventory::getMaterialTotalPrice)).map(this::toInventoryResponseDTO).toList();
+    public Page<InventoryResponseDTO> getAllInventory(Pageable pageable) {
+        Pageable sortedByDateMaterialBuy= PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "dateMaterialBuy"));
+        Page<Inventory> inventories = inventoryRepository.findAll(sortedByDateMaterialBuy);
+        return inventories.map(this::toInventoryResponseDTO);
     }
 
     @Override
     public Page<InventoryResponseDTO> getAllInventoryByCategory(Pageable pageable, String category) {
-        Page<Inventory> inventories = inventoryRepository.findAllByCategory(Inventory.Category.valueOf(category.toUpperCase()), pageable);
+        Pageable sortedByDateMaterialBuy= PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "dateMaterialBuy"));
+        Page<Inventory> inventories = inventoryRepository.findAllByCategory(Inventory.Category.valueOf(category.toUpperCase()), sortedByDateMaterialBuy);
         return inventories.map(this::toInventoryResponseDTO);
     }
 
@@ -55,6 +57,8 @@ public class InventoryServiceImpl implements InventoryService {
         Users user = usersRepository.findById(inventoryRequestDTO.getIdUser())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        Double materialPriceDiscount = inventoryRequestDTO.getMaterialPriceUnit() - (inventoryRequestDTO.getMaterialPriceUnit() * (inventoryRequestDTO.getMaterialDiscount()/100));
+        Double materialTotalPrice = materialPriceDiscount * inventoryRequestDTO.getMaterialQuantity();
         Inventory inventory = Inventory.builder()
                 .user(user)
                 .category(Inventory.Category.valueOf(inventoryRequestDTO.getMaterialCategory().toUpperCase()))
@@ -62,8 +66,11 @@ public class InventoryServiceImpl implements InventoryService {
                 .materialPriceUnit(inventoryRequestDTO.getMaterialPriceUnit())
                 .materialQuantity(inventoryRequestDTO.getMaterialQuantity())
                 .materialDiscount(inventoryRequestDTO.getMaterialDiscount())
-                .materialPriceDiscount(inventoryRequestDTO.getMaterialPriceUnit()-(inventoryRequestDTO.getMaterialPriceUnit() * inventoryRequestDTO.getMaterialDiscount()))
-                .materialTotalPrice(inventoryRequestDTO.getMaterialPriceUnit()-(inventoryRequestDTO.getMaterialPriceUnit() * inventoryRequestDTO.getMaterialDiscount()) * inventoryRequestDTO.getMaterialQuantity())
+                .materialPriceDiscount(materialPriceDiscount)
+                .materialTotalPrice(materialTotalPrice)
+                .dateMaterialBuy(inventoryRequestDTO.getDateMaterialBuy())
+                .period(inventoryRequestDTO.getDateMaterialBuy().getMonth().name())
+                .years(Long.valueOf(inventoryRequestDTO.getDateMaterialBuy().getYear()))
                 .build();
 
         inventoryRepository.save(inventory);
@@ -77,14 +84,20 @@ public class InventoryServiceImpl implements InventoryService {
         Users user = usersRepository.findById(inventoryRequestDTO.getIdUser())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        Double materialPriceDiscount = inventoryRequestDTO.getMaterialPriceUnit() - (inventoryRequestDTO.getMaterialPriceUnit() * (inventoryRequestDTO.getMaterialDiscount()/100));
+        Double materialTotalPrice = materialPriceDiscount * inventoryRequestDTO.getMaterialQuantity();
         inventory.setUser(user);
         inventory.setCategory(Inventory.Category.valueOf(inventoryRequestDTO.getMaterialCategory().toUpperCase()));
         inventory.setMaterialName(inventoryRequestDTO.getMaterialName());
         inventory.setMaterialPriceUnit(inventoryRequestDTO.getMaterialPriceUnit());
         inventory.setMaterialQuantity(inventoryRequestDTO.getMaterialQuantity());
         inventory.setMaterialDiscount(inventoryRequestDTO.getMaterialDiscount());
-        inventory.setMaterialPriceDiscount(inventoryRequestDTO.getMaterialPriceUnit()-(inventoryRequestDTO.getMaterialPriceUnit() * inventoryRequestDTO.getMaterialDiscount()));
-        inventory.setMaterialTotalPrice(inventoryRequestDTO.getMaterialPriceUnit()-(inventoryRequestDTO.getMaterialPriceUnit() * inventoryRequestDTO.getMaterialDiscount()) * inventoryRequestDTO.getMaterialQuantity());
+        inventory.setMaterialPriceDiscount(materialPriceDiscount);
+        inventory.setMaterialTotalPrice(materialTotalPrice);
+        inventory.setDateMaterialBuy(inventoryRequestDTO.getDateMaterialBuy());
+        inventory.setPeriod(inventoryRequestDTO.getDateMaterialBuy().getMonth().name());
+        inventory.setYears(Long.valueOf(inventoryRequestDTO.getDateMaterialBuy().getYear()));
+        inventoryRepository.save(inventory);
         return toInventoryResponseDTO(inventory);
     }
 
@@ -101,7 +114,7 @@ public class InventoryServiceImpl implements InventoryService {
     private InventoryResponseDTO toInventoryResponseDTO(Inventory inventory) {
         return InventoryResponseDTO.builder()
                 .idMaterial(inventory.getIdMaterial())
-                .idUser(inventory.getUser().getIdUser())
+                .usersResponseDTO(convertToResponse(inventory.getUser()))
                 .materialCategory(inventory.getCategory().toString())
                 .materialName(inventory.getMaterialName())
                 .materialPriceUnit(inventory.getMaterialPriceUnit())
@@ -110,6 +123,16 @@ public class InventoryServiceImpl implements InventoryService {
                 .materialPriceDiscount(inventory.getMaterialPriceDiscount())
                 .materialTotalPrice(inventory.getMaterialTotalPrice())
                 .dateMaterialBuy(inventory.getDateMaterialBuy())
+                .period(inventory.getPeriod())
+                .years(inventory.getYears())
+                .build();
+    }
+
+    private UsersResponseDTO convertToResponse(Users user) {
+        return UsersResponseDTO.builder()
+                .idUser(user.getIdUser())
+                .email(user.getEmail())
+                .name(user.getName())
                 .build();
     }
 }

@@ -49,5 +49,8 @@ public class ProductSales {
     @Column(name = "period", nullable = false)
     private String period;
 
+    @Column(name = "years", nullable = false)
+    private Long years;
+
 
 }

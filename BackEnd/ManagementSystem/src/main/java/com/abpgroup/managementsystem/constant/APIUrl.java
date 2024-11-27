@@ -7,6 +7,6 @@ public class APIUrl {
     public static final String BASE_URL_SALES_PRODUCT = "/api/product-sales";
     public static final String BASE_URL_INVENTORY = "/api/inventory";
     public static final String BASE_URL_PURCHASE = "/api/purchases";
-    public static final String BASE_URL_PROFIT = "/api/profits";
+    public static final String BASE_URL_BUSINESS_PERFORMANCE = "/api/business-performance";
     public static final String BASE_URL_SALES = "/api/sales";
 }

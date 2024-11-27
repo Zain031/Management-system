@@ -27,7 +27,7 @@ public class SecurityConfiguration {
             APIUrl.BASE_URL_PRODUCT+"/**",
             APIUrl.BASE_URL_INVENTORY+"/**",
             APIUrl.BASE_URL_PURCHASE+"/**",
-            APIUrl.BASE_URL_PROFIT+"/**",
+            APIUrl.BASE_URL_BUSINESS_PERFORMANCE+"/**",
             APIUrl.BASE_URL_SALES_PRODUCT+"/**",
             APIUrl.BASE_URL_TOOL+"/**",
             APIUrl.BASE_URL_SALES+"/**",

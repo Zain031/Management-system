@@ -6,12 +6,13 @@ import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.ProductSalesResponseDTO;
 import com.abpgroup.managementsystem.service.ProductSalesService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -37,10 +38,10 @@ public class ProductSalesController {
     }
 
     @GetMapping("")
-    public ResponseEntity<CommonResponse<?>> getAllProducts() {
+    public ResponseEntity<CommonResponse<?>> getAllProductSales(@RequestParam(name = "page", defaultValue = "0" ) int page, @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
-            List<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getAllProductSales();
-            CommonResponse<List<ProductSalesResponseDTO>> commonResponse = CommonResponse.<List<ProductSalesResponseDTO>>builder()
+            Page<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getAllProductSales(PageRequest.of(page, size));
+            CommonResponse<Page<ProductSalesResponseDTO>> commonResponse = CommonResponse.<Page<ProductSalesResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved all product sales")
                     .data(Optional.ofNullable(productSalesResponseDTOList))
@@ -52,10 +53,10 @@ public class ProductSalesController {
     }
 
     @GetMapping("/date/{date_product_sales}")
-    public ResponseEntity<CommonResponse<?>> getProductSalesById(@PathVariable LocalDate date_product_sales) {
+    public ResponseEntity<CommonResponse<?>> getProductSalesById(@PathVariable LocalDate date_product_sales, @RequestParam(name = "page", defaultValue = "0" ) int page, @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
-            List<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getProductSalesByDate(date_product_sales);
-            CommonResponse<List<ProductSalesResponseDTO>> commonResponse = CommonResponse.<List<ProductSalesResponseDTO>>builder()
+            Page<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getProductSalesByDate(date_product_sales, PageRequest.of(page, size));
+            CommonResponse<Page<ProductSalesResponseDTO>> commonResponse = CommonResponse.<Page<ProductSalesResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved product sales")
                     .data(Optional.ofNullable(productSalesResponseDTOList))
@@ -67,10 +68,10 @@ public class ProductSalesController {
     }
 
     @GetMapping("/month/{period}")
-    public ResponseEntity<CommonResponse<?>> getProductSalesByMonth(@PathVariable String period) {
+    public ResponseEntity<CommonResponse<?>> getProductSalesByMonth(@PathVariable String period,@RequestParam(name = "years", required = true) long years, @RequestParam( name = "page", defaultValue = "0" ) int page, @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
-            List<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getProductSalesByPeriod(period);
-            CommonResponse<List<ProductSalesResponseDTO>> commonResponse = CommonResponse.<List<ProductSalesResponseDTO>>builder()
+            Page<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getProductSalesByPeriodAndYears(period,years, PageRequest.of(page, size));
+            CommonResponse<Page<ProductSalesResponseDTO>> commonResponse = CommonResponse.<Page<ProductSalesResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved product sales")
                     .data(Optional.ofNullable(productSalesResponseDTOList))
@@ -82,10 +83,10 @@ public class ProductSalesController {
     }
 
     @GetMapping("/category/{product_categories}")
-    public ResponseEntity<CommonResponse<?>> getProductSalesByProductCategories(@PathVariable String product_categories) {
+    public ResponseEntity<CommonResponse<?>> getProductSalesByProductCategories(@PathVariable String product_categories, @RequestParam(name = "page", defaultValue = "0" ) int page, @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
-            List<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getProductSalesByProductCategories(product_categories);
-            CommonResponse<List<ProductSalesResponseDTO>> commonResponse = CommonResponse.<List<ProductSalesResponseDTO>>builder()
+            Page<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getProductSalesByProductCategories(product_categories, PageRequest.of(page, size));
+            CommonResponse<Page<ProductSalesResponseDTO>> commonResponse = CommonResponse.<Page<ProductSalesResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved product sales")
                     .data(Optional.ofNullable(productSalesResponseDTOList))
