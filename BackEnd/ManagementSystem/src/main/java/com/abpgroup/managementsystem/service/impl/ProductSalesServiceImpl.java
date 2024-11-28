@@ -135,6 +135,12 @@ public class ProductSalesServiceImpl implements ProductSalesService {
         return convertToResponse(productSales);
     }
 
+    @Override
+    public Page<ProductSalesResponseDTO> getProductSalesByProductName(String productName, Pageable pageable) {
+        Pageable sortedByDateProductSales = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "dateProductSales"));
+        Page<ProductSales> productSales = productSalesRepository.findProductSalesByProductName(productName, sortedByDateProductSales);
+        return productSales.map(this::convertToResponse);
+    }
 
     private ProductSalesResponseDTO convertToResponse(ProductSales productSales) {
         return ProductSalesResponseDTO.builder()

@@ -107,6 +107,13 @@ public class InventoryServiceImpl implements InventoryService {
         inventoryRepository.delete(inventory);
     }
 
+    @Override
+    public Page<InventoryResponseDTO> getInventoryByMaterialName(String materialName, Pageable pageable) {
+        Pageable sortedByDateMaterialBuy= PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "dateMaterialBuy"));
+        Page<Inventory> inventories = inventoryRepository.getInventoryByMaterialName(materialName, sortedByDateMaterialBuy);
+        return inventories.map(this::toInventoryResponseDTO);
+    }
+
     private Inventory findInventoryByIdOrThrow(Long id) {
         return inventoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
     }

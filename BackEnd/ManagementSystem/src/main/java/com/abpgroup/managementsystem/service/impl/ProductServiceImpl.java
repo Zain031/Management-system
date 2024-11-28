@@ -92,6 +92,12 @@ public class ProductServiceImpl implements ProductService {
         return products.map(this::convertToResponse);
     }
 
+    @Override
+    public Page<ProductResponseDTO> getProductByProductName(String productName, Pageable pageable) {
+        Pageable sortedByPrice = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "productPrice"));
+        Page<Products> products = productRepository.getProductsByProductName(productName, sortedByPrice);
+        return products.map(this::convertToResponse);
+    }
 
     private ProductResponseDTO convertToResponse(Products product) {
         return ProductResponseDTO.builder()

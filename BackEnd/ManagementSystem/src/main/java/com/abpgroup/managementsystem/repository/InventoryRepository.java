@@ -40,4 +40,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT i FROM Inventory i " +
             "WHERE i.period = :periodUpper AND i.years = :years")
     List<Inventory> findInventoryByPeriodAndYears(String periodUpper, Long years);
+
+    @Query("SELECT i FROM Inventory i " +
+            "WHERE lower(i.materialName) LIKE lower(CONCAT('%', :materialName, '%')) ")
+    Page<Inventory> getInventoryByMaterialName(String materialName, Pageable sortedByDateMaterialBuy);
 }

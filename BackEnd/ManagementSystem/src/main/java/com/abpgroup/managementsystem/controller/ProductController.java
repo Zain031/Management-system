@@ -5,6 +5,7 @@ import com.abpgroup.managementsystem.model.dto.request.ProductRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.ProductResponseDTO;
 import com.abpgroup.managementsystem.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(APIUrl.BASE_URL_PRODUCT)
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class ProductController {
 
     private final ProductService productService;
@@ -101,6 +103,26 @@ public class ProductController {
         try {
             PageRequest pageable = PageRequest.of(page, size);
             Page<ProductResponseDTO> productResponseDTOList = productService.getAllProductsByPage(pageable);
+            if (productResponseDTOList.isEmpty()) {
+                return createErrorResponse(HttpStatus.NOT_FOUND, "No products found");
+            } else {
+                CommonResponse<Page<ProductResponseDTO>> commonResponse = CommonResponse.<Page<ProductResponseDTO>>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Successfully retrieved products")
+                        .data(Optional.of(productResponseDTOList))
+                        .build();
+                return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+            }
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve products: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/search/{productName}")
+    public ResponseEntity<CommonResponse<?>> getProductByProductName(@PathVariable String productName, @RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
+        try {
+            PageRequest pageable = PageRequest.of(page, size);
+            Page<ProductResponseDTO> productResponseDTOList = productService.getProductByProductName(productName, pageable);
             if (productResponseDTOList.isEmpty()) {
                 return createErrorResponse(HttpStatus.NOT_FOUND, "No products found");
             } else {

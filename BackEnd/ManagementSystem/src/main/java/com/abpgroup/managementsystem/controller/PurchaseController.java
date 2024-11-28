@@ -4,6 +4,7 @@ import com.abpgroup.managementsystem.constant.APIUrl;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.PurchaseResponseDTO;
 import com.abpgroup.managementsystem.service.PurchaseService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(APIUrl.BASE_URL_PURCHASE)
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class PurchaseController {
     private final PurchaseService purchaseService;
     @GetMapping("/date/{date_purchase}")

@@ -5,6 +5,7 @@ import com.abpgroup.managementsystem.model.dto.request.ProductSalesRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.ProductSalesResponseDTO;
 import com.abpgroup.managementsystem.service.ProductSalesService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(APIUrl.BASE_URL_SALES_PRODUCT)
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class ProductSalesController {
     private final ProductSalesService productSalesService;
 
@@ -97,6 +99,20 @@ public class ProductSalesController {
         }
     }
 
+    @GetMapping("/search/{productName}")
+    public ResponseEntity<CommonResponse<?>> getProductByProductName(@PathVariable String productName, @RequestParam(name = "page", defaultValue = "0" ) int page, @RequestParam(name = "size", defaultValue = "10") int size) {
+        try {
+            Page<ProductSalesResponseDTO> productSalesResponseDTOList = productSalesService.getProductSalesByProductName(productName, PageRequest.of(page, size));
+            CommonResponse<Page<ProductSalesResponseDTO>> commonResponse = CommonResponse.<Page<ProductSalesResponseDTO>>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully retrieved product sales")
+                    .data(Optional.ofNullable(productSalesResponseDTOList))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve product sales: " + e.getMessage());
+        }
+    }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<CommonResponse<?>> updateProductSales(@PathVariable Long id, @RequestBody ProductSalesRequestDTO productSalesRequestDTO) {
@@ -126,6 +142,8 @@ public class ProductSalesController {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete product sales: " + e.getMessage());
         }
     }
+
+
 
     private ResponseEntity<CommonResponse<?>> createErrorResponse(HttpStatus status, String errorMessage) {
         CommonResponse<?> errorResponse = CommonResponse.builder()

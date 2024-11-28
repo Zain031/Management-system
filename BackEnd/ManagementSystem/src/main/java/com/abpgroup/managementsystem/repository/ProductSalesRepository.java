@@ -54,4 +54,8 @@ public interface ProductSalesRepository extends JpaRepository<ProductSales, Long
     @Query("SELECT ps FROM ProductSales ps " +
             "WHERE ps.period = :periodUpper AND ps.years = :years")
     List<ProductSales> getProductSalesByPeriodAndYears(String periodUpper, Long years);
+
+    @Query("SELECT ps FROM ProductSales ps " +
+            "WHERE lower(ps.product.productName) LIKE lower(CONCAT('%', :productName, '%')) ")
+    Page<ProductSales> findProductSalesByProductName(String productName, Pageable sortedByDateProductSales);
 }

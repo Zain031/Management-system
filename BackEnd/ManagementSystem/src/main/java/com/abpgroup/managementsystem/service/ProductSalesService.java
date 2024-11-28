@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public interface ProductSalesService {
     ProductSalesResponseDTO createProductSales(ProductSalesRequestDTO productSalesRequestDTO);
@@ -16,4 +15,5 @@ public interface ProductSalesService {
     Page<ProductSalesResponseDTO> getProductSalesByProductCategories(String productCategories, Pageable pageable);
     ProductSalesResponseDTO updateProductSales(Long id, ProductSalesRequestDTO productSalesRequestDTO);
     ProductSalesResponseDTO deleteProductSales(Long id);
+    Page<ProductSalesResponseDTO> getProductSalesByProductName(String productName, Pageable pageable);
 }

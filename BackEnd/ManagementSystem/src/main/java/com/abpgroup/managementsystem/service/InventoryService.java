@@ -15,4 +15,5 @@ public interface InventoryService {
     InventoryResponseDTO createInventory(InventoryRequestDTO inventoryRequestDTO);
     InventoryResponseDTO updateInventory(Long id, InventoryRequestDTO inventoryRequestDTO);
     void deleteInventoryById(Long id);
+    Page<InventoryResponseDTO> getInventoryByMaterialName(String materialName, Pageable pageable);
 }

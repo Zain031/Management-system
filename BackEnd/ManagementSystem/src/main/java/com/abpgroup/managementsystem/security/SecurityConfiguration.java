@@ -24,13 +24,12 @@ public class SecurityConfiguration {
 
     private final String [] WHITE_LIST_URL={
             APIUrl.BASE_URL_USER+"/**",
-            APIUrl.BASE_URL_PRODUCT+"/**",
-            APIUrl.BASE_URL_INVENTORY+"/**",
+            APIUrl.BASE_URL_SALES+"/**",
             APIUrl.BASE_URL_PURCHASE+"/**",
             APIUrl.BASE_URL_BUSINESS_PERFORMANCE+"/**",
+            APIUrl.BASE_URL_PRODUCT+"/**",
+            APIUrl.BASE_URL_INVENTORY+"/**",
             APIUrl.BASE_URL_SALES_PRODUCT+"/**",
-            APIUrl.BASE_URL_TOOL+"/**",
-            APIUrl.BASE_URL_SALES+"/**",
             "/swagger-ui/**",
             "/docs/**",
     };
@@ -54,15 +53,20 @@ public class SecurityConfiguration {
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers("/api/v1/products/create").hasAnyAuthority("ADMIN", "SELLER")
-                        .requestMatchers("/api/v1/products/delete-product/").hasAnyAuthority("ADMIN", "SELLER")
-                        .requestMatchers("/api/v1/customers/**").hasAnyAuthority("ADMIN", "CUSTOMER")
-                        .requestMatchers(HttpMethod.GET,"/api/v1/products/get-all-product").hasAnyAuthority("CUSTOMER","ADMIN","SELLER")
-                        .requestMatchers("/api/v1/transactions/**").hasAnyAuthority("ADMIN", "SELLER", "CUSTOMER")
+//                        .requestMatchers(APIUrl.BASE_URL_USER+"/register").hasAnyAuthority("SUPER_ADMIN")
+//                        .requestMatchers(HttpMethod.GET,APIUrl.BASE_URL_USER+"/users").hasAnyAuthority("SUPER_ADMIN")
+//                        .requestMatchers(APIUrl.BASE_URL_USER+"/update/**").hasAnyAuthority("SUPER_ADMIN")
+//                        .requestMatchers(HttpMethod.GET,APIUrl.BASE_URL_USER+"/user/**").hasAnyAuthority("SUPER_ADMIN")
+//                        .requestMatchers(HttpMethod.DELETE,APIUrl.BASE_URL_USER+"/user/**").hasAnyAuthority("SUPER_ADMIN")
+//                        .requestMatchers(APIUrl.BASE_URL_PRODUCT).hasAnyAuthority("SUPER_ADMIN","ADMIN")
+//                        .requestMatchers(HttpMethod.GET,APIUrl.BASE_URL_PRODUCT+"/category/**").hasAnyAuthority("SUPER_ADMIN","ADMIN")
+//                        .requestMatchers(APIUrl.BASE_URL_PRODUCT+"/create").hasAnyAuthority("SUPER_ADMIN","ADMIN")
+//                        .requestMatchers(APIUrl.BASE_URL_PRODUCT+"/update/**").hasAnyAuthority("SUPER_ADMIN","ADMIN")
+//                        .requestMatchers(HttpMethod.DELETE,APIUrl.BASE_URL_PRODUCT+"/product/delete/**").hasAnyAuthority("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
+        return httpSecurity.build();
     }
 }

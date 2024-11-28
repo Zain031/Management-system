@@ -7,6 +7,8 @@ import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,18 +21,6 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UsersRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    @Override
-    public AppUser loadUserById(Long id) {
-        Users user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return AppUser.builder()
-                .id(user.getIdUser())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .role(Users.Role.valueOf(user.getRole().name()))
-                .build();
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -114,6 +104,12 @@ public class UserServiceImpl implements UserService {
     public List<UsersResponseDTO> getAllUsers() {
         List<Users> users = userRepository.findAll();
         return users.stream().map(this::convertToResponse).toList();
+    }
+
+    @Override
+    public Page<UsersResponseDTO> getUserByName(String name, Pageable pageable) {
+        Page<Users> users = userRepository.getUsersByName(name, pageable);
+        return users.map(this::convertToResponse);
     }
 
     private UsersResponseDTO convertToResponse(Users user) {

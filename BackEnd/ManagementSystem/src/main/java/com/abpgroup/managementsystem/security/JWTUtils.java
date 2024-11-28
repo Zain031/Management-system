@@ -62,6 +62,8 @@ public class JWTUtils {
         Map<String, String> userInfo = new HashMap<>();
         userInfo.put("idUser", decodedJWT.getSubject());
         userInfo.put("role", decodedJWT.getClaim("role").asString());
+        userInfo.put("name", decodedJWT.getClaim("name").asString());
+        System.out.println(userInfo);
         return userInfo;
     }
 }

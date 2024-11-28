@@ -8,7 +8,10 @@ import com.abpgroup.managementsystem.model.dto.response.LoginResponseDTO;
 import com.abpgroup.managementsystem.model.dto.response.UsersResponseDTO;
 import com.abpgroup.managementsystem.service.AuthService;
 import com.abpgroup.managementsystem.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(APIUrl.BASE_URL_USER)
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class UsersController {
     private final UserService userService;
 
@@ -97,6 +101,21 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
         } catch (Exception e) {
             return createErrorResponse(HttpStatus.NOT_FOUND, "Failed to delete user: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/search/{name}")
+    public ResponseEntity<CommonResponse<?>> getUserByName(@PathVariable String name, @RequestParam(name = "page", defaultValue = "0" ) int page, @RequestParam(name = "size", defaultValue = "10") int size) {
+        try {
+            Page<UsersResponseDTO> usersResponseDTOList = userService.getUserByName(name, PageRequest.of(page, size));
+            CommonResponse<Page<UsersResponseDTO>> commonResponse = CommonResponse.<Page<UsersResponseDTO>>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully retrieved users")
+                    .data(Optional.ofNullable(usersResponseDTOList))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve users: " + e.getMessage());
         }
     }
 
