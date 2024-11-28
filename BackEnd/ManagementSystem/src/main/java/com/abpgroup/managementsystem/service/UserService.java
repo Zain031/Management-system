@@ -3,6 +3,7 @@ package com.abpgroup.managementsystem.service;
 import com.abpgroup.managementsystem.model.dto.request.UsersRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.UsersResponseDTO;
 import com.abpgroup.managementsystem.model.entity.AppUser;
+import com.abpgroup.managementsystem.model.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,4 +17,5 @@ public interface UserService extends UserDetailsService {
     UsersResponseDTO findById(Long id);
     List<UsersResponseDTO> getAllUsers();
     Page<UsersResponseDTO> getUserByName(String name, Pageable pageable);
+    byte[] generatedPdf(List<Users> users) ;
 }

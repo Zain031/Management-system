@@ -23,9 +23,9 @@ public class ProductSalesRequestDTO {
     @JsonProperty("id_product")
     private Long idProduct;
 
-    @NotNull(message = "Total product sales is required")
-    @JsonProperty("total_product_sales")
-    private Long totalProductSales;
+    @NotNull(message = "Total product to sell is required")
+    @JsonProperty("total_product_to_sell")
+    private Long totalProductToSell;
 
     @NotNull(message = "Leftover product sales is required")
     @JsonProperty("leftover_product_sales")

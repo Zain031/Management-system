@@ -4,16 +4,21 @@ import com.abpgroup.managementsystem.constant.APIUrl;
 import com.abpgroup.managementsystem.model.dto.request.ProductSalesRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.ProductSalesResponseDTO;
+import com.abpgroup.managementsystem.model.entity.ProductSales;
+import com.abpgroup.managementsystem.model.entity.Users;
+import com.abpgroup.managementsystem.repository.ProductSalesRepository;
 import com.abpgroup.managementsystem.service.ProductSalesService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,6 +27,7 @@ import java.util.Optional;
 @SecurityRequirement(name = "bearerAuth")
 public class ProductSalesController {
     private final ProductSalesService productSalesService;
+    private final ProductSalesRepository productSalesRepository;
 
     @PostMapping("/create")
     public ResponseEntity<CommonResponse<?>> createProductSales(@RequestBody ProductSalesRequestDTO productSalesRequestDTO) {
@@ -141,6 +147,23 @@ public class ProductSalesController {
         } catch (Exception e) {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete product sales: " + e.getMessage());
         }
+    }
+    @GetMapping("/export-pdf")
+    public ResponseEntity<byte[]> exportProductSalesToPdf() {
+        // Fetch product sales from database
+        List< ProductSales> productSales = productSalesRepository.findAll();
+
+        // Generate PDF
+        byte[] pdfContent = productSalesService.generatedPdf(productSales);
+
+        // Set HTTP headers for file download
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=productSales.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdfContent);
     }
 
 

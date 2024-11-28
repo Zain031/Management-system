@@ -1,20 +1,23 @@
 package com.abpgroup.managementsystem.controller;
 
 import com.abpgroup.managementsystem.constant.APIUrl;
-import com.abpgroup.managementsystem.model.dto.request.LoginRequestDTO;
 import com.abpgroup.managementsystem.model.dto.request.UsersRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
-import com.abpgroup.managementsystem.model.dto.response.LoginResponseDTO;
 import com.abpgroup.managementsystem.model.dto.response.UsersResponseDTO;
-import com.abpgroup.managementsystem.service.AuthService;
+import com.abpgroup.managementsystem.model.entity.Users;
+import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.UserService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,7 @@ import java.util.Optional;
 @SecurityRequirement(name = "bearerAuth")
 public class UsersController {
     private final UserService userService;
+    private final UsersRepository usersRepository;
 
     @PostMapping("/register")
     public ResponseEntity<CommonResponse<?>> registerUser(@RequestBody UsersRequestDTO usersRequestDTO) {
@@ -117,6 +121,23 @@ public class UsersController {
         } catch (Exception e) {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve users: " + e.getMessage());
         }
+    }
+    @GetMapping("/export-pdf")
+    public ResponseEntity<byte[]> exportUsersToPdf() {
+        // Fetch users from database
+        List<Users> users = usersRepository.findAll();
+
+        // Generate PDF
+        byte[] pdfContent = userService.generatedPdf(users);
+
+        // Set HTTP headers for file download
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=users.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdfContent);
     }
 
     private ResponseEntity<CommonResponse<?>> createErrorResponse(HttpStatus status, String errorMessage) {

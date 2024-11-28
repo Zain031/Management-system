@@ -30,11 +30,14 @@ public class ProductSales {
     @JoinColumn(name = "id_product", nullable = false)
     private Products product;
 
-    @Column(name = "total_product_sales", nullable = false)
-    private Long totalProductSales;
+    @Column(name = "total_product_to_sell", nullable = false)
+    private Long totalProductToSell;
 
     @Column(name = "leftover_product_sales", nullable = false)
     private Long leftoverProductSales;
+
+    @Column(name = "total_product_sales", nullable = false)
+    private Long totalProductSales;
 
     @Column(name = "total_leftover_product_sales_price", nullable = false)
     private Long totalLeftoverProductSalesPrice;
