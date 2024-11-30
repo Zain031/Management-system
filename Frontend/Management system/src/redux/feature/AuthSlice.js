@@ -19,7 +19,7 @@ export const login = createAsyncThunk(
 
             console.log("🚀 ~ response:", response);
 
-            return response
+            return response;
         } catch (e) {
             return rejectWithValue(e || "Login failed");
         }
@@ -47,8 +47,10 @@ export const fetchUsers = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get(`/auth/users`);
-            return response.data;
+            return response;
         } catch (e) {
+            console.log(e);
+
             return rejectWithValue(
                 e.response?.data?.message || "Failed to fetch users"
             );

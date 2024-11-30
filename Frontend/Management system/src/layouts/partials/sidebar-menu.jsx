@@ -2,11 +2,13 @@ import { HomeSVG } from "../../assets/svgs";
 import StateSvg from "../../assets/svgs/state-svg";
 import { NavLink } from "react-router-dom";
 import {
+    BaggageClaim,
     BellPlus,
     Bolt,
     Coffee,
     HandPlatter,
     LayoutDashboard,
+    NotebookPen,
     UserPlus,
     Utensils,
     UtensilsCrossed,
@@ -34,20 +36,14 @@ function SidebarMenu() {
                 </NavLink>
             </li>{" "}
             <li>
-                <NavLink to="/State-cooperation">
-                    <Bolt size={30} strokeWidth={1.5} />
-                    Tools
+                <NavLink to="/Inventory">
+                   <BaggageClaim size={30} strokeWidth={1.5} />
+                    Inventory
                 </NavLink>
             </li>{" "}
             <li>
-                <NavLink to="/State-cooperation">
-                    <HandPlatter size={30} strokeWidth={1.5} />
-                    FoodStuff
-                </NavLink>
-            </li>
-            <li>
-                <NavLink to="/State-cooperation">
-                    <UserPlus  size={30} strokeWidth={1.5} />
+                <NavLink to="/users">
+                    <UserPlus size={30} strokeWidth={1.5} />
                     Create Users
                 </NavLink>
             </li>
