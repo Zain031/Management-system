@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "product_sales")
@@ -27,7 +26,11 @@ public class ProductSales {
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name = "id_product", nullable = false)
+    @JoinColumn(
+            name = "id_product",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_product_sales_product", foreignKeyDefinition = "FOREIGN KEY (id_product) REFERENCES products(id_product) ON DELETE SET NULL")
+    )
     private Products product;
 
     @Column(name = "total_product_to_sell", nullable = false)
@@ -54,6 +57,4 @@ public class ProductSales {
 
     @Column(name = "years", nullable = false)
     private Long years;
-
-
 }

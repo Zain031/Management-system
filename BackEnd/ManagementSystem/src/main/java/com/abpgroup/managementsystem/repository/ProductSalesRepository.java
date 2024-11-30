@@ -1,6 +1,7 @@
 package com.abpgroup.managementsystem.repository;
 
 import com.abpgroup.managementsystem.model.entity.ProductSales;
+import com.abpgroup.managementsystem.model.entity.Products;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,8 +18,8 @@ public interface ProductSalesRepository extends JpaRepository<ProductSales, Long
 
     List<ProductSales> findProductSalesByDateProductSales(LocalDate dateProductSales);
 
-    Page<ProductSales> findProductSalesByProductCategories(String productCategories, Pageable pageable);
-
+    @Query("SELECT ps FROM ProductSales ps WHERE ps.product.categories = :productCategories")
+    Page<ProductSales> findProductSalesByProductCategories(Products.ProductCategory productCategories, Pageable pageable);
     @Query(
             "SELECT SUM(ps.totalProductSales) " +
                     "FROM ProductSales ps " +
@@ -58,4 +59,8 @@ public interface ProductSalesRepository extends JpaRepository<ProductSales, Long
     @Query("SELECT ps FROM ProductSales ps " +
             "WHERE lower(ps.product.productName) LIKE lower(CONCAT('%', :productName, '%')) ")
     Page<ProductSales> findProductSalesByProductName(String productName, Pageable sortedByDateProductSales);
+
+    @Query("SELECT ps FROM ProductSales ps " +
+            "WHERE ps.dateProductSales = :date")
+    List<ProductSales> getProductSalesByDateProductSales(LocalDate date);
 }

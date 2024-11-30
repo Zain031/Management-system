@@ -14,9 +14,11 @@ import com.abpgroup.managementsystem.service.ProductSalesService;
 import com.itextpdf.io.source.ByteArrayOutputStream;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.AreaBreakType;
 import com.itextpdf.layout.properties.TextAlignment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,11 +45,11 @@ public class ProductSalesServiceImpl implements ProductSalesService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         LocalDate dateProductSales = productSalesRequestDTO.getDateProductSales();
 
-        if (productSalesRequestDTO.getTotalProductToSell() <= 0) {
+        if (productSalesRequestDTO.getTotalProductToSell() < 0) {
             throw new IllegalArgumentException("Total product sales must be greater than zero");
         }
 
-        if (productSalesRequestDTO.getLeftoverProductSales() <= 0) {
+        if (productSalesRequestDTO.getLeftoverProductSales() < 0) {
             throw new IllegalArgumentException("Leftover product sales must be greater than zero");
         }
 
@@ -95,10 +97,18 @@ public class ProductSalesServiceImpl implements ProductSalesService {
 
     @Override
     public Page<ProductSalesResponseDTO> getProductSalesByProductCategories(String productCategories, Pageable pageable) {
+        Products.ProductCategory category;
+        try {
+            category = Products.ProductCategory.valueOf(productCategories.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid product category: " + productCategories);
+        }
+
         Pageable sortedByDateProductSales = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "dateProductSales"));
-        Page<ProductSales> productSales = productSalesRepository.findProductSalesByProductCategories(productCategories.toUpperCase(), sortedByDateProductSales);
+        Page<ProductSales> productSales = productSalesRepository.findProductSalesByProductCategories(category, sortedByDateProductSales);
         return productSales.map(this::convertToResponse);
     }
+
 
     @Override
     public ProductSalesResponseDTO updateProductSales(Long id, ProductSalesRequestDTO productSalesRequestDTO) {
@@ -155,80 +165,205 @@ public class ProductSalesServiceImpl implements ProductSalesService {
     }
 
     @Override
-    public byte[] generatedPdf(List<ProductSales> productSalesList) {
+    public byte[] generatedPdf(List<ProductSales> productSalesList, String period, Long year) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            // Initialize PDF writer and document
             PdfWriter writer = new PdfWriter(outputStream);
             com.itextpdf.kernel.pdf.PdfDocument pdf = new com.itextpdf.kernel.pdf.PdfDocument(writer);
 
-            // Set the page size to landscape orientation (A4)
             pdf.setDefaultPageSize(com.itextpdf.kernel.geom.PageSize.A4.rotate());
 
-            // Initialize document
             Document document = new Document(pdf);
 
-            // Add Title
-            Paragraph title = new Paragraph("Product Sales Report")
+            // Add title
+            Paragraph title = new Paragraph("Product Sales Report By " + productSalesList.get(0).getPeriod().toCharArray()[0] + productSalesList.get(0).getPeriod().substring(1).toLowerCase()+ " " + year)
                     .setBold()
                     .setFontSize(16)
                     .setTextAlignment(TextAlignment.CENTER)
                     .setMarginBottom(10);
             document.add(title);
 
-            // Add empty line for spacing
             document.add(new Paragraph(" "));
 
-            // Define table column widths for better readability
-            float[] columnWidths = {0.8f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f}; // Adjust column widths
-            Table table = new Table(columnWidths);
+            // Add period and year
+            Paragraph periodAndYear = new Paragraph("Period: " + productSalesList.get(0).getPeriod().toCharArray()[0] + productSalesList.get(0).getPeriod().substring(1).toLowerCase() + "   Year: " + year)
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setFontSize(12)
+                    .setMarginBottom(10);
+            document.add(periodAndYear);
 
-            // Add Table Header with styling
-            table.addHeaderCell(new Cell().add(new Paragraph("No").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Product Name").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Product Price").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Total Products To Sell").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Total Products Remaining").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Total Products Sold").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Total Price Remaining").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Total Price Sold").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Date").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Period").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Year").setBold()).setTextAlignment(TextAlignment.CENTER));
+            // Define column widths
+            float[] columnWidths = {0.8f, 3f, 2f, 2f, 2f, 2f, 2.5f, 2.5f, 2.5f};
 
-            // Add Table Data with centered text
+            int itemsPerPage = 10;
+            int totalItems = productSalesList.size();
+            int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+
             int index = 1;
-            for (ProductSales productSales : productSalesList) {
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(index++))).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(productSales.getProduct().getProductName())).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getProduct().getProductPrice()))).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductSales()))).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getLeftoverProductSales()))).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductSales() - productSales.getLeftoverProductSales()))).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalLeftoverProductSalesPrice()))).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductSalesPrice()))).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(productSales.getDateProductSales().toString())).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(productSales.getPeriod())).setTextAlignment(TextAlignment.CENTER));
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getYears()))).setTextAlignment(TextAlignment.CENTER));
+            long totalProductSalesPrice = 0;
+
+            for (int page = 0; page < totalPages; page++) {
+                Table table = new Table(columnWidths);
+
+                // Header
+                table.addHeaderCell(new Cell().add(new Paragraph("No").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Product Name").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Product Price").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Products To Sell").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Products Remaining").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Products Sold").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Price Remaining").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Date").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Price Sold").setBold()).setTextAlignment(TextAlignment.CENTER));
+
+                // Rows
+                int start = page * itemsPerPage;
+                int end = Math.min(start + itemsPerPage, totalItems);
+                for (int i = start; i < end; i++) {
+                    ProductSales productSales = productSalesList.get(i);
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(index++))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(productSales.getProduct().getProductName())).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getProduct().getProductPrice()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductToSell()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getLeftoverProductSales()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductToSell() - productSales.getLeftoverProductSales()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalLeftoverProductSalesPrice()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(productSales.getDateProductSales().toString())).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductSalesPrice()))).setTextAlignment(TextAlignment.CENTER));
+
+                    // Add TotalProductSalesPrice to the running total
+                    totalProductSalesPrice += productSales.getTotalProductSalesPrice();
+                }
+
+                document.add(table);
+
+                // Add a page break only if this is not the last page
+                if (page < totalPages - 1) {
+                    document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                }
             }
 
-            // Add table to the document
-            document.add(table);
+            // Add the final row for "Grand Total" on the last page
+            Table totalTable = new Table(columnWidths);
+            document.add(totalTable);
 
-            // Close the document
+            Paragraph grandTotal = new Paragraph("Grand Total: " + totalProductSalesPrice)
+                    .setBold()
+                    .setFontSize(12)
+                    .setTextAlignment(TextAlignment.RIGHT);
+            document.add(grandTotal);
+
             document.close();
 
             return outputStream.toByteArray();
+
         } catch (Exception e) {
             throw new RuntimeException("Error generating Product Sales PDF", e);
         }
     }
 
+    @Override
+    public byte[] generatedPdfByDate(List<ProductSales> productSalesList, LocalDate dateProductSales) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            PdfWriter writer = new PdfWriter(outputStream);
+            com.itextpdf.kernel.pdf.PdfDocument pdf = new com.itextpdf.kernel.pdf.PdfDocument(writer);
+
+            pdf.setDefaultPageSize(com.itextpdf.kernel.geom.PageSize.A4.rotate());
+
+            Document document = new Document(pdf);
+
+            // Add title
+            Paragraph title = new Paragraph("Product Sales Report By Date")
+                    .setBold()
+                    .setFontSize(16)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(10);
+            document.add(title);
+
+            document.add(new Paragraph(" "));
+
+            // Add date
+            Paragraph date = new Paragraph("Date: " + dateProductSales)
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setFontSize(12)
+                    .setMarginBottom(10);
+            document.add(date);
+
+            // Define column widths
+            float[] columnWidths = {0.8f, 3f, 2f, 2f, 2f, 2f, 2.5f, 2.5f, 2.5f};
+
+            int itemsPerPage = 10;
+            int totalItems = productSalesList.size();
+            int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+
+            int index = 1;
+            long totalProductSalesPrice = 0;
+
+            for (int page = 0; page < totalPages; page++) {
+                Table table = new Table(columnWidths);
+
+                // Header
+                table.addHeaderCell(new Cell().add(new Paragraph("No").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Product Name").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Product Price").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Products To Sell").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Products Remaining").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Products Sold").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Price Remaining").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Date").setBold()).setTextAlignment(TextAlignment.CENTER));
+                table.addHeaderCell(new Cell().add(new Paragraph("Total Price Sold").setBold()).setTextAlignment(TextAlignment.CENTER));
+
+                // Rows
+                int start = page * itemsPerPage;
+                int end = Math.min(start + itemsPerPage, totalItems);
+                for (int i = start; i < end; i++) {
+                    ProductSales productSales = productSalesList.get(i);
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(index++))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(productSales.getProduct().getProductName())).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getProduct().getProductPrice()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductToSell()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getLeftoverProductSales()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductToSell() - productSales.getLeftoverProductSales()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalLeftoverProductSalesPrice()))).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(productSales.getDateProductSales().toString())).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(String.valueOf(productSales.getTotalProductSalesPrice()))).setTextAlignment(TextAlignment.CENTER));
+
+                    // Add TotalProductSalesPrice to the running total
+                    totalProductSalesPrice += productSales.getTotalProductSalesPrice();
+                }
+
+                document.add(table);
+
+                // Add a page break only if this is not the last page
+                if (page < totalPages - 1) {
+                    document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                }
+            }
+
+            // Add the final row for "Grand Total" on the last page
+            Table totalTable = new Table(columnWidths);
+            document.add(totalTable);
+
+            Paragraph grandTotal = new Paragraph("Grand Total: " + totalProductSalesPrice)
+                    .setBold()
+                    .setFontSize(12)
+                    .setTextAlignment(TextAlignment.RIGHT);
+            document.add(grandTotal);
+
+            document.close();
+
+            return outputStream.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating Product Sales PDF", e);
+        }
+    }
 
     private ProductSalesResponseDTO convertToResponse(ProductSales productSales) {
         return ProductSalesResponseDTO.builder()
                 .idProductSales(productSales.getIdProductSales())
                 .usersResponseDTO(convertToUsersResponseDTO(productSales.getUser()))
                 .productResponseDTO(convertToResponse(productSales.getProduct()))
+                .totalProductToSell(productSales.getTotalProductToSell())
                 .totalProductSales(productSales.getTotalProductSales())
                 .leftoverProductSales(productSales.getLeftoverProductSales())
                 .totalProductSalesPrice(productSales.getTotalProductSalesPrice())

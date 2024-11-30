@@ -148,23 +148,60 @@ public class ProductSalesController {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete product sales: " + e.getMessage());
         }
     }
-    @GetMapping("/export-pdf")
-    public ResponseEntity<byte[]> exportProductSalesToPdf() {
+    @GetMapping("/export-pdf-month/{period}")
+    public ResponseEntity<byte[]> exportProductSalesToPdf(@PathVariable String period, @RequestParam(name = "years", required = true) long years) {
         // Fetch product sales from database
-        List< ProductSales> productSales = productSalesRepository.findAll();
+        List< ProductSales> productSales = productSalesRepository.getProductSalesByPeriodAndYears(period.toUpperCase(), years);
 
         // Generate PDF
-        byte[] pdfContent = productSalesService.generatedPdf(productSales);
+        byte[] pdfContent = productSalesService.generatedPdf(productSales, period, years);
 
         // Set HTTP headers for file download
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=productSales.pdf");
+        headers.add("Content-Disposition", "attachment; filename=product-sales-" + period + "-" + years + ".pdf");
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
                 .body(pdfContent);
     }
+
+    @GetMapping("/export-pdf-date/{date}")
+    public ResponseEntity<?> exportProductSalesToPdf(@PathVariable LocalDate date) {
+        try {
+            // Validasi input date
+            if (date == null) {
+                return ResponseEntity.badRequest().body("Date parameter cannot be null.");
+            }
+
+            // Fetch product sales data from the database
+            List<ProductSales> productSales = productSalesRepository.getProductSalesByDateProductSales(date);
+
+            // Jika data tidak ditemukan
+            if (productSales == null || productSales.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No product sales data found for the given date: " + date);
+            }
+
+            // Generate PDF
+            byte[] pdfContent = productSalesService.generatedPdfByDate(productSales, date);
+
+            // Set HTTP headers for file download
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=product-sales-" + date + ".pdf");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .body(pdfContent);
+
+        } catch (Exception e) {
+            // Tangkap error dan berikan respons
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while generating the PDF: " + e.getMessage());
+        }
+    }
+
 
 
 

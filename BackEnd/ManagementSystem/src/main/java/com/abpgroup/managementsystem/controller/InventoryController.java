@@ -4,15 +4,19 @@ import com.abpgroup.managementsystem.constant.APIUrl;
 import com.abpgroup.managementsystem.model.dto.request.InventoryRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.InventoryResponseDTO;
+import com.abpgroup.managementsystem.model.entity.Inventory;
+import com.abpgroup.managementsystem.repository.InventoryRepository;
 import com.abpgroup.managementsystem.service.InventoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +26,7 @@ import java.util.Optional;
 @SecurityRequirement(name = "bearerAuth")
 public class InventoryController {
     private final InventoryService inventoryService;
+    private final InventoryRepository inventoryRepository;
 
     @PostMapping("/create")
     public ResponseEntity<CommonResponse<?>> createInventory(@RequestBody InventoryRequestDTO requestDTO) {
@@ -133,6 +138,36 @@ public class InventoryController {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete inventory: " + e.getMessage());
         }
     }
+    @GetMapping("/export-pdf-month/{period}")
+    public ResponseEntity<byte[]> exportPdf(@PathVariable String period,@RequestParam(name = "year",defaultValue = "0",required = true ) long year) {
+            List<Inventory> inventoryList = inventoryRepository.getInventoryByPeriodAndYear(period.toUpperCase(),year);
+            byte[] pdf = inventoryService.generatedPdfByPeriodAndYears(inventoryList,period.toUpperCase(),year);
+
+            // Set HTTP headers for file download
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=purchases-" + period.toLowerCase() + "-" + year + ".pdf");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .body(pdf);
+    }
+
+    @GetMapping("/export-pdf-date/{date-purchases}")
+    public ResponseEntity<byte[]> exportPdfByDate(@PathVariable(name = "date-purchases", required = true ) LocalDate datePurchases) {
+        List<Inventory> inventoryList = inventoryRepository.getInventoryByDatePurchases(datePurchases);
+        byte[] pdf = inventoryService.generatedPdfByDatePurchases(inventoryList,datePurchases);
+
+        // Set HTTP headers for file download
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=purchases-" + datePurchases + ".pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
 
     private ResponseEntity<CommonResponse<?>> createErrorResponse(HttpStatus status, String errorMessage) {
         CommonResponse<?> errorResponse = CommonResponse.builder()

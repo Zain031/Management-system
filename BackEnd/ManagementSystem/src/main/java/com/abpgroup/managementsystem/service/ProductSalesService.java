@@ -18,5 +18,6 @@ public interface ProductSalesService {
     ProductSalesResponseDTO updateProductSales(Long id, ProductSalesRequestDTO productSalesRequestDTO);
     ProductSalesResponseDTO deleteProductSales(Long id);
     Page<ProductSalesResponseDTO> getProductSalesByProductName(String productName, Pageable pageable);
-    byte[] generatedPdf(List<ProductSales> productSalesList);
+    byte[] generatedPdf(List<ProductSales> productSalesList, String period, Long years);
+    byte[] generatedPdfByDate(List<ProductSales> productSalesList, LocalDate dateProductSales);
 }

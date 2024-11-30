@@ -44,4 +44,12 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT i FROM Inventory i " +
             "WHERE lower(i.materialName) LIKE lower(CONCAT('%', :materialName, '%')) ")
     Page<Inventory> getInventoryByMaterialName(String materialName, Pageable sortedByDateMaterialBuy);
+
+    @Query("SELECT i FROM Inventory i " +
+            "WHERE i.period = :period AND i.years = :years")
+    List<Inventory> getInventoryByPeriodAndYear(String period, long years);
+
+    @Query("SELECT i FROM Inventory i " +
+            "WHERE i.dateMaterialBuy = :datePurchases")
+    List<Inventory> getInventoryByDatePurchases(LocalDate datePurchases);
 }
