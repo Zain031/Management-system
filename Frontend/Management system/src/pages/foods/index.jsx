@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Container from "../../components/container";
 import Header from "../../layouts/partials/header";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import {
     createProduct,
@@ -11,21 +10,15 @@ import {
 } from "../../redux/feature/ProductsSlice";
 import { Trash2 } from "lucide-react";
 import { SquarePen, SquarePlus } from "lucide-react";
-import { useState } from "react";
 
 const Foods = () => {
     const [productId, setProductId] = useState(null);
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
-    const [categories, setCategories] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("");
 
     const { products } = useSelector((state) => state.products);
-    console.log(products?.data?.content, "==========ggg===>");
 
-    const foods = products?.data?.content?.filter((product) => {
-        return product.categories === "FOODS";
-    });
-    console.log(foods);
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(fetchProducts());
@@ -45,26 +38,15 @@ const Foods = () => {
             try {
                 await dispatch(deleteProduct(id)).unwrap();
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    },
-                });
-                Toast.fire({
+                Swal.fire({
                     icon: "success",
                     title: "Product has been deleted",
+                    timer: 1500,
                 });
 
                 await dispatch(fetchProducts());
             } catch (error) {
                 console.log(error);
-
             }
         }
     };
@@ -82,21 +64,11 @@ const Foods = () => {
             categories: "FOODS",
         };
 
-       await dispatch(createProduct(formData));
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-            },
-        });
-        Toast.fire({
+        await dispatch(createProduct(formData));
+        Swal.fire({
             icon: "success",
             title: "Product has been added",
+            timer: 1500,
         });
 
         document.getElementById("my_modal_1").close();
@@ -104,15 +76,36 @@ const Foods = () => {
         setProductId("");
         setName("");
         setPrice("");
-        setCategories("");
     };
+
+    const filteredProducts = products?.data?.content?.filter((product) =>
+        selectedCategory ? product.categories === selectedCategory : true
+    );
 
     return (
         <>
             <Container>
-                <Header title="Foods" />
+                <Header title="Products" />
                 <div className="flex justify-end gap-5">
-                <input type="text" placeholder="Search" className="input input-bordered w-full max-w-xs" />
+                    <input
+                        type="text"
+                        placeholder="Search"
+                        className="input input-bordered w-full max-w-xs"
+                    />
+
+                    <label className="form-control max-w-xs">
+                        <select
+                            className="select select-bordered"
+                            onChange={(e) =>
+                                setSelectedCategory(e.target.value)
+                            }
+                        >
+                            <option value="">All Categories</option>
+                            <option value="FOODS">Foods</option>
+                            <option value="DRINKS">Drinks</option>
+                        </select>
+                    </label>
+
                     <button
                         onClick={handleAdd}
                         className="tooltip"
@@ -144,7 +137,7 @@ const Foods = () => {
                             <input
                                 type="text"
                                 placeholder="Product Price"
-                                className="input input-bordered input-ghost w-full my-2 "
+                                className="input input-bordered input-ghost w-full my-2"
                                 value={price}
                                 onChange={(e) => setPrice(e.target.value)}
                             />
@@ -167,18 +160,46 @@ const Foods = () => {
                             <tr>
                                 <th></th>
                                 <th>Name</th>
+                                <th>Category</th>
                                 <th>Price</th>
                                 <th>User Name</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {Array.isArray(foods) && foods.length > 0 ? (
-                                foods.map((item, index) => (
+                            {Array.isArray(filteredProducts) &&
+                            filteredProducts.length > 0 ? (
+                                filteredProducts.map((item, index) => (
                                     <tr key={item.id_product}>
                                         <th>{++index}</th>
                                         <td>{item.product_name}</td>
-                                        <td>{item.product_price}</td>
+
+                                        <td>
+                                            <p
+                                                className={` ${
+                                                    item.categories === "FOODS"
+                                                        ? "bg-red-600 w-14 px-2 py-1 text-white rounded-sm"
+                                                        : item.categories ===
+                                                          "DRINKS"
+                                                        ? "bg-blue-600 w-14 px-2 py-1 text-white rounded-sm"
+                                                        : ""
+                                                } font-bold`}
+                                            >
+                                                {item.categories === "FOODS"
+                                                    ? "Food"
+                                                    : item.categories ===
+                                                      "DRINKS"
+                                                    ? "Drinks"
+                                                    : item.categories}
+                                            </p>
+                                        </td>
+                                        <td>
+                                            {new Intl.NumberFormat("id-ID", {
+                                                style: "currency",
+                                                currency: "IDR",
+                                            }).format(item.product_price)}
+                                        </td>
+
                                         <td>{item.user.name}</td>
                                         <td className="flex gap-8">
                                             <button

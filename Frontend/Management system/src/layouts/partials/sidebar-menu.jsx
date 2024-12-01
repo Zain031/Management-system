@@ -9,6 +9,7 @@ import {
     HandPlatter,
     LayoutDashboard,
     NotebookPen,
+    PackageSearch,
     UserPlus,
     Utensils,
     UtensilsCrossed,
@@ -24,20 +25,14 @@ function SidebarMenu() {
                 </NavLink>
             </li>
             <li>
-                <NavLink to="/foods">
-                    <Utensils size={30} strokeWidth={1.5} />
-                    Foods
+                <NavLink to="/products">
+                    <PackageSearch size={30} strokeWidth={1.5} />
+                    Products
                 </NavLink>
             </li>
             <li>
-                <NavLink to="/drinks">
-                    <Coffee size={30} strokeWidth={1.5} />
-                    Drinks
-                </NavLink>
-            </li>{" "}
-            <li>
                 <NavLink to="/Inventory">
-                   <BaggageClaim size={30} strokeWidth={1.5} />
+                    <BaggageClaim size={30} strokeWidth={1.5} />
                     Inventory
                 </NavLink>
             </li>{" "}

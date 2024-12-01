@@ -4,12 +4,11 @@ import Register from "../pages/Auth/Register";
 import GuestLayout from "../layouts/guest-layout";
 import AppLayout from "../layouts/app-layout";
 import NotFound from "../components/errors/not-found";
-import Drinks from "../pages/drinks";
+
 import Foods from "../pages/foods";
 
 import FoodStuff from "../pages/foodstuff";
 import { Users } from "lucide-react";
-
 
 const router = createBrowserRouter([
     {
@@ -22,23 +21,18 @@ const router = createBrowserRouter([
                 element: <div>Dashboard</div>,
             },
             {
-                path: "/foods",
+                path: "/products",
                 element: <Foods />,
-            },
-            {
-                path: "/drinks",
-                element: <Drinks />,
             },
 
             {
                 path: "/Inventory",
-                element: <FoodStuff/>,
+                element: <FoodStuff />,
             },
             {
                 path: "/users",
                 element: <Users />,
-            }
-
+            },
         ],
     },
     {

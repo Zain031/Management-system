@@ -14,12 +14,11 @@ import {
 const FoodStuff = () => {
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState(""); // State untuk kategori yang dipilih
+    const [selectedCategory, setSelectedCategory] = useState("");
 
     const { inventories } = useSelector((state) => state.inventories);
     const dispatch = useDispatch();
 
-    // Fetch inventories ketika komponen dimuat
     useEffect(() => {
         dispatch(fetchInventories());
     }, [dispatch]);
@@ -222,10 +221,32 @@ const FoodStuff = () => {
                                             </p>
                                         </td>
 
-                                        <td>{item.material_price_unit}</td>
+                                        <td>
+                                            {new Intl.NumberFormat("id-ID", {
+                                                style: "currency",
+                                                currency: "IDR",
+                                            }).format(item.material_price_unit)}
+                                        </td>
+
                                         <td>{item.material_quantity}</td>
-                                        <td>{item.material_price_discount}</td>
-                                        <td>{item.material_total_price}</td>
+
+                                        <td>
+                                            {new Intl.NumberFormat("id-ID", {
+                                                style: "currency",
+                                                currency: "IDR",
+                                            }).format(
+                                                item.material_price_discount
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            {new Intl.NumberFormat("id-ID", {
+                                                style: "currency",
+                                                currency: "IDR",
+                                            }).format(
+                                                item.material_total_price
+                                            )}
+                                        </td>
 
                                         <td className="flex gap-8">
                                             <button
