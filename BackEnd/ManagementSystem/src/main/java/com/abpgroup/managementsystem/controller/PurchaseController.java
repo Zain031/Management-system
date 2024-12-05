@@ -20,9 +20,9 @@ import java.util.Optional;
 public class PurchaseController {
     private final PurchaseService purchaseService;
     @GetMapping("/date/{date_purchase}")
-    public ResponseEntity<CommonResponse<?>> getPurchaseByDate(@PathVariable LocalDate date_purchase) {
+    public ResponseEntity<CommonResponse<?>> getPurchaseByDate(@PathVariable("date_purchase") LocalDate datePurchase) {
         try {
-            PurchaseResponseDTO purchaseResponseDTO = purchaseService.getPurchasesByDate(date_purchase);
+            PurchaseResponseDTO purchaseResponseDTO = purchaseService.getPurchasesByDate(datePurchase);
             CommonResponse<PurchaseResponseDTO> commonResponse = CommonResponse.<PurchaseResponseDTO>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved purchase")
@@ -35,7 +35,7 @@ public class PurchaseController {
 
     }
 
-    @GetMapping("/period/{period}")
+    @GetMapping("/month/{period}")
     public ResponseEntity<CommonResponse<?>> getPurchaseByPeriod(@PathVariable String period, @RequestParam(name = "years", required = false) Long years) {
         try {
             PurchaseResponseDTO purchaseResponseDTO = purchaseService.getPurchasesByPeriodAndYears(period, years);

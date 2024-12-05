@@ -24,12 +24,12 @@ public class SecurityConfiguration {
 
     private final String [] WHITE_LIST_URL={
             APIUrl.BASE_URL_USER+"/**",
-            APIUrl.BASE_URL_SALES+"/**",
+            APIUrl.BASE_URL_PAYMENT+"/**",
             APIUrl.BASE_URL_PURCHASE+"/**",
             APIUrl.BASE_URL_BUSINESS_PERFORMANCE+"/**",
             APIUrl.BASE_URL_PRODUCT+"/**",
             APIUrl.BASE_URL_INVENTORY+"/**",
-            APIUrl.BASE_URL_SALES_PRODUCT+"/**",
+            APIUrl.BASE_URL_ORDERS+"/**",
             "/swagger-ui/**",
             "/docs/**",
     };

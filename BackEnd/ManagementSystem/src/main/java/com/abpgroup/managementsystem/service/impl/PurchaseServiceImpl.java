@@ -19,7 +19,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     public PurchaseResponseDTO getPurchasesByDate(LocalDate datePurchases) {
         List<Inventory> inventoryList = inventoryRepository.findInventoryByDatePurchases(datePurchases);
         if (inventoryList.isEmpty()) {
-            throw new IllegalArgumentException("No data found");
+            return PurchaseResponseDTO.builder()
+                    .purchaseTotalQuantity(0.0)
+                    .purchaseTotalPrice(0.0)
+                    .datePurchase(datePurchases)
+                    .period(datePurchases.getMonth().name())
+                    .years(Long.valueOf(datePurchases.getYear()))
+                    .build();
         }
         Double totalPurchases= inventoryRepository.calculateTotalPurchasesByDate(datePurchases);
         Double totalPurchasesPrice = inventoryRepository.calculateTotalPurchasesPriceByDate(datePurchases);
@@ -38,7 +44,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         String periodUpper = period.toUpperCase();
         List<Inventory> inventoryList = inventoryRepository.findInventoryByPeriodAndYears(periodUpper, years);
         if (inventoryList.isEmpty()) {
-            throw new IllegalArgumentException("No data found");
+            return PurchaseResponseDTO.builder()
+                    .purchaseTotalQuantity(0.0)
+                    .purchaseTotalPrice(0.0)
+                    .period(periodUpper)
+                    .years(years)
+                    .build();
         }
         Double totalPurchases = inventoryRepository.calculateTotalPurchasesByPeriod(periodUpper);
         Double totalPurchasesPrice = inventoryRepository.calculateTotalPurchasesPriceByPeriod(periodUpper);

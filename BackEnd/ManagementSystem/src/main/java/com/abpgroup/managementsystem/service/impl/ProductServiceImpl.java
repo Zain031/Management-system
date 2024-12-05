@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -43,6 +45,9 @@ public class ProductServiceImpl implements ProductService {
                 .productName(productRequestDTO.getProductName())
                 .productPrice(productRequestDTO.getProductPrice())
                 .categories(Products.ProductCategory.valueOf(productRequestDTO.getCategories().toUpperCase()))
+                .availableStock(productRequestDTO.getAvailableStock())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         productRepository.save(product);
@@ -65,6 +70,8 @@ public class ProductServiceImpl implements ProductService {
         product.setProductName(productRequestDTO.getProductName());
         product.setProductPrice(productRequestDTO.getProductPrice());
         product.setCategories(Products.ProductCategory.valueOf(productRequestDTO.getCategories().toUpperCase()));
+        product.setAvailableStock(productRequestDTO.getAvailableStock());
+        product.setUpdatedAt(LocalDateTime.now());
         productRepository.save(product);
         return convertToResponse(product);
     }
@@ -78,12 +85,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponseDTO> getAllProductsByPage(Pageable pageable) {
+    public Page<ProductResponseDTO> getAllProductsByAvailableStock(Pageable pageable, Boolean availableStock) {
+        Pageable sortedByPrice = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "productPrice"));
+        Page<Products> products = productRepository.findAllByAvailableStock(sortedByPrice, availableStock);
+        return products.map(this::convertToResponse);
+    }
+
+    @Override
+    public Page<ProductResponseDTO> getAllProducts(Pageable pageable) {
         Pageable sortedByPrice = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "productPrice"));
         Page<Products> products = productRepository.findAll(sortedByPrice);
         return products.map(this::convertToResponse);
     }
-
 
     @Override
     public Page<ProductResponseDTO> getProductByCategory(String category, Pageable pageable) {
@@ -106,6 +119,9 @@ public class ProductServiceImpl implements ProductService {
                 .productName(product.getProductName())
                 .productPrice(product.getProductPrice())
                 .categories(product.getCategories().name())
+                .availableStock(product.getAvailableStock())
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
                 .build();
     }
 
@@ -115,6 +131,8 @@ public class ProductServiceImpl implements ProductService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole().name())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 }

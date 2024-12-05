@@ -16,4 +16,8 @@ public interface ProductsRepository extends JpaRepository<Products, Long> {
     )
     Page<Products> getProductsByProductName(@Param("productName") String productName, Pageable sortedByPrice);
 
+    @Query(
+            "SELECT p FROM Products p WHERE p.availableStock = :availableStock"
+    )
+    Page<Products> findAllByAvailableStock(Pageable sortedByPrice, Boolean availableStock);
 }

@@ -3,7 +3,7 @@ package com.abpgroup.managementsystem.controller;
 import com.abpgroup.managementsystem.constant.APIUrl;
 import com.abpgroup.managementsystem.model.dto.response.BusinessPerformanceResponseDTO;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
-import com.abpgroup.managementsystem.service.BusinessPerfomanceService;
+import com.abpgroup.managementsystem.service.BusinessPerformanceService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,13 +16,13 @@ import java.util.Optional;
 @RequestMapping(APIUrl.BASE_URL_BUSINESS_PERFORMANCE)
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-public class BusinessPerfomanceController {
-    private final BusinessPerfomanceService businessPerformanceService;
+public class BusinessPerformanceController {
+    private final BusinessPerformanceService businessPerformanceService;
 
     @GetMapping("/period/{period}")
-    public ResponseEntity<CommonResponse<?>> getBusinessPerformanceByPeriod(@PathVariable String period, @RequestParam (name = "years", required = false) Long years) {
+    public ResponseEntity<CommonResponse<?>> getBusinessPerformanceByPeriod(@PathVariable String period, @RequestParam(name = "years", required = false) Long years) {
         try {
-            BusinessPerformanceResponseDTO businessPerformanceResponseDTO = businessPerformanceService.getBusinessPerformanceByPeriodAndYears(period, years);
+            BusinessPerformanceResponseDTO businessPerformanceResponseDTO = businessPerformanceService.getBusinessPerformanceByPeriodAndYears(period.toUpperCase(), years);
             CommonResponse<BusinessPerformanceResponseDTO> commonResponse = CommonResponse.<BusinessPerformanceResponseDTO>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved business performance")

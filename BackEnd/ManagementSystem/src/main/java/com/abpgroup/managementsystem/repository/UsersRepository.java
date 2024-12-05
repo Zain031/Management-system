@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UsersRepository extends JpaRepository<Users, Long> {
+
+    @Query("SELECT u FROM Users u WHERE u.email = :email")
     Users findByEmail(String email);
 
     @Query("SELECT u FROM Users u WHERE lower(u.name) LIKE lower(CONCAT('%', :name, '%'))")

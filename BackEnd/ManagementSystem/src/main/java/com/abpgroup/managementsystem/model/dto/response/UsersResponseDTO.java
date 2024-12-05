@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,4 +20,8 @@ public class UsersResponseDTO {
     private String name;
     @JsonProperty("role")
     private String role;
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
 }

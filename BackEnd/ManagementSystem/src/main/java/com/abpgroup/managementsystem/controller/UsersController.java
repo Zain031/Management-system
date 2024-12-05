@@ -62,8 +62,8 @@ public class UsersController {
         }
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<CommonResponse<?>> getUserById(@PathVariable Long id) {
+    @GetMapping("/user/{id_user}")
+    public ResponseEntity<CommonResponse<?>> getUserById(@PathVariable(name = "id_user") Long id) {
         try {
             UsersResponseDTO usersResponseDTO = userService.findById(id);
             CommonResponse<UsersResponseDTO> commonResponse = CommonResponse.<UsersResponseDTO>builder()
@@ -78,8 +78,8 @@ public class UsersController {
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<CommonResponse<?>> updateUser(@PathVariable Long id, @RequestBody UsersRequestDTO usersRequestDTO) {
+    @PutMapping("/update/{id_user}")
+    public ResponseEntity<CommonResponse<?>> updateUser(@PathVariable(name = "id_user" ) Long id, @RequestBody UsersRequestDTO usersRequestDTO) {
         try {
             UsersResponseDTO usersResponseDTO = userService.update(id, usersRequestDTO);
             CommonResponse<UsersResponseDTO> commonResponse = CommonResponse.<UsersResponseDTO>builder()
@@ -94,8 +94,8 @@ public class UsersController {
         }
     }
 
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity<CommonResponse<?>> deleteUser(@PathVariable Long id) {
+    @DeleteMapping("/user/{id_user}")
+    public ResponseEntity<CommonResponse<?>> deleteUser(@PathVariable(name = "id_user") Long id) {
         try {
             userService.delete(id);
             CommonResponse<UsersResponseDTO> commonResponse = CommonResponse.<UsersResponseDTO>builder()

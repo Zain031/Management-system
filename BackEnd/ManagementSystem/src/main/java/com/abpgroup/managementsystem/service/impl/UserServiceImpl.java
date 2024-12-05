@@ -6,17 +6,14 @@ import com.abpgroup.managementsystem.model.entity.AppUser;
 import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.UserService;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
-import com.itextpdf.kernel.pdf.canvas.parser.listener.ITextExtractionStrategy;
-import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,9 +22,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,7 +31,6 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UsersRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UsersRepository usersRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -55,6 +50,10 @@ public class UserServiceImpl implements UserService {
     public UsersResponseDTO register(UsersRequestDTO userRequest) {
         if (userRequest.getEmail() == null || userRequest.getEmail().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
+        }
+
+        if (!isValidEmail(userRequest.getEmail())) {
+            throw new IllegalArgumentException("Invalid email format");
         }
 
         if (userRequest.getPassword() == null || userRequest.getPassword().isEmpty()) {
@@ -78,10 +77,16 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(userRequest.getPassword())) // Encrypt password
                 .name(userRequest.getName())
                 .role(Users.Role.valueOf(userRequest.getRole()))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         userRepository.save(user);
         return convertToResponse(user);
+    }
+
+    private boolean isValidEmail(@Email(message = "Invalid email format") @NotBlank(message = "Email cannot be blank") String email) {
+        return email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
     }
 
     @Override
@@ -89,12 +94,42 @@ public class UserServiceImpl implements UserService {
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        if (userRequest.getEmail() == null || userRequest.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+
+        if (!isValidEmail(userRequest.getEmail())) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        if (userRequest.getPassword() == null || userRequest.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+
+        if (userRequest.getName() == null || userRequest.getName().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
+        if (userRequest.getRole() == null || userRequest.getRole().isEmpty()) {
+            throw new IllegalArgumentException("Role cannot be empty");
+        }
+
+        if (!isValidRole(userRequest.getRole())) {
+            throw new IllegalArgumentException("Invalid role specified, must be SUPER_ADMIN or ADMIN");
+        }
+
         user.setEmail(userRequest.getEmail());
         user.setName(userRequest.getName());
+
+        if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        }
 
         if (isValidRole(userRequest.getRole())) {
             user.setRole(Users.Role.valueOf(userRequest.getRole()));
         }
+
+        user.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(user);
         return convertToResponse(user);
@@ -146,7 +181,7 @@ public class UserServiceImpl implements UserService {
             document.add(new Paragraph(" "));
 
             // Define table column widths
-            float[] columnWidths = {1, 3, 4, 3}; // Adjust column widths
+            float[] columnWidths = {1f, 3f, 3f, 3f, 3f, 3f};
             Table table = new Table(columnWidths);
 
             // Add Table Header with styling
@@ -154,6 +189,8 @@ public class UserServiceImpl implements UserService {
             table.addHeaderCell(new Cell().add(new Paragraph("Name").setBold()));
             table.addHeaderCell(new Cell().add(new Paragraph("Email").setBold()));
             table.addHeaderCell(new Cell().add(new Paragraph("Role").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Created At").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Updated At").setBold()));
 
             // Add Table Data
             int index = 1;
@@ -162,6 +199,8 @@ public class UserServiceImpl implements UserService {
                 table.addCell(new Cell().add(new Paragraph(user.getName())));
                 table.addCell(new Cell().add(new Paragraph(user.getEmail())));
                 table.addCell(new Cell().add(new Paragraph(user.getRole().name())));
+                table.addCell(new Cell().add(new Paragraph(user.getCreatedAt().toString())));
+                table.addCell(new Cell().add(new Paragraph(user.getUpdatedAt().toString())));
             }
 
             // Add table to the document
@@ -183,6 +222,8 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole().name())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 

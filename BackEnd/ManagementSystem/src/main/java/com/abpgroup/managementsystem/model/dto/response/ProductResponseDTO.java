@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,4 +27,13 @@ public class ProductResponseDTO {
 
     @JsonProperty("categories")
     private String categories;
+
+    @JsonProperty("available_stock")
+    private Boolean availableStock;
+
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
 }

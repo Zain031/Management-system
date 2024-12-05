@@ -59,8 +59,8 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<?>> getInventoryById(@PathVariable Long id) {
+    @GetMapping("/{id_material}")
+    public ResponseEntity<CommonResponse<?>> getInventoryById(@PathVariable("id_material") Long id) {
         try {
             InventoryResponseDTO inventoryResponseDTO = inventoryService.getInventoryById(id);
             CommonResponse<InventoryResponseDTO> commonResponse = CommonResponse.<InventoryResponseDTO>builder()
@@ -92,8 +92,8 @@ public class InventoryController {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve inventorys: " + e.getMessage());
         }
     }
-    @GetMapping("/search/{materialName}")
-    public ResponseEntity<CommonResponse<?>> getInventoryByMaterialName(@PathVariable String materialName,@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
+    @GetMapping("/search/{material_name}")
+    public ResponseEntity<CommonResponse<?>> getInventoryByMaterialName(@PathVariable(name = "material_name") String materialName,@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
         try {
             PageRequest pageable = PageRequest.of(page, size);
             Page<InventoryResponseDTO> inventoryResponseDTOList = inventoryService.getInventoryByMaterialName(materialName, pageable);
@@ -110,8 +110,8 @@ public class InventoryController {
 
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<CommonResponse<?>> updateInventory(@PathVariable Long id, @RequestBody InventoryRequestDTO inventoryRequestDTO) {
+    @PutMapping("/update/{id_material}")
+    public ResponseEntity<CommonResponse<?>> updateInventory(@PathVariable("id_material") Long id, @RequestBody InventoryRequestDTO inventoryRequestDTO) {
         try {
             InventoryResponseDTO inventoryResponseDTO = inventoryService.updateInventory(id, inventoryRequestDTO);
             CommonResponse<InventoryResponseDTO> commonResponse = CommonResponse.<InventoryResponseDTO>builder()
@@ -125,8 +125,8 @@ public class InventoryController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<CommonResponse<?>> deleteInventory(@PathVariable Long id) {
+    @DeleteMapping("/delete/{id_material}")
+    public ResponseEntity<CommonResponse<?>> deleteInventory(@PathVariable(name = "id_material" ) Long id) {
         try {
             inventoryService.deleteInventoryById(id);
             CommonResponse<?> commonResponse = CommonResponse.builder()
@@ -153,8 +153,8 @@ public class InventoryController {
                     .body(pdf);
     }
 
-    @GetMapping("/export-pdf-date/{date-purchases}")
-    public ResponseEntity<byte[]> exportPdfByDate(@PathVariable(name = "date-purchases", required = true ) LocalDate datePurchases) {
+    @GetMapping("/export-pdf-date/{date_purchases}")
+    public ResponseEntity<byte[]> exportPdfByDate(@PathVariable(name = "date_purchases", required = true ) LocalDate datePurchases) {
         List<Inventory> inventoryList = inventoryRepository.getInventoryByDatePurchases(datePurchases);
         byte[] pdf = inventoryService.generatedPdfByDatePurchases(inventoryList,datePurchases);
 

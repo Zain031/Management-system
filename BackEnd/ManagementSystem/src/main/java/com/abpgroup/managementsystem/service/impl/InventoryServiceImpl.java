@@ -4,7 +4,6 @@ import com.abpgroup.managementsystem.model.dto.request.InventoryRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.InventoryResponseDTO;
 import com.abpgroup.managementsystem.model.dto.response.UsersResponseDTO;
 import com.abpgroup.managementsystem.model.entity.Inventory;
-import com.abpgroup.managementsystem.model.entity.ProductSales;
 import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.InventoryRepository;
 import com.abpgroup.managementsystem.repository.UsersRepository;
@@ -235,8 +234,6 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
 
-
-
     @Override
     public byte[] generatedPdfByDatePurchases(List<Inventory> inventory, LocalDate datePurchases) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -341,7 +338,6 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
 
-
     private Inventory findInventoryByIdOrThrow(Long id) {
         return inventoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
     }
@@ -368,6 +364,8 @@ public class InventoryServiceImpl implements InventoryService {
                 .idUser(user.getIdUser())
                 .email(user.getEmail())
                 .name(user.getName())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 }

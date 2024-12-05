@@ -38,8 +38,8 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<?>> getProductById(@PathVariable Long id) {
+    @GetMapping("/{id_product}")
+    public ResponseEntity<CommonResponse<?>> getProductById(@PathVariable ("id_product") Long id) {
         try {
             ProductResponseDTO productResponseDTO = productService.getProductById(id);
             CommonResponse<ProductResponseDTO> commonResponse = CommonResponse.<ProductResponseDTO>builder()
@@ -69,8 +69,8 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<CommonResponse<?>> updateProduct(@PathVariable Long id, @RequestBody ProductRequestDTO productRequestDTO) {
+    @PutMapping("/update/{id_product}")
+    public ResponseEntity<CommonResponse<?>> updateProduct(@PathVariable (name = "id_product" ) Long id, @RequestBody ProductRequestDTO productRequestDTO) {
         try {
             ProductResponseDTO productResponseDTO = productService.updateProduct(id, productRequestDTO);
             CommonResponse<ProductResponseDTO> commonResponse = CommonResponse.<ProductResponseDTO>builder()
@@ -84,8 +84,8 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<CommonResponse<?>> deleteProduct(@PathVariable Long id) {
+    @DeleteMapping("/delete/{id_product}")
+    public ResponseEntity<CommonResponse<?>> deleteProduct(@PathVariable(name = "id_product" ) Long id) {
         try {
             productService.deleteProduct(id);
             CommonResponse<?> commonResponse = CommonResponse.builder()
@@ -99,27 +99,39 @@ public class ProductController {
     }
 
     @GetMapping("")
-    public ResponseEntity<CommonResponse<?>> getAllProductsByPage(@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
+    public ResponseEntity<CommonResponse<?>> getAllProducts(@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
         try {
             PageRequest pageable = PageRequest.of(page, size);
-            Page<ProductResponseDTO> productResponseDTOList = productService.getAllProductsByPage(pageable);
-            if (productResponseDTOList.isEmpty()) {
-                return createErrorResponse(HttpStatus.NOT_FOUND, "No products found");
-            } else {
-                CommonResponse<Page<ProductResponseDTO>> commonResponse = CommonResponse.<Page<ProductResponseDTO>>builder()
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Successfully retrieved products")
-                        .data(Optional.of(productResponseDTOList))
-                        .build();
-                return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-            }
+            Page<ProductResponseDTO> productResponseDTOList = productService.getAllProducts(pageable);
+            CommonResponse<Page<ProductResponseDTO>> commonResponse = CommonResponse.<Page<ProductResponseDTO>>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully retrieved products")
+                    .data(Optional.of(productResponseDTOList))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
         } catch (Exception e) {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve products: " + e.getMessage());
         }
     }
 
-    @GetMapping("/search/{productName}")
-    public ResponseEntity<CommonResponse<?>> getProductByProductName(@PathVariable String productName, @RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
+    @GetMapping("/availability")
+    public ResponseEntity<CommonResponse<?>> getProductByAvailability(@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size, @RequestParam(name = "availability", defaultValue = "true", required = true ) boolean availability) {
+        try {
+            PageRequest pageable = PageRequest.of(page, size);
+            Page<ProductResponseDTO> productResponseDTOList = productService.getAllProductsByAvailableStock(pageable, availability);
+            CommonResponse<Page<ProductResponseDTO>> commonResponse = CommonResponse.<Page<ProductResponseDTO>>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully retrieved products")
+                    .data(Optional.of(productResponseDTOList))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve products: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/search/{product_name}")
+    public ResponseEntity<CommonResponse<?>> getProductByProductName(@PathVariable(name = "product_name" ) String productName, @RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
         try {
             PageRequest pageable = PageRequest.of(page, size);
             Page<ProductResponseDTO> productResponseDTOList = productService.getProductByProductName(productName, pageable);

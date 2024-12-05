@@ -31,4 +31,7 @@ public class ProductRequestDTO {
     @JsonProperty("categories")
     private String categories;
 
+    @JsonProperty("available_stock")
+    private Boolean availableStock;
+
 }
