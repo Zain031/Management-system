@@ -5,50 +5,49 @@ import GuestLayout from "../layouts/guest-layout";
 import AppLayout from "../layouts/app-layout";
 import NotFound from "../components/errors/not-found";
 
-import Foods from "../pages/foods";
-
-import FoodStuff from "../pages/foodstuff";
 import { Users } from "lucide-react";
+import Products from "../pages/products";
+import Inventory from "../pages/inventory";
 
 const router = createBrowserRouter([
-    {
+  {
+    path: "/",
+    element: <AppLayout />,
+    errorElement: <NotFound />,
+    children: [
+      {
         path: "/",
-        element: <AppLayout />,
-        errorElement: <NotFound />,
-        children: [
-            {
-                path: "/",
-                element: <div>Dashboard</div>,
-            },
-            {
-                path: "/products",
-                element: <Foods />,
-            },
+        element: <div>Dashboard</div>,
+      },
+      {
+        path: "/products",
+        element: <Products />,
+      },
 
-            {
-                path: "/Inventory",
-                element: <FoodStuff />,
-            },
-            {
-                path: "/users",
-                element: <Users />,
-            },
-        ],
-    },
-    {
-        path: "/",
-        element: <GuestLayout />,
-        children: [
-            {
-                path: "login",
-                element: <Login />,
-            },
-            {
-                path: "register",
-                element: <Register />,
-            },
-        ],
-    },
+      {
+        path: "/inventory",
+        element: <Inventory />,
+      },
+      {
+        path: "/users",
+        element: <Users />,
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <GuestLayout />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+    ],
+  },
 ]);
 
 export default router;
