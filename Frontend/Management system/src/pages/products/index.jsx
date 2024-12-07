@@ -10,6 +10,8 @@ import {
   fetchProducts,
   fetchProductsByCategory,
   fetchProductsByName,
+  setPage,
+  updateProduct,
 } from "../../redux/feature/ProductsSlice";
 import { Trash2 } from "lucide-react";
 import { SquarePen, SquarePlus } from "lucide-react";
@@ -22,14 +24,29 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState("");
   const [isStockAvailable, setIsStockAvailable] = useState("");
-  const tableHeaders = ["Name", "Category", "Price", "User name", "Action"];
+  const tableHeaders = [
+    "Name",
+    "Category",
+    "Price",
+    "User name",
+    "Available",
+    "Action",
+  ];
 
   const [isEditing, setIsEditing] = useState(false);
 
   const [searchByName, setSearchByName] = useState("");
-  const [selectedPage, setSelectedPage] = useState(1);
 
-  const { products, paging } = useSelector((state) => state.products);
+  const { products, paging, productById, page } = useSelector(
+    (state) => state.products
+  );
+
+  useEffect(() => {
+    setName(productById?.product_name || "");
+    setPrice(productById?.product_price) || "";
+    setCategories(productById?.categories || "");
+    setIsStockAvailable(productById?.available_stock || false);
+  }, [productById]);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -37,8 +54,8 @@ const Products = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(fetchProducts({ page: selectedPage }));
-  }, [selectedPage]);
+    dispatch(fetchProducts({ page: page }));
+  }, [page]);
 
   useEffect(() => {
     if (searchByName === "") {
@@ -61,6 +78,7 @@ const Products = () => {
     setCategories("");
     setIsStockAvailable("");
   };
+
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -94,7 +112,7 @@ const Products = () => {
     setProductId(id);
     dispatch(fetchProductById(id));
   };
-  const handleEdit = async (id) => {
+  const handleEdit = async (data) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       icon: "warning",
@@ -105,14 +123,15 @@ const Products = () => {
     });
     if (result.isConfirmed) {
       try {
-        await dispatch(deleteProduct(id)).unwrap();
+        await dispatch(updateProduct(data)).unwrap();
+        setIsEditing(false);
 
         Swal.fire({
           icon: "success",
           title: "Product has been updated",
           timer: 1500,
         });
-
+        document.getElementById("modal_form_product").close();
         await dispatch(fetchProducts());
       } catch (error) {
         console.log(error);
@@ -137,6 +156,7 @@ const Products = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    document.getElementById("modal_form_product").close();
     const data = {
       id_user: 2,
       product_name: name,
@@ -145,7 +165,7 @@ const Products = () => {
       available_stock: isStockAvailable,
     };
     if (isEditing) {
-      handleEdit(productId, data);
+      handleEdit({ id: productId, ...data });
     } else {
       handleAdd(data);
     }
@@ -171,6 +191,7 @@ const Products = () => {
           <label className="form-control max-w-xs">
             <select
               className="select select-bordered"
+              value={isEditing ? productById?.categories : ""}
               onChange={(e) => setSelectedCategory(e.target.value)}>
               <option value="">All Categories</option>
               <option value="FOODS">Foods</option>
@@ -198,7 +219,7 @@ const Products = () => {
               />
 
               <input
-                type="text"
+                type="number"
                 placeholder="Product Price"
                 className="input input-bordered input-ghost w-full my-2"
                 value={price}
@@ -207,6 +228,7 @@ const Products = () => {
 
               <select
                 className="select select-bordered w-full my-2"
+                selected={categories}
                 onChange={(e) => setCategories(e.target.value)}>
                 <option value="" disabled selected>
                   Select Category
@@ -253,7 +275,7 @@ const Products = () => {
               {Array.isArray(products) && products.length > 0 ? (
                 products.map((item, index) => (
                   <tr key={item.id_product}>
-                    <th>{(selectedPage - 1) * 10 + ++index}</th>
+                    <th>{(page - 1) * 10 + ++index}</th>
                     <td>{item.product_name}</td>
 
                     <td>
@@ -280,6 +302,7 @@ const Products = () => {
                     </td>
 
                     <td>{item.user.name}</td>
+                    <td>{item.available_stock ? "Ready" : "Not Ready"}</td>
                     <td className="flex gap-8">
                       <button
                         className="tooltip"
@@ -308,9 +331,9 @@ const Products = () => {
         </div>
         <div className="my-6">
           <Pagination
-            initialPage={selectedPage}
+            initialPage={page}
             total={paging?.totalPages}
-            onChange={(page) => setSelectedPage(page)}
+            onChange={(page) => dispatch(setPage(page))}
           />
         </div>
       </Container>

@@ -59,7 +59,6 @@ export const fetchProductsAvailable = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      console.error(e);
       const errorMessage =
         e.response?.data?.message || e.message || "Failed to fetch products";
       return rejectWithValue(errorMessage);
@@ -88,7 +87,6 @@ export const createProduct = createAsyncThunk(
   async (product, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post("/products/create", product);
-      console.log("Creating product", response.data);
       return response.data;
     } catch (e) {
       return rejectWithValue(
@@ -104,9 +102,10 @@ export const updateProduct = createAsyncThunk(
   async (product, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.put(
-        `/products/${product.id}`,
+        `/products/update/${product.id}`,
         product
       );
+      console.log("updated data", response.data);
       return response.data;
     } catch (e) {
       return rejectWithValue(
@@ -124,7 +123,6 @@ export const deleteProduct = createAsyncThunk(
       await axiosInstance.delete(`/products/delete/${id}`);
       return id;
     } catch (e) {
-      console.log(e);
       return rejectWithValue(e || "Failed to delete product");
     }
   }
@@ -136,8 +134,14 @@ const ProductsSlice = createSlice({
     products: [],
     paging: null,
     productById: null,
+    page: 1,
     status: null,
     error: null,
+  },
+  reducers: {
+    setPage: (state, action) => {
+      state.page = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -214,7 +218,7 @@ const ProductsSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchProductById.fulfilled, (state, action) => {
-        state.productById = action.payload || null;
+        state.productById = action.payload.data || null;
         state.status = "succeeded";
       })
       .addCase(fetchProductById.rejected, (state, action) => {
@@ -241,7 +245,7 @@ const ProductsSlice = createSlice({
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         const index = state.products.findIndex(
-          (p) => p.id === action.payload.id
+          (p) => p.id_product === action.payload.id_product
         );
         if (index !== -1) {
           state.products[index] = action.payload;
@@ -278,5 +282,5 @@ const ProductsSlice = createSlice({
       );
   },
 });
-
+export const { setPage } = ProductsSlice.actions;
 export default ProductsSlice.reducer;

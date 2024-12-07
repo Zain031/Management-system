@@ -9,19 +9,55 @@ import {
   createInventory,
   deleteInventory,
   fetchInventories,
+  fetchInventoryByCategory,
+  fetchInventoryByName,
+  setPage,
 } from "../../redux/feature/InventorySlice";
+import { Pagination } from "@nextui-org/pagination";
 
 const Inventory = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [category, setCategory] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [date, setDate] = useState("");
+  const [searchByName, setSearchByName] = useState("");
 
-  const { inventories } = useSelector((state) => state.inventories);
+  const [isEditing, setIsEditing] = useState(false);
+  const { inventories, paging, page } = useSelector(
+    (state) => state.inventories
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchInventories());
-  }, [dispatch]);
+  }, []);
+
+  useEffect(() => {
+    dispatch(fetchInventoryByName({ name: searchByName, page }));
+  }, [searchByName]);
+
+  useEffect(() => {
+    dispatch(fetchInventoryByCategory({ category: selectedCategory, page }));
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    console.log("Page", page);
+    dispatch(fetchInventories({ page }));
+  }, [page]);
+
+  console.log("Paging", paging);
+
+  const resetForm = () => {
+    setName("");
+    setPrice("");
+    setCategory("");
+    setQuantity("");
+    setDiscount("");
+    setDate("");
+  };
 
   // Filter data berdasarkan kategori yang dipilih
   const filterByCategory = (category) => {
@@ -29,10 +65,10 @@ const Inventory = () => {
   };
 
   // Mengambil produk yang sudah difilter berdasarkan kategori
-  const filteredInventories = inventories?.data?.content?.filter(
-    (product) =>
-      selectedCategory === "" || product.material_category === selectedCategory
-  );
+  //   const filteredInventories = inventories?.content?.filter(
+  //     (Material) =>
+  //       selectedCategory === "" || Material.material_category === selectedCategory
+  //   );
 
   // Handle delete action
   const handleDelete = async (id) => {
@@ -61,7 +97,7 @@ const Inventory = () => {
         });
         Toast.fire({
           icon: "success",
-          title: "Product has been deleted",
+          title: "Material has been deleted",
         });
         await dispatch(fetchInventories());
       } catch (error) {
@@ -70,19 +106,8 @@ const Inventory = () => {
     }
   };
 
-  const handleAdd = () => {
-    document.getElementById("my_modal_1").showModal();
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = {
-      product_name: name,
-      product_price: price,
-      categories: "FOODS",
-    };
-
-    await dispatch(createInventory(formData));
+  const handleAdd = async (data) => {
+    await dispatch(createInventory(data)).unwrap();
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",
@@ -96,13 +121,56 @@ const Inventory = () => {
     });
     Toast.fire({
       icon: "success",
-      title: "Product has been added",
+      title: "Material has been added",
     });
 
-    document.getElementById("my_modal_1").close();
+    document.getElementById("form_modal").close();
+    resetForm();
     await dispatch(fetchInventories());
-    setName("");
-    setPrice("");
+  };
+  const handleEdit = (data) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon: "success",
+      title: "Material has been updated",
+    });
+    document.getElementById("form_modal").close();
+    resetForm();
+    dispatch(fetchInventories());
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    document.getElementById("form_modal").showModal();
+    const data = {
+      id_user: 2,
+      material_name: name,
+      material_category: category,
+      material_price_unit: price,
+      material_quantity: quantity,
+      material_discount: discount,
+      date_material_buy: date,
+    };
+
+    if (isEditing) {
+      handleEdit(data);
+    } else {
+      handleAdd(data);
+    }
+  };
+
+  const onButtonAddClick = () => {
+    document.getElementById("form_modal").showModal();
   };
 
   return (
@@ -113,6 +181,7 @@ const Inventory = () => {
           <input
             type="text"
             placeholder="Search"
+            onChange={(e) => setSearchByName(e.target.value)}
             className="input input-bordered w-full max-w-xs"
           />
 
@@ -130,19 +199,19 @@ const Inventory = () => {
           </label>
 
           <button
-            onClick={handleAdd}
+            onClick={onButtonAddClick}
             className="tooltip"
-            data-tip="Add Product">
+            data-tip="Add Material">
             <SquarePlus size={50} color="#00d12a" />
           </button>
         </div>
 
-        <dialog id="my_modal_1" className="modal">
+        <dialog id="form_modal" className="modal">
           <div className="modal-box">
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
-                placeholder="Product Name"
+                placeholder="Material Name"
                 className="input input-bordered input-ghost w-full my-2"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -150,10 +219,42 @@ const Inventory = () => {
 
               <input
                 type="text"
-                placeholder="Product Price"
+                placeholder="Material Price"
                 className="input input-bordered input-ghost w-full my-2"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+              />
+
+              <input
+                type="text"
+                placeholder="Material Quantity"
+                className="input input-bordered input-ghost w-full my-2"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+
+              <input
+                type="text"
+                placeholder="Material Discount"
+                className="input input-bordered input-ghost w-full my-2"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+              />
+
+              <select
+                value={category}
+                className="input input-bordered input-ghost w-full my-2"
+                onChange={(e) => setCategory(e.target.value)}>
+                <option value="FOODSTUFF">Foods Stuff</option>
+                <option value="TOOL">Toll</option>
+                <option value="ETC">Others</option>
+              </select>
+
+              <input
+                type="date"
+                className="input input-bordered input-ghost w-full my-2"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
               />
 
               <button className="btn btn-outline btn-primary w-full">
@@ -177,18 +278,17 @@ const Inventory = () => {
                 <th>Category</th>
                 <th>Price</th>
                 <th>Quantity</th>
-                <th>Discount (per product)</th>
+                <th>Discount (per Material)</th>
                 <th>Total Price</th>
                 <th>User name</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(filteredInventories) &&
-              filteredInventories.length > 0 ? (
-                filteredInventories.map((item, index) => (
+              {Array.isArray(inventories) && inventories.length > 0 ? (
+                inventories.map((item, index) => (
                   <tr key={item.id_material}>
-                    <th>{++index}</th>
+                    <th>{(page - 1) * 10 + ++index}</th>
                     <td>{item.material_name}</td>
                     <td>
                       <p
@@ -244,7 +344,7 @@ const Inventory = () => {
                         <SquarePen size={28} color="#00d15b" />
                       </button>
                       <button
-                        onClick={() => handleDelete(item.id_product)}
+                        onClick={() => handleDelete(item.id_Material)}
                         className=" text-white tooltip"
                         data-tip="Delete">
                         <Trash2 size={28} color="#d12a00" />
@@ -255,12 +355,19 @@ const Inventory = () => {
               ) : (
                 <tr>
                   <td colSpan="6" className="text-center">
-                    No products available
+                    No Materials available
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+        <div className="my-6">
+          <Pagination
+            initialPage={page}
+            total={paging?.totalPages}
+            onChange={(page) => dispatch(setPage(page))}
+          />
         </div>
       </Container>
     </>
