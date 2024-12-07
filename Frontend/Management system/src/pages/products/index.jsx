@@ -7,9 +7,12 @@ import {
   createProduct,
   deleteProduct,
   fetchProducts,
+  fetchProductsByCategory,
+  fetchProductsByName,
 } from "../../redux/feature/ProductsSlice";
 import { Trash2 } from "lucide-react";
 import { SquarePen, SquarePlus } from "lucide-react";
+import { Pagination } from "@nextui-org/pagination";
 
 const Products = () => {
   const [productId, setProductId] = useState(null);
@@ -17,14 +20,37 @@ const Products = () => {
   const [price, setPrice] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState("");
+  const [isStockAvailable, setIsStockAvailable] = useState("");
   const tableHeaders = ["Name", "Category", "Price", "User name", "Action"];
 
-  const { products } = useSelector((state) => state.products);
+  const [searchByName, setSearchByName] = useState("");
+  const [selectedPage, setSelectedPage] = useState(1);
+
+  const { products, paging } = useSelector((state) => state.products);
 
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchProducts());
-  }, [dispatch]);
+  }, []);
+
+  useEffect(() => {
+    dispatch(fetchProducts({ page: selectedPage }));
+  }, [selectedPage]);
+
+  useEffect(() => {
+    if (searchByName === "") {
+      dispatch(fetchProducts());
+      return;
+    }
+    dispatch(fetchProductsByName(searchByName));
+  }, [searchByName]);
+
+  useEffect(() => {
+    if (selectedCategory === "") {
+      dispatch(fetchProducts());
+    }
+    dispatch(fetchProductsByCategory(selectedCategory));
+  }, [selectedCategory]);
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
@@ -54,16 +80,17 @@ const Products = () => {
   };
 
   const handleAdd = () => {
-    document.getElementById("my_modal_1").showModal();
+    document.getElementById("modal_adding_product").showModal();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = {
-      id_user: productId,
+      id_user: 2,
       product_name: name,
       product_price: price,
       categories,
+      available_stock: isStockAvailable,
     };
 
     await dispatch(createProduct(formData));
@@ -73,7 +100,7 @@ const Products = () => {
       timer: 1500,
     });
 
-    document.getElementById("my_modal_1").close();
+    document.getElementById("modal_adding_product").close();
     await dispatch(fetchProducts());
     setProductId("");
     setName("");
@@ -81,9 +108,9 @@ const Products = () => {
     setCategories("");
   };
 
-  const filteredProducts = products?.data?.content?.filter((product) =>
-    selectedCategory ? product.categories === selectedCategory : true
-  );
+  //   const filteredProducts = products?.filter((product) =>
+  //     selectedCategory ? product.categories === selectedCategory : true
+  //   );
 
   return (
     <>
@@ -94,6 +121,11 @@ const Products = () => {
             type="text"
             placeholder="Search"
             className="input input-bordered w-full max-w-xs"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setSearchByName(e.target.value);
+              }
+            }}
           />
 
           <label className="form-control max-w-xs">
@@ -101,7 +133,7 @@ const Products = () => {
               className="select select-bordered"
               onChange={(e) => setSelectedCategory(e.target.value)}>
               <option value="">All Categories</option>
-              <option value="Products">Products</option>
+              <option value="FOODS">Foods</option>
               <option value="DRINKS">Drinks</option>
             </select>
           </label>
@@ -114,7 +146,7 @@ const Products = () => {
           </button>
         </div>
 
-        <dialog id="my_modal_1" className="modal">
+        <dialog id="modal_adding_product" className="modal">
           <div className="modal-box">
             <form onSubmit={handleSubmit}>
               <input
@@ -141,6 +173,28 @@ const Products = () => {
                 onChange={(e) => setPrice(e.target.value)}
               />
 
+              <select
+                className="select select-bordered w-full my-2"
+                onChange={(e) => setCategories(e.target.value)}>
+                <option value="" disabled selected>
+                  Select Category
+                </option>
+                <option value="DRINKS">Drink</option>
+                <option value="FOODS">Food</option>
+              </select>
+
+              <select
+                className="select select-bordered w-full my-2"
+                onChange={(e) =>
+                  setIsStockAvailable(e.target.value === "true")
+                }>
+                <option value="" disabled selected>
+                  Available Stock
+                </option>
+                <option value="true">Ready</option>
+                <option value="false">Not Ready</option>
+              </select>
+
               <button className="btn btn-outline btn-primary w-full">
                 Submit
               </button>
@@ -164,9 +218,8 @@ const Products = () => {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(filteredProducts) &&
-              filteredProducts.length > 0 ? (
-                filteredProducts.map((item, index) => (
+              {Array.isArray(products) && products.length > 0 ? (
+                products.map((item, index) => (
                   <tr key={item.id_product}>
                     <th>{++index}</th>
                     <td>{item.product_name}</td>
@@ -217,6 +270,13 @@ const Products = () => {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="my-6">
+          <Pagination
+            initialPage={selectedPage}
+            total={paging?.totalPages}
+            onChange={(page) => setSelectedPage(page)}
+          />
         </div>
       </Container>
     </>
