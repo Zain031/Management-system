@@ -9,10 +9,8 @@ export const fetchProducts = createAsyncThunk(
       const response = await axiosInstance.get(
         `/products?page=${page - 1}&size=${size}`
       );
-      console.log(response.data);
       return response.data;
     } catch (e) {
-      console.error(e);
       const errorMessage =
         e.response?.data?.message || e.message || "Failed to fetch products";
       return rejectWithValue(errorMessage);
@@ -59,7 +57,6 @@ export const fetchProductsAvailable = createAsyncThunk(
       const response = await axiosInstance.get(
         `/products/availability?page=${page - 1}&size=${size}`
       );
-      console.log(response.data);
       return response.data;
     } catch (e) {
       console.error(e);
@@ -91,6 +88,7 @@ export const createProduct = createAsyncThunk(
   async (product, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post("/products/create", product);
+      console.log("Creating product", response.data);
       return response.data;
     } catch (e) {
       return rejectWithValue(
@@ -124,6 +122,7 @@ export const deleteProduct = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       await axiosInstance.delete(`/products/delete/${id}`);
+      return id;
     } catch (e) {
       console.log(e);
       return rejectWithValue(e || "Failed to delete product");
@@ -228,7 +227,7 @@ const ProductsSlice = createSlice({
         state.status = "loading";
       })
       .addCase(createProduct.fulfilled, (state, action) => {
-        state.products.push(action.payload);
+        state.products.push(action.payload.data);
         state.status = "succeeded";
       })
       .addCase(createProduct.rejected, (state, action) => {

@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import {
   createProduct,
   deleteProduct,
+  fetchProductById,
   fetchProducts,
   fetchProductsByCategory,
   fetchProductsByName,
@@ -22,6 +23,8 @@ const Products = () => {
   const [categories, setCategories] = useState("");
   const [isStockAvailable, setIsStockAvailable] = useState("");
   const tableHeaders = ["Name", "Category", "Price", "User name", "Action"];
+
+  const [isEditing, setIsEditing] = useState(false);
 
   const [searchByName, setSearchByName] = useState("");
   const [selectedPage, setSelectedPage] = useState(1);
@@ -52,6 +55,12 @@ const Products = () => {
     dispatch(fetchProductsByCategory(selectedCategory));
   }, [selectedCategory]);
 
+  const resetForm = () => {
+    setName("");
+    setPrice("");
+    setCategories("");
+    setIsStockAvailable("");
+  };
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -79,33 +88,68 @@ const Products = () => {
     }
   };
 
-  const handleAdd = () => {
-    document.getElementById("modal_adding_product").showModal();
+  const onButtonEditClick = (id) => {
+    setIsEditing(true);
+    document.getElementById("modal_form_product").showModal();
+    setProductId(id);
+    dispatch(fetchProductById(id));
+  };
+  const handleEdit = async (id) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, update it!",
+    });
+    if (result.isConfirmed) {
+      try {
+        await dispatch(deleteProduct(id)).unwrap();
+
+        Swal.fire({
+          icon: "success",
+          title: "Product has been updated",
+          timer: 1500,
+        });
+
+        await dispatch(fetchProducts());
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = {
-      id_user: 2,
-      product_name: name,
-      product_price: price,
-      categories,
-      available_stock: isStockAvailable,
-    };
-
-    await dispatch(createProduct(formData));
+  const onButtonAddClick = () => {
+    document.getElementById("modal_form_product").showModal();
+  };
+  const handleAdd = async (data) => {
+    await dispatch(createProduct(data));
     Swal.fire({
       icon: "success",
       title: "Product has been added",
       timer: 1500,
     });
 
-    document.getElementById("modal_adding_product").close();
+    document.getElementById("modal_form_product").close();
     await dispatch(fetchProducts());
-    setProductId("");
-    setName("");
-    setPrice("");
-    setCategories("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = {
+      id_user: 2,
+      product_name: name,
+      product_price: price,
+      categories,
+      available_stock: isStockAvailable,
+    };
+    if (isEditing) {
+      handleEdit(productId, data);
+    } else {
+      handleAdd(data);
+    }
+    resetForm();
   };
 
   //   const filteredProducts = products?.filter((product) =>
@@ -121,11 +165,7 @@ const Products = () => {
             type="text"
             placeholder="Search"
             className="input input-bordered w-full max-w-xs"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                setSearchByName(e.target.value);
-              }
-            }}
+            onChange={(e) => setSearchByName(e.target.value)}
           />
 
           <label className="form-control max-w-xs">
@@ -139,24 +179,16 @@ const Products = () => {
           </label>
 
           <button
-            onClick={handleAdd}
+            onClick={onButtonAddClick}
             className="tooltip"
             data-tip="Add Product">
             <SquarePlus size={50} color="#00d12a" />
           </button>
         </div>
 
-        <dialog id="modal_adding_product" className="modal">
+        <dialog id="modal_form_product" className="modal">
           <div className="modal-box">
             <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                value={productId}
-                placeholder="id_product"
-                className="input input-bordered input-ghost w-full my-2"
-                onChange={(e) => setProductId(e.target.value)}
-              />
-
               <input
                 type="text"
                 placeholder="Product Name"
@@ -221,7 +253,7 @@ const Products = () => {
               {Array.isArray(products) && products.length > 0 ? (
                 products.map((item, index) => (
                   <tr key={item.id_product}>
-                    <th>{++index}</th>
+                    <th>{(selectedPage - 1) * 10 + ++index}</th>
                     <td>{item.product_name}</td>
 
                     <td>
@@ -249,7 +281,10 @@ const Products = () => {
 
                     <td>{item.user.name}</td>
                     <td className="flex gap-8">
-                      <button className="tooltip" data-tip="Edit">
+                      <button
+                        className="tooltip"
+                        data-tip="Edit"
+                        onClick={() => onButtonEditClick(item.id_product)}>
                         <SquarePen size={28} color="#00d15b" />
                       </button>
                       <button
