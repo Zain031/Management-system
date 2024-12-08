@@ -35,22 +35,24 @@ const Inventory = () => {
 
   useEffect(() => {
     dispatch(fetchInventories());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
+    dispatch(setPage(1));
     if (searchByName === "") {
       dispatch(fetchInventories({ page }));
       return;
     }
-    dispatch(fetchInventoryByName({ name: searchByName, page }));
-  }, [searchByName]);
+    dispatch(fetchInventoryByName({ name: searchByName, page: 1 }));
+  }, [searchByName, dispatch]);
 
   useEffect(() => {
+    dispatch(setPage(1));
     if (selectedCategory === "") {
       dispatch(fetchInventories({ page }));
       return;
     }
-    dispatch(fetchInventoryByCategory({ category: selectedCategory, page }));
+    dispatch(fetchInventoryByCategory({ category: selectedCategory, page: 1 }));
   }, [selectedCategory]);
 
   useEffect(() => {
@@ -121,6 +123,10 @@ const Inventory = () => {
         console.log(error);
       }
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    dispatch(setPage(newPage));
   };
 
   const handleAdd = async (data) => {
@@ -395,13 +401,18 @@ const Inventory = () => {
             </tbody>
           </table>
         </div>
-        <div className="my-6">
-          <Pagination
-            initialPage={page}
-            total={paging?.totalPages}
-            onChange={(page) => dispatch(setPage(page))}
-          />
-        </div>
+        {inventories &&
+          inventories.length > 0 &&
+          paging &&
+          paging.totalPages > 1 && (
+            <div className="my-6">
+              <Pagination
+                initialPage={page}
+                total={paging?.totalPages}
+                onChange={handlePageChange}
+              />
+            </div>
+          )}
       </Container>
     </>
   );

@@ -51,32 +51,37 @@ const Products = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchProducts());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(fetchProducts({ page: page }));
-  }, [page]);
+  }, [page, dispatch]);
 
   useEffect(() => {
+    dispatch(setPage(1));
     if (searchByName === "") {
       dispatch(fetchProducts());
       return;
     }
     dispatch(fetchProductsByName(searchByName));
-  }, [searchByName]);
+  }, [searchByName, dispatch]);
 
   useEffect(() => {
+    dispatch(setPage(1));
     if (selectedCategory === "") {
       dispatch(fetchProducts());
     }
     dispatch(fetchProductsByCategory(selectedCategory));
-  }, [selectedCategory]);
+  }, [selectedCategory, dispatch]);
 
   const resetForm = () => {
     setName("");
     setPrice("");
     setCategories("");
     setIsStockAvailable("");
+  };
+  const handlePageChange = (newPage) => {
+    dispatch(setPage(newPage));
   };
 
   const handleDelete = async (id) => {
@@ -330,13 +335,15 @@ const Products = () => {
             </tbody>
           </table>
         </div>
-        <div className="my-6">
-          <Pagination
-            initialPage={page}
-            total={paging?.totalPages}
-            onChange={(page) => dispatch(setPage(page))}
-          />
-        </div>
+        {products && products.length > 0 && paging && paging.totalPages > 1 && (
+          <div className="my-6">
+            <Pagination
+              initialPage={page}
+              total={paging?.totalPages}
+              onChange={handlePageChange}
+            />
+          </div>
+        )}
       </Container>
     </>
   );
