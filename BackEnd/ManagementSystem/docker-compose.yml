@@ -30,6 +30,8 @@ services:
       DDL_AUTO: ${DDL_AUTO}
       SHOW_SQL: ${SHOW_SQL}
       API_DOCS: ${API_DOCS}
+      MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY}
+      MIDTRANS_IS_PRODUCTION: ${MIDTRANS_IS_PRODUCTION}
     depends_on:
       - db
     volumes:

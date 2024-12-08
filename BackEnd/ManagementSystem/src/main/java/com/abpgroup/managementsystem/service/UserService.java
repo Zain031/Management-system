@@ -15,7 +15,7 @@ public interface UserService extends UserDetailsService {
     UsersResponseDTO update(Long id, UsersRequestDTO user);
     UsersResponseDTO delete(Long id);
     UsersResponseDTO findById(Long id);
-    List<UsersResponseDTO> getAllUsers();
+    Page<UsersResponseDTO> getAllUsers(Pageable pageable);
     Page<UsersResponseDTO> getUserByName(String name, Pageable pageable);
     byte[] generatedPdf(List<Users> users) ;
 }

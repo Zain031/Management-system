@@ -151,9 +151,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UsersResponseDTO> getAllUsers() {
-        List<Users> users = userRepository.findAll();
-        return users.stream().map(this::convertToResponse).toList();
+    public Page<UsersResponseDTO> getAllUsers(Pageable pageable) {
+        Page<Users> users = userRepository.findAll(pageable);
+        return users.map(this::convertToResponse);
     }
 
     @Override

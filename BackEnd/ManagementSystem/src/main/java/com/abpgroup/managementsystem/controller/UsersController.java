@@ -47,13 +47,13 @@ public class UsersController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<CommonResponse<?>> getAllUsers() {
+    public ResponseEntity<CommonResponse<?>> getAllUsers(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
-            List<UsersResponseDTO> usersResponseDTOList = userService.getAllUsers();
-            CommonResponse<List<UsersResponseDTO>> commonResponse = CommonResponse.<List<UsersResponseDTO>>builder()
+            Page<UsersResponseDTO> usersResponseDTOS = userService.getAllUsers(PageRequest.of(page, size));
+            CommonResponse<Page<UsersResponseDTO>> commonResponse = CommonResponse.<Page<UsersResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
-                    .message("Successfully retrieved all users")
-                    .data(Optional.ofNullable(usersResponseDTOList))
+                    .message("Successfully retrieved users")
+                    .data(Optional.ofNullable(usersResponseDTOS))
                     .build();
 
             return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
