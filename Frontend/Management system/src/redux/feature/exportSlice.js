@@ -6,10 +6,9 @@ export const exportUsers = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/auth/export-pdf", {
-        responseType: "blob", // Pastikan respons berupa file (PDF/Excel/CSV)
+        responseType: "blob",
       });
 
-      // Buat Blob URL
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -18,7 +17,7 @@ export const exportUsers = createAsyncThunk(
       link.click();
       link.parentNode.removeChild(link);
 
-      return true; // Kembalikan nilai jika perlu
+      return true;
     } catch (e) {
       return rejectWithValue(e.message || "Failed to export users");
     }
@@ -33,7 +32,6 @@ export const exportProducts = createAsyncThunk(
         responseType: "blob",
       });
 
-      // Buat Blob URL
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -49,12 +47,143 @@ export const exportProducts = createAsyncThunk(
   }
 );
 
+export const exportInventoryPerMonth = createAsyncThunk(
+  "export/exportInventoryPerMonth",
+  async ({ year, month }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/inventory/export-pdf-month/${month}`,
+        { year },
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `inventory-${year}-${month}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+
+      return true;
+    } catch (e) {
+      return rejectWithValue(e.message || "Failed to export inventory");
+    }
+  }
+);
+export const exportInventoryPerDate = createAsyncThunk(
+  "export/exportInventoryPerDate",
+  async ({ date }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/inventory/export-pdf-date/${date}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `inventory-${date}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+
+      return true;
+    } catch (e) {
+      return rejectWithValue(e.message || "Failed to export inventory");
+    }
+  }
+);
+
+export const exportPaymentReceipt = createAsyncThunk(
+  "export/exportPaymentReceipt",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/payment/generate-receipt/${id}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `payment-receipt-${id}-${Date.now()}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+
+      return true;
+    } catch (e) {
+      return rejectWithValue(e.message || "Failed to export payment receipt");
+    }
+  }
+);
+
+export const exportOrdersPerMonth = createAsyncThunk(
+  "export/exportOrderPerMonth",
+  async ({ year, month }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/orders/export-pdf-month/${month}`,
+        { year },
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "orders.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+
+      return true;
+    } catch (e) {
+      return rejectWithValue(e.message || "Failed to export orders");
+    }
+  }
+);
+
+export const exportOrdersPerDate = createAsyncThunk(
+  "export/exportOrderPerDate",
+  async ({ date }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/orders/export-pdf-date/${date}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "orders.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+
+      return true;
+    } catch (e) {
+      return rejectWithValue(e.message || "Failed to export orders");
+    }
+  }
+);
+
 const exportSlice = createSlice({
   name: "export",
   initialState: {
     loading: false,
     error: null,
-    success: null, // Tambahkan untuk status berhasil
+    success: null,
   },
   reducers: {
     clearExportStatus: (state) => {
@@ -87,6 +216,71 @@ const exportSlice = createSlice({
         state.success = "Products exported successfully!";
       })
       .addCase(exportProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(exportInventoryPerMonth.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
+      })
+      .addCase(exportInventoryPerMonth.fulfilled, (state) => {
+        state.loading = false;
+        state.success = "Inventory exported successfully!";
+      })
+      .addCase(exportInventoryPerMonth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(exportInventoryPerDate.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
+      })
+      .addCase(exportInventoryPerDate.fulfilled, (state) => {
+        state.loading = false;
+        state.success = "Inventory exported successfully!";
+      })
+      .addCase(exportInventoryPerDate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(exportPaymentReceipt.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
+      })
+      .addCase(exportPaymentReceipt.fulfilled, (state) => {
+        state.loading = false;
+        state.success = "Payment receipt exported successfully!";
+      })
+      .addCase(exportPaymentReceipt.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(exportOrdersPerMonth.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
+      })
+      .addCase(exportOrdersPerMonth.fulfilled, (state) => {
+        state.loading = false;
+        state.success = "Orders exported successfully!";
+      })
+      .addCase(exportOrdersPerMonth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(exportOrdersPerDate.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
+      })
+      .addCase(exportOrdersPerDate.fulfilled, (state) => {
+        state.loading = false;
+        state.success = "Orders exported successfully!";
+      })
+      .addCase(exportOrdersPerDate.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
