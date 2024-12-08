@@ -25,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -156,6 +157,8 @@ public class InventoryServiceImpl implements InventoryService {
 
             // Define column widths
             float[] columnWidths = {0.8f, 3f, 2f, 2f, 2f, 2f, 2.5f, 2.5f, 2.5f};
+            // Sort inventory by dateMaterialBuy in ascending order
+            inventory.sort(Comparator.comparing(Inventory::getDateMaterialBuy));
 
             int itemsPerPage = 10;
             int totalItems = inventory.size();
@@ -257,6 +260,8 @@ public class InventoryServiceImpl implements InventoryService {
                     .setFontSize(12)
                     .setMarginBottom(10);
             document.add(date);
+            // Sort inventory by dateMaterialBuy in ascending order
+            inventory.sort(Comparator.comparing(Inventory::getDateMaterialBuy));
 
             // Define column widths
             float[] columnWidths = {0.8f, 3f, 2f, 2f, 2f, 2f, 2.5f, 2.5f, 2.5f};

@@ -439,6 +439,7 @@ const Inventory = () => {
                 <th>Discount (per Material)</th>
                 <th>Total Price</th>
                 <th>User name</th>
+                <th>Date Buy</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -493,6 +494,8 @@ const Inventory = () => {
                     </td>
 
                     <td>{item.user.name}</td>
+
+                    <td>{item.date_material_buy}</td>
 
                     <td className="flex gap-8">
                       <button
