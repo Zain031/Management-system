@@ -138,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
             document.setMargins(20, 20, 20, 20);
 
             // Add title
-            Paragraph title = new Paragraph("Product Report By Date")
+            Paragraph title = new Paragraph("Product Report")
                     .setBold()
                     .setFontSize(16)
                     .setTextAlignment(TextAlignment.CENTER)
@@ -146,11 +146,6 @@ public class ProductServiceImpl implements ProductService {
             document.add(title);
 
             document.add(new Paragraph(" "));
-
-            // Define column widths
-            float[] columnWidths = {0.8f, 3f, 2f, 2f, 2.5f};
-            Table table = new Table(UnitValue.createPercentArray(columnWidths));
-            table.setWidth(UnitValue.createPercentValue(100));
 
             int itemsPerPage = 10;
             int totalItems = products.size();
@@ -161,9 +156,10 @@ public class ProductServiceImpl implements ProductService {
             long totalProductPrice = 0;
 
             for (int page = 0; page < totalPages; page++) {
-                if (page > 0) {
-                    document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-                }
+                // Add new table for each page
+                float[] columnWidths = {0.8f, 3f, 2f, 2f, 2.5f};
+                Table table = new Table(UnitValue.createPercentArray(columnWidths));
+                table.setWidth(UnitValue.createPercentValue(100));
 
                 // Add table header
                 table.addHeaderCell(new Cell().add(new Paragraph("No").setBold()).setTextAlignment(TextAlignment.CENTER));
@@ -172,7 +168,7 @@ public class ProductServiceImpl implements ProductService {
                 table.addHeaderCell(new Cell().add(new Paragraph("Category").setBold()).setTextAlignment(TextAlignment.CENTER));
                 table.addHeaderCell(new Cell().add(new Paragraph("Available Stock").setBold()).setTextAlignment(TextAlignment.CENTER));
 
-                // Rows
+                // Add rows for the current page
                 int start = page * itemsPerPage;
                 int end = Math.min(start + itemsPerPage, totalItems);
                 for (int i = start; i < end; i++) {
@@ -195,6 +191,11 @@ public class ProductServiceImpl implements ProductService {
                 }
 
                 document.add(table);
+
+                // Add a page break except for the last page
+                if (page < totalPages - 1) {
+                    document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                }
             }
 
             // Add total purchase paragraph
@@ -210,8 +211,8 @@ public class ProductServiceImpl implements ProductService {
         } catch (Exception e) {
             throw new RuntimeException("Error generating Product Report PDF", e);
         }
-
     }
+
 
     private ProductResponseDTO convertToResponse(Products product) {
         return ProductResponseDTO.builder()
