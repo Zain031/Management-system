@@ -10,8 +10,10 @@ import {
   deleteInventory,
   fetchInventories,
   fetchInventoryByCategory,
+  fetchInventoryById,
   fetchInventoryByName,
   setPage,
+  updateInventory,
 } from "../../redux/feature/InventorySlice";
 import { Pagination } from "@nextui-org/pagination";
 
@@ -26,7 +28,7 @@ const Inventory = () => {
   const [searchByName, setSearchByName] = useState("");
 
   const [isEditing, setIsEditing] = useState(false);
-  const { inventories, paging, page } = useSelector(
+  const { inventories, paging, page, inventoryById } = useSelector(
     (state) => state.inventories
   );
   const dispatch = useDispatch();
@@ -52,12 +54,25 @@ const Inventory = () => {
   }, [selectedCategory]);
 
   useEffect(() => {
-    console.log("Page", page);
     dispatch(fetchInventories({ page }));
   }, [page]);
 
-  console.log("Paging", paging);
+  useEffect(() => {
+    console.log("inventoryById", inventoryById);
+    if (isEditing) {
+      console.log("ini runninng");
+      setName(inventoryById.material_name);
+      setPrice(inventoryById.material_price_unit);
+      setCategory(inventoryById.material_category);
+      setQuantity(inventoryById.material_quantity);
+      setDiscount(inventoryById.material_discount);
+      setDate(inventoryById.date_material_buy);
+    }
+  }, [inventoryById]);
 
+  useEffect(() => {
+    console.log("test form", name, price, category, quantity, discount, date);
+  }, [name, price, category, quantity, discount, date]);
   const resetForm = () => {
     setName("");
     setPrice("");
@@ -71,12 +86,6 @@ const Inventory = () => {
   const filterByCategory = (category) => {
     setSelectedCategory(category); // Set kategori yang dipilih
   };
-
-  // Mengambil produk yang sudah difilter berdasarkan kategori
-  //   const filteredInventories = inventories?.content?.filter(
-  //     (Material) =>
-  //       selectedCategory === "" || Material.material_category === selectedCategory
-  //   );
 
   // Handle delete action
   const handleDelete = async (id) => {
@@ -136,7 +145,7 @@ const Inventory = () => {
     resetForm();
     await dispatch(fetchInventories());
   };
-  const handleEdit = (data) => {
+  const handleEdit = async (data) => {
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",
@@ -148,13 +157,14 @@ const Inventory = () => {
         toast.onmouseleave = Swal.resumeTimer;
       },
     });
+    await dispatch(updateInventory({ id: inventoryById.id_material, data }));
     Toast.fire({
       icon: "success",
       title: "Material has been updated",
     });
     document.getElementById("form_modal").close();
     resetForm();
-    dispatch(fetchInventories());
+    await dispatch(fetchInventories());
   };
 
   const handleSubmit = async (e) => {
@@ -179,6 +189,14 @@ const Inventory = () => {
 
   const onButtonAddClick = () => {
     document.getElementById("form_modal").showModal();
+  };
+  const onButtonEditClick = async (id) => {
+    setIsEditing(true);
+    await dispatch(fetchInventoryById(id));
+    document.getElementById("form_modal").showModal();
+  };
+  const onButtonDeleteClick = (id) => {
+    handleDelete(id);
   };
 
   return (
@@ -249,18 +267,19 @@ const Inventory = () => {
               />
 
               <select
-                value={category}
+                value={isEditing ? "TOOL" : ""}
                 className="input input-bordered input-ghost w-full my-2"
                 onChange={(e) => setCategory(e.target.value)}>
+                <option value="">Select Category</option>
                 <option value="FOODSTUFF">Foods Stuff</option>
-                <option value="TOOL">Toll</option>
+                <option value="TOOL">Tool</option>
                 <option value="ETC">Others</option>
               </select>
 
               <input
                 type="date"
                 className="input input-bordered input-ghost w-full my-2"
-                value={date}
+                defaultValue={isEditing ? date : ""}
                 onChange={(e) => setDate(e.target.value)}
               />
 
@@ -270,7 +289,14 @@ const Inventory = () => {
             </form>
             <div className="modal-action">
               <form method="dialog">
-                <button className="btn">Close</button>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    setIsEditing(false);
+                    resetForm();
+                  }}>
+                  Close
+                </button>
               </form>
             </div>
           </div>
@@ -329,10 +355,7 @@ const Inventory = () => {
 
                     <td>
                       {new Intl.NumberFormat("id-ID").format(
-                        (item.material_price_discount /
-                          (item.material_total_price +
-                            item.material_price_discount)) *
-                          100
+                        item.material_discount
                       )}{" "}
                       %
                     </td>
@@ -347,11 +370,14 @@ const Inventory = () => {
                     <td>{item.user.name}</td>
 
                     <td className="flex gap-8">
-                      <button className="tooltip" data-tip="Edit">
+                      <button
+                        className="tooltip"
+                        data-tip="Edit"
+                        onClick={() => onButtonEditClick(item.id_material)}>
                         <SquarePen size={28} color="#00d15b" />
                       </button>
                       <button
-                        onClick={() => handleDelete(item.id_Material)}
+                        onClick={() => onButtonDeleteClick(item.id_material)}
                         className=" text-white tooltip"
                         data-tip="Delete">
                         <Trash2 size={28} color="#d12a00" />

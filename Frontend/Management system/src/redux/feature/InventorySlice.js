@@ -5,14 +5,12 @@ import axiosInstance from "../../api/axios";
 export const fetchInventories = createAsyncThunk(
   "inventories/fetchInventories",
   async ({ page = 1, size = 10 } = {}, { rejectWithValue }) => {
-    console.log(page, size);
     try {
       const response = await axiosInstance.get(
         `/inventory?page=${page - 1}&size=${size}`
       );
       return response.data;
     } catch (e) {
-      console.error(e);
       const errorMessage =
         e.response?.data?.message || e.message || "Failed to fetch inventories";
       return rejectWithValue(errorMessage);
@@ -85,12 +83,9 @@ export const createInventory = createAsyncThunk(
 // Update an existing product
 export const updateInventory = createAsyncThunk(
   "inventories/updateInventory",
-  async (inventory, { rejectWithValue }) => {
+  async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(
-        `/inventory/${inventory.id}`,
-        inventory
-      );
+      const response = await axiosInstance.put(`/inventory/update/${id}`, data);
       return response.data;
     } catch (e) {
       return rejectWithValue(
@@ -154,7 +149,7 @@ const InventoriesSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchInventoryById.fulfilled, (state, action) => {
-        state.inventoryById = action.payload.data.content || null;
+        state.inventoryById = action.payload.data || null;
         state.status = "succeeded";
       })
       .addCase(fetchInventoryById.rejected, (state, action) => {
@@ -201,7 +196,7 @@ const InventoriesSlice = createSlice({
         state.status = "loading";
       })
       .addCase(createInventory.fulfilled, (state, action) => {
-        state.inventories.content.push(action.payload.data);
+        state.inventories.push(action.payload.data);
         state.status = "succeeded";
       })
       .addCase(createInventory.rejected, (state, action) => {
@@ -214,11 +209,12 @@ const InventoriesSlice = createSlice({
         state.status = "loading";
       })
       .addCase(updateInventory.fulfilled, (state, action) => {
+        console.log(action.payload.data);
         const index = state.inventories.findIndex(
-          (p) => p.id === action.payload.id
+          (p) => p.id_material === action.payload.data.id_material
         );
         if (index !== -1) {
-          state.inventories[index] = action.payload;
+          state.inventories[index] = action.payload.data;
         }
         state.status = "succeeded";
       })

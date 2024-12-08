@@ -5,10 +5,9 @@ import GuestLayout from "../layouts/guest-layout";
 import AppLayout from "../layouts/app-layout";
 import NotFound from "../components/errors/not-found";
 
-import { Users } from "lucide-react";
 import Products from "../pages/products";
 import Inventory from "../pages/inventory";
-
+import Users from "../pages/users";
 const router = createBrowserRouter([
   {
     path: "/",

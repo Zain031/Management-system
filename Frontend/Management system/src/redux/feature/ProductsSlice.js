@@ -41,6 +41,10 @@ export const fetchProductsByName = createAsyncThunk(
       const response = await axiosInstance.get(
         `/products/search/${searchTerm}`
       );
+      console.log("404 payload", response.status);
+      if (response.status === 404) {
+        return 404;
+      }
       return response.data;
     } catch (e) {
       return rejectWithValue(
@@ -184,6 +188,12 @@ const ProductsSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchProductsByName.fulfilled, (state, action) => {
+        if (action.payload === 404) {
+          state.products = [];
+          state.paging = null;
+          state.status = "succeeded";
+          return;
+        }
         state.products = action.payload.data.content || [];
         state.paging = {
           totalElements: action.payload.data.totalElements,
