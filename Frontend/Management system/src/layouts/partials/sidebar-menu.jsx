@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import {
   BaggageClaim,
-  FileUp,
   LayoutDashboard,
   PackageSearch,
   UserPlus,
@@ -32,12 +31,6 @@ function SidebarMenu() {
         <NavLink to="/users">
           <UserPlus size={30} strokeWidth={1.5} />
           User
-        </NavLink>
-      </li>
-      <li>
-        <NavLink to="/export">
-          <FileUp size={30} strokeWidth={1.5} />
-          Export
         </NavLink>
       </li>
     </>

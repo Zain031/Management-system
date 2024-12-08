@@ -16,6 +16,7 @@ import {
   updateInventory,
 } from "../../redux/feature/InventorySlice";
 import { Pagination } from "@nextui-org/pagination";
+import ButtonExport from "../../components/ButtonExport";
 
 const Inventory = () => {
   const [name, setName] = useState("");
@@ -228,6 +229,8 @@ const Inventory = () => {
               <option value="ETC">Others</option>
             </select>
           </label>
+
+          <ButtonExport>Export Inventory</ButtonExport>
 
           <button
             onClick={onButtonAddClick}

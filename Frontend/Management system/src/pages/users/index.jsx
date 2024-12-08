@@ -16,6 +16,8 @@ import {
   setPage,
 } from "../../redux/feature/AuthSlice";
 import { Pagination } from "@nextui-org/pagination";
+import ButtonExport from "../../components/ButtonExport";
+import { exportUsers } from "../../redux/feature/exportSlice";
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -164,6 +166,9 @@ const Users = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <ButtonExport onPress={() => dispatch(exportUsers())}>
+            Export Users
+          </ButtonExport>
           <button
             className="tooltip"
             data-tip="Add User"

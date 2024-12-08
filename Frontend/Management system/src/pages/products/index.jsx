@@ -16,6 +16,7 @@ import {
 import { Trash2 } from "lucide-react";
 import { SquarePen, SquarePlus } from "lucide-react";
 import { Pagination } from "@nextui-org/pagination";
+import ButtonExport from "../../components/ButtonExport";
 
 const Products = () => {
   const [productId, setProductId] = useState(null);
@@ -203,7 +204,7 @@ const Products = () => {
               <option value="DRINKS">Drinks</option>
             </select>
           </label>
-
+          <ButtonExport>Export Products</ButtonExport>
           <button
             onClick={onButtonAddClick}
             className="tooltip"
