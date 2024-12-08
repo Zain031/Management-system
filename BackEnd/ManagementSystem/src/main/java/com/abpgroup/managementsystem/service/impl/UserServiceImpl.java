@@ -6,6 +6,7 @@ import com.abpgroup.managementsystem.model.entity.AppUser;
 import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.UserService;
+import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
@@ -167,8 +168,14 @@ public class UserServiceImpl implements UserService {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             // Initialize PDF writer and document
             PdfWriter writer = new PdfWriter(outputStream);
+            PageSize pageSize = PageSize.A4.rotate();
             com.itextpdf.kernel.pdf.PdfDocument pdf = new com.itextpdf.kernel.pdf.PdfDocument(writer);
+
+            // Set page size
+            pdf.setDefaultPageSize(pageSize);
             Document document = new Document(pdf);
+            // Set document properties
+            document.setMargins(20, 20, 20, 20);
 
             // Add Title
             Paragraph title = new Paragraph("Users Data Export")

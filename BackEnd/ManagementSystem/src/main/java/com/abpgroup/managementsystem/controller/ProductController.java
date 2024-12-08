@@ -4,15 +4,20 @@ import com.abpgroup.managementsystem.constant.APIUrl;
 import com.abpgroup.managementsystem.model.dto.request.ProductRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.ProductResponseDTO;
+import com.abpgroup.managementsystem.model.entity.Products;
+import com.abpgroup.managementsystem.model.entity.Users;
+import com.abpgroup.managementsystem.repository.ProductsRepository;
 import com.abpgroup.managementsystem.service.ProductService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,6 +27,7 @@ import java.util.Optional;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductsRepository productsRepository;
 
     @PostMapping("/create")
     public ResponseEntity<CommonResponse<?>> createProduct(@RequestBody ProductRequestDTO productRequestDTO) {
@@ -148,6 +154,20 @@ public class ProductController {
         } catch (Exception e) {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve products: " + e.getMessage());
         }
+    }
+    @GetMapping("/export-pdf")
+    public ResponseEntity<byte[]> exportPdf() {
+        List<Products> products = productsRepository.findAll();
+        byte[] pdfContent = productService.generatedPdf(products);
+
+        // Set HTTP headers for file download
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=users.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdfContent);
     }
 
     private ResponseEntity<CommonResponse<?>> createErrorResponse(HttpStatus status, String errorMessage) {

@@ -7,7 +7,7 @@ const ButtonExport = ({ children, onPress, ...props }) => {
       onClick={onPress}
       {...props}
       data-tip={children}>
-      <Download size={50} color="#00d12a" />
+      <Download size={40} color="#00d12a" />
     </button>
   );
 };
