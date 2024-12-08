@@ -53,8 +53,8 @@ export const exportInventoryPerMonth = createAsyncThunk(
     try {
       const response = await axiosInstance.get(
         `/inventory/export-pdf-month/${month}`,
-        { year },
         {
+          params: { year },
           responseType: "blob",
         }
       );
@@ -66,13 +66,17 @@ export const exportInventoryPerMonth = createAsyncThunk(
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url); // Clean up URL
 
       return true;
     } catch (e) {
-      return rejectWithValue(e.message || "Failed to export inventory");
+      return rejectWithValue(
+        e.response?.data?.message || e.message || "Failed to export inventory"
+      );
     }
   }
 );
+
 export const exportInventoryPerDate = createAsyncThunk(
   "export/exportInventoryPerDate",
   async ({ date }, { rejectWithValue }) => {
@@ -91,10 +95,13 @@ export const exportInventoryPerDate = createAsyncThunk(
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url); // Clean up URL
 
       return true;
     } catch (e) {
-      return rejectWithValue(e.message || "Failed to export inventory");
+      return rejectWithValue(
+        e.response?.data?.message || e.message || "Failed to export inventory"
+      );
     }
   }
 );

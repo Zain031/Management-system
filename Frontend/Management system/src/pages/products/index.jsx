@@ -17,6 +17,7 @@ import { Trash2 } from "lucide-react";
 import { SquarePen, SquarePlus } from "lucide-react";
 import { Pagination } from "@nextui-org/pagination";
 import ButtonExport from "../../components/ButtonExport";
+import { exportProducts } from "../../redux/feature/exportSlice";
 
 const Products = () => {
   const [productId, setProductId] = useState(null);
@@ -33,7 +34,6 @@ const Products = () => {
     "Available",
     "Action",
   ];
-
   const [isEditing, setIsEditing] = useState(false);
 
   const [searchByName, setSearchByName] = useState("");
@@ -81,6 +81,7 @@ const Products = () => {
     setCategories("");
     setIsStockAvailable("");
   };
+
   const handlePageChange = (newPage) => {
     dispatch(setPage(newPage));
   };
@@ -118,6 +119,7 @@ const Products = () => {
     setProductId(id);
     dispatch(fetchProductById(id));
   };
+
   const handleEdit = async (data) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -178,10 +180,6 @@ const Products = () => {
     resetForm();
   };
 
-  //   const filteredProducts = products?.filter((product) =>
-  //     selectedCategory ? product.categories === selectedCategory : true
-  //   );
-
   return (
     <>
       <Container>
@@ -204,7 +202,9 @@ const Products = () => {
               <option value="DRINKS">Drinks</option>
             </select>
           </label>
-          <ButtonExport>Export Products</ButtonExport>
+          <ButtonExport onPress={() => dispatch(exportProducts())}>
+            Export Products
+          </ButtonExport>
           <button
             onClick={onButtonAddClick}
             className="tooltip"

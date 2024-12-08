@@ -17,6 +17,10 @@ import {
 } from "../../redux/feature/InventorySlice";
 import { Pagination } from "@nextui-org/pagination";
 import ButtonExport from "../../components/ButtonExport";
+import {
+  exportInventoryPerDate,
+  exportInventoryPerMonth,
+} from "../../redux/feature/exportSlice";
 
 const Inventory = () => {
   const [name, setName] = useState("");
@@ -27,6 +31,10 @@ const Inventory = () => {
   const [discount, setDiscount] = useState("");
   const [date, setDate] = useState("");
   const [searchByName, setSearchByName] = useState("");
+  const [exportPer, setExportPer] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const [isEditing, setIsEditing] = useState(false);
   const { inventories, paging, page, inventoryById } = useSelector(
@@ -206,6 +214,37 @@ const Inventory = () => {
     handleDelete(id);
   };
 
+  const yearOptionRange = () => {
+    const currentYear = new Date().getFullYear();
+    const endRangeYear = 2023;
+    const yearRange = [];
+    for (let i = currentYear; i >= endRangeYear; i--) {
+      yearRange.push(i);
+    }
+    return yearRange;
+  };
+
+  useEffect(() => {
+    console.log("date", selectedDate);
+    console.log("month", selectedMonth);
+    console.log("year", selectedYear);
+    console.log("export per", exportPer);
+  }, [selectedDate, selectedMonth, selectedYear, exportPer]);
+
+  const onButtonExportClick = () => {
+    document.getElementById("export_modal").showModal();
+  };
+  const handleExport = (e) => {
+    e.preventDefault();
+    if (exportPer == "date") {
+      dispatch(exportInventoryPerDate({ date: selectedDate }));
+    } else {
+      dispatch(
+        exportInventoryPerMonth({ month: selectedMonth, year: selectedYear })
+      );
+    }
+  };
+
   return (
     <>
       <Container>
@@ -230,7 +269,9 @@ const Inventory = () => {
             </select>
           </label>
 
-          <ButtonExport>Export Inventory</ButtonExport>
+          <ButtonExport onPress={onButtonExportClick}>
+            Export Inventory
+          </ButtonExport>
 
           <button
             onClick={onButtonAddClick}
@@ -239,6 +280,81 @@ const Inventory = () => {
             <SquarePlus size={50} color="#00d12a" />
           </button>
         </div>
+
+        <dialog id="export_modal" className="modal">
+          <div className="modal-box">
+            <form onSubmit={handleExport}>
+              <select
+                className="select select-bordered w-full my-2"
+                value={exportPer}
+                onChange={(e) => setExportPer(e.target.value)}>
+                <option value="" disabled>
+                  Select Export Per Date Or Month
+                </option>
+                <option value="month">Month</option>
+                <option value="date">Date</option>
+              </select>
+              {exportPer === "month" && (
+                <>
+                  <select
+                    className="select select-bordered w-full my-2"
+                    defaultValue={selectedMonth}
+                    placeholder="Select Month"
+                    onChange={(e) => setSelectedMonth(e.target.value)}>
+                    <option value="" disabled>
+                      Select Month
+                    </option>
+                    Select Month
+                    <option value="january">January</option>
+                    <option value="february">February</option>
+                    <option value="march">March</option>
+                    <option value="april">April</option>
+                    <option value="may">May</option>
+                    <option value="june">June</option>
+                    <option value="july">July</option>
+                    <option value="august">August</option>
+                    <option value="september">September</option>
+                    <option value="october">October</option>
+                    <option value="november">November</option>
+                    <option value="december">December</option>
+                  </select>
+                  <select
+                    className="select select-bordered w-full my-2"
+                    defaultValue={selectedYear}
+                    placeholder="Select Year"
+                    onChange={(e) => setSelectedYear(e.target.value)}>
+                    <option value="" disabled>
+                      Select Year
+                    </option>
+                    {yearOptionRange().map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
+              {exportPer === "date" && (
+                <input
+                  type="date"
+                  className="input input-bordered input-ghost w-full my-2"
+                  value={selectedDate}
+                  onChange={(e) =>
+                    setSelectedDate(e.target.value.split("T")[0])
+                  }
+                />
+              )}
+              <button className="btn btn-outline btn-primary w-full">
+                Submit
+              </button>
+            </form>
+            <div className="modal-action">
+              <form method="dialog">
+                <button className="btn">Close</button>
+              </form>
+            </div>
+          </div>
+        </dialog>
 
         <dialog id="form_modal" className="modal">
           <div className="modal-box">
