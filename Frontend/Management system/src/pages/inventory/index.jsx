@@ -252,7 +252,7 @@ const Inventory = () => {
         <div className="flex justify-end gap-5">
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search by name"
             onChange={(e) => setSearchByName(e.target.value)}
             className="input input-bordered w-full max-w-xs"
           />
@@ -452,11 +452,11 @@ const Inventory = () => {
                       <p
                         className={` ${
                           item.material_category === "FOODSTUFF"
-                            ? "bg-red-600 w-14 px-2 py-1 text-white rounded-sm"
+                            ? "bg-red-600 w-14 px-2 py-1 text-white rounded-md text-center"
                             : item.material_category === "TOOL"
-                            ? "bg-blue-600 w-14 px-2 py-1 text-white rounded-sm"
+                            ? "bg-blue-600 w-14 px-2 py-1 text-white rounded-md text-center"
                             : item.material_category === "ETC"
-                            ? "bg-green-600 w-14 px-2 py-1 text-white rounded-sm"
+                            ? "bg-green-600 w-14 px-2 py-1 text-white rounded-md text-center"
                             : ""
                         } font-bold`}>
                         {item.material_category === "FOODSTUFF"

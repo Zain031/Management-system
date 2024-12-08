@@ -187,7 +187,7 @@ const Products = () => {
         <div className="flex justify-end gap-5">
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search by name"
             className="input input-bordered w-full max-w-xs"
             onChange={(e) => setSearchByName(e.target.value)}
           />
@@ -289,9 +289,9 @@ const Products = () => {
                       <p
                         className={` ${
                           item.categories === "FOODS"
-                            ? "bg-red-600 w-14 px-2 py-1 text-white rounded-sm text-center"
+                            ? "bg-red-600 w-14 px-2 py-1 text-white rounded-md text-center"
                             : item.categories === "DRINKS"
-                            ? "bg-blue-600 w-14 px-2 py-1 text-white rounded-sm text-center"
+                            ? "bg-blue-600 w-14 px-2 py-1 text-white rounded-md text-center"
                             : ""
                         } font-bold`}>
                         {item.categories === "FOODS"

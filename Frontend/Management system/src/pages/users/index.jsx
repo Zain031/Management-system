@@ -172,7 +172,8 @@ const Users = () => {
           <button
             className="tooltip"
             data-tip="Add User"
-            onClick={onButtonAddClick}>
+            onClick={onButtonAddClick}
+          >
             <SquarePlus size={50} color="#00d12a" />
           </button>
         </div>
@@ -206,7 +207,8 @@ const Users = () => {
               <select
                 className="select select-bordered w-full max-w-xs"
                 defaultValue={role}
-                onChange={(e) => setRole(e.target.value)}>
+                onChange={(e) => setRole(e.target.value)}
+              >
                 <option value="">Select Role</option>
                 <option value="SUPER_ADMIN">Super Admin</option>
                 <option value="ADMIN">Admin</option>
@@ -243,20 +245,38 @@ const Users = () => {
                     <td>{index + 1}</td>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
-                    <td>{user.role}</td>
+                    <td>
+                      <p
+                        className={`${
+                          user.role === "SUPER_ADMIN"
+                            ? "bg-blue-600 w-24 px-2 py-1 text-white rounded-md text-center"
+                            : user.role === "ADMIN"
+                            ? "bg-red-600 w-24 px-2 py-1 text-white rounded-md text-center"
+                            : user.role === "CUSTOMER"
+                        } font-bold text-center`}
+                      >
+                        {user.role === "SUPER_ADMIN"
+                          ? "Super Admin"
+                          : user.role === "ADMIN"
+                          ? "Admin"
+                          : "Customer"}
+                      </p>
+                    </td>
                     <td>{user.created_at.split("T")[0]}</td>
                     <td>
                       <div className="flex gap-4">
                         <button
                           className="tooltip"
                           data-tip="Edit"
-                          onClick={() => onButtonEditClick(user.id_user)}>
+                          onClick={() => onButtonEditClick(user.id_user)}
+                        >
                           <SquarePen size={28} color="#00d15b" />
                         </button>
                         <button
                           onClick={() => handleDelete(user.id_user)}
                           className="tooltip"
-                          data-tip="Delete">
+                          data-tip="Delete"
+                        >
                           <Trash2 size={28} color="#d12a00" />
                         </button>
                       </div>
