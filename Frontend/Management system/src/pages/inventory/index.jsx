@@ -36,10 +36,18 @@ const Inventory = () => {
   }, []);
 
   useEffect(() => {
+    if (searchByName === "") {
+      dispatch(fetchInventories({ page }));
+      return;
+    }
     dispatch(fetchInventoryByName({ name: searchByName, page }));
   }, [searchByName]);
 
   useEffect(() => {
+    if (selectedCategory === "") {
+      dispatch(fetchInventories({ page }));
+      return;
+    }
     dispatch(fetchInventoryByCategory({ category: selectedCategory, page }));
   }, [selectedCategory]);
 
@@ -188,10 +196,9 @@ const Inventory = () => {
           <label className="form-control max-w-xs">
             <select
               className="select select-bordered"
+              value={selectedCategory}
               onChange={(e) => filterByCategory(e.target.value)}>
-              <option selected value="ALL">
-                All Categories
-              </option>
+              <option value="">All Categories</option>
               <option value="FOODSTUFF">Foodstuffs</option>
               <option value="TOOL">Tools</option>
               <option value="ETC">Others</option>

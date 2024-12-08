@@ -191,7 +191,7 @@ const Products = () => {
           <label className="form-control max-w-xs">
             <select
               className="select select-bordered"
-              value={isEditing ? productById?.categories : ""}
+              value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}>
               <option value="">All Categories</option>
               <option value="FOODS">Foods</option>
@@ -228,9 +228,9 @@ const Products = () => {
 
               <select
                 className="select select-bordered w-full my-2"
-                selected={categories}
+                value={isEditing ? productById?.categories : ""}
                 onChange={(e) => setCategories(e.target.value)}>
-                <option value="" disabled selected>
+                <option value="" disabled>
                   Select Category
                 </option>
                 <option value="DRINKS">Drink</option>
@@ -239,6 +239,7 @@ const Products = () => {
 
               <select
                 className="select select-bordered w-full my-2"
+                value={isStockAvailable ? "true" : "false"}
                 onChange={(e) =>
                   setIsStockAvailable(e.target.value === "true")
                 }>
