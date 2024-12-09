@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/axios";
-
 const getMonthName = (month) => {
   const months = [
     "January",
@@ -19,7 +18,7 @@ const getMonthName = (month) => {
   return months[month - 1];
 };
 
-export const fetchPurchasesPerMonthInLastOneYear = createAsyncThunk(
+export const fetchPurchasesPerMonthInRange = createAsyncThunk(
   "purchases/fetchPurchases",
   async ({ startDate, endDate } = {}, { rejectWithValue }) => {
     try {
@@ -30,73 +29,59 @@ export const fetchPurchasesPerMonthInLastOneYear = createAsyncThunk(
       const end = endDate ? new Date(endDate) : new Date();
 
       const dataPurchase = [];
-      const rangeYearAndMonth = [];
       const startYear = start.getFullYear();
       const startMonth = start.getMonth();
       const endYear = end.getFullYear();
       const endMonth = end.getMonth();
 
-      let currentYear = startYear;
-      let currentMonth = startMonth;
-
-      while (
+      for (
+        let currentYear = startYear, currentMonth = startMonth;
         currentYear < endYear ||
-        (currentYear === endYear && currentMonth <= endMonth)
+        (currentYear === endYear && currentMonth <= endMonth);
+        currentMonth++
       ) {
-        rangeYearAndMonth.push({ year: currentYear, month: currentMonth + 1 });
-        currentMonth++;
         if (currentMonth > 11) {
           currentMonth = 0;
           currentYear++;
         }
+        const monthName = getMonthName(currentMonth + 1);
+        const response = await axiosInstance.get(
+          `/purchases/month/${monthName}?years=${currentYear}`
+        );
+        dataPurchase.push({
+          year: currentYear,
+          month: monthName,
+          purchases: response.data.data,
+        });
       }
-
-      rangeYearAndMonth.sort(
-        (a, b) => new Date(a.year, a.month - 1) - new Date(b.year, b.month - 1)
-      );
-
-      //   for (const { year, month } of rangeYearAndMonth) {
-      //     const monthName = getMonthName(month);
-      //     const response = await axiosInstance.get(
-      //       `/purchases/month/${monthName}?years=${year}`
-      //     );
-      //     dataPurchase.push({
-      //       year,
-      //       month: monthName,
-      //       purchases: response.data.data,
-      //     });
-      //   }
-
-      await Promise.all(
-        rangeYearAndMonth.map(async ({ year, month }) => {
-          const monthName = getMonthName(month);
-          const response = await axiosInstance.get(
-            `/purchases/month/${monthName}?years=${year}`
-          );
-          dataPurchase.push({
-            year,
-            month: monthName,
-            purchases: response.data.data,
-          });
-        })
-      );
 
       dataPurchase.sort(
         (a, b) =>
-          new Date(a.year, new Date(a.month).getMonth()) -
-          new Date(b.year, new Date(b.month).getMonth())
+          new Date(a.year, getMonthName(a.month) - 1) -
+          new Date(b.year, getMonthName(b.month) - 1)
       );
 
-      const data = dataPurchase.map((item) => {
-        console.log(item.purchases);
-        return item.purchases;
-      });
-      return data;
+      return dataPurchase.map((item) => item.purchases);
     } catch (error) {
       return rejectWithValue(error?.message || "Failed to fetch purchases");
     }
   }
 );
+
+export const fetchPurchasesPerDay = createAsyncThunk(
+  "purchases/fetchPurchasesPerDay",
+  async ({ startDate, endDate } = {}, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/purchases?startDate=${startDate}&endDate=${endDate}`
+      );
+      return response.data;
+    } catch (e) {
+      return rejectWithValue(e || "Failed to fetch purchases per day");
+    }
+  }
+);
+
 export const fetchPurchaseById = createAsyncThunk(
   "purchases/fetchById",
   async (id, { rejectWithValue }) => {
@@ -156,24 +141,17 @@ const PurchaseSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPurchasesPerMonthInLastOneYear.pending, (state) => {
+      .addCase(fetchPurchasesPerMonthInRange.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(
-        fetchPurchasesPerMonthInLastOneYear.fulfilled,
-        (state, action) => {
-          state.purchases = action.payload.data || [];
-          state.paging = action.payload.paging;
-          state.status = "succeeded";
-        }
-      )
-      .addCase(
-        fetchPurchasesPerMonthInLastOneYear.rejected,
-        (state, action) => {
-          state.status = "failed";
-          state.error = action.payload;
-        }
-      )
+      .addCase(fetchPurchasesPerMonthInRange.fulfilled, (state, action) => {
+        state.purchases = action.payload || [];
+        state.status = "succeeded";
+      })
+      .addCase(fetchPurchasesPerMonthInRange.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
       .addCase(fetchPurchaseById.fulfilled, (state, action) => {
         const packageWeddingById = action.payload.data;
         state.purchaseById = packageWeddingById;

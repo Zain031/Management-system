@@ -1,61 +1,50 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import ChartCompose from "../../components/ChartCompose";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Card } from "@nextui-org/card";
-import { fetchPurchasesPerMonthInLastOneYear } from "../../redux/feature/PurchaseSlice";
-// import {
-//   fetchDashboard,
-//   fetchDashboardStatus,
-// } from "../redux/feature/dashboardSlice";
-// import ChartCompose from "../../components/ChartCompose";
+import { fetchPurchasesPerMonthInRange } from "../../redux/feature/PurchaseSlice";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
-  //   const { (totalIncome || 20000), (totalIncome || 20000)Month, registerCount } = useSelector(
-  //     (state) => state.dashboard
-  //   );
+  const { purchases } = useSelector((state) => state.purchases);
+
   const [filterYear, setFilterYear] = useState(new Date().getFullYear());
   const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
 
   useEffect(() => {
-    dispatch(fetchPurchasesPerMonthInLastOneYear())
-      .unwrap()
-      .then((data) => {
-        console.log("Fetched purchases:", data);
-      })
-      .catch((error) => {
-        console.error("Error fetching purchases:", error);
-      });
+    dispatch(fetchPurchasesPerMonthInRange());
+    //   .unwrap()
+    //   .then((data) => {
+    //     console.log("Fetched purchases:", data);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching purchases:", error);
+    //   });
 
-    dispatch(
-      fetchPurchasesPerMonthInLastOneYear({
-        startDate: "2023-01-01",
-        endDate: "2024-12-31",
-      })
-    )
-      .unwrap()
-      .then((data) => {
-        console.log("Fetched purchases:", data);
-      })
-      .catch((error) => {
-        console.error("Error fetching purchases:", error);
-      });
+    // dispatch(
+    //   fetchPurchasesPerMonthInRange({
+    //     startDate: "2023-01-01",
+    //     endDate: "2024-12-31",
+    //   })
+    // )
+    //   .unwrap()
+    //   .then((data) => {
+    //     console.log("Fetched purchases:", data);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching purchases:", error);
+    //   });
   }, []);
 
-  //   useEffect(() => {
-  //     dispatch(fetchDashboardStatus({ month: filterMonth, year: filterYear }));
-  //     dispatch(fetchDashboard({ month: filterMonth, year: filterYear }));
-  //   }, []);
+  const formatterNumberToIndonesianFormat = (value) => {
+    return new Intl.NumberFormat("id-ID").format(value);
+  };
 
-  //   useEffect(() => {
-  //     dispatch(fetchDashboardStatus({ month: filterMonth, year: filterYear }));
-  //     dispatch(fetchDashboard({ month: filterMonth, year: filterYear }));
-  //   }, [filterMonth, filterYear]);
+  useEffect(() => {
+    console.log(purchases);
+  }, [purchases]);
 
-  //   useEffect(() => {
-  //     console.log(filterMonth, filterYear);
-  //   }, [filterMonth, filterYear]);
   return (
     <section className="flex flex-col gap-6">
       <section className="absolute top-2 right-10 flex gap-6 w-1/4">
@@ -127,7 +116,14 @@ const AdminDashboard = () => {
       </section>
       <section className="flex gap-4">
         <section className="bg-neutral-50 w-full rounded-xl py-4 px-6">
-          <ChartCompose />
+          <ChartCompose
+            data={purchases}
+            barDataKey={"purchase_total_quantity"}
+            barName={"Quantity"}
+            formatter={formatterNumberToIndonesianFormat}
+            // lineDataKey={"purchase_total_price"}
+            XAxisDataKey={"period"}
+          />
         </section>
       </section>
     </section>
