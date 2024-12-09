@@ -5,8 +5,11 @@ import { CloseSVG } from "../assets/svgs";
 import Navbar from "./partials/navbar";
 import SidebarMenu from "./partials/sidebar-menu";
 import { LogOut } from "lucide-react";
+import { logout } from "../redux/feature/AuthSlice";
+import { useDispatch } from "react-redux";
 
 function AppLayout() {
+  const dispatch = useDispatch();
   const [isDark, setIsDark] = useState(
     JSON.parse(localStorage.getItem("isDark"))
   );
@@ -51,7 +54,7 @@ function AppLayout() {
           </div>
           <SidebarMenu />
           <li className="flex-1 justify-end">
-            <NavLink to="/premium">
+            <NavLink to="/login" onClick={() => dispatch(logout())}>
               <LogOut size={30} strokeWidth={1.5} />
               <span className="font-bold">Logout</span>
             </NavLink>

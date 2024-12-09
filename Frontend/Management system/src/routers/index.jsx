@@ -9,10 +9,15 @@ import Products from "../pages/products";
 import Inventory from "../pages/inventory";
 import Users from "../pages/users";
 import AdminDashboard from "../pages/dashboard";
+import RequireAuth from "../components/HOC/RequireAuth";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     errorElement: <NotFound />,
     children: [
       {

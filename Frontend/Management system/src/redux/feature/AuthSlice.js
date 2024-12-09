@@ -3,9 +3,10 @@ import axiosInstance from "../../api/axios";
 
 // Helper functions
 const saveToLocalStorage = (key, value) => {
-  if (value) {
+  if (typeof value === "object") {
     localStorage.setItem(key, JSON.stringify(value));
-  } else {
+  } else if (typeof value === "string") localStorage.setItem(key, value);
+  else {
     localStorage.removeItem(key);
   }
 };
@@ -19,7 +20,7 @@ export const login = createAsyncThunk(
 
       console.log("🚀 ~ response:", response);
 
-      return response;
+      return response.data;
     } catch (e) {
       return rejectWithValue(e || "Login failed");
     }
@@ -161,9 +162,9 @@ const authSlice = createSlice({
       state.token = null;
       state.role = null;
       state.user = null;
-      saveToLocalStorage("token", null);
-      saveToLocalStorage("role", null);
-      saveToLocalStorage("user", null);
+      saveToLocalStorage("token");
+      saveToLocalStorage("role");
+      saveToLocalStorage("user");
     },
   },
   extraReducers: (builder) => {
@@ -173,7 +174,11 @@ const authSlice = createSlice({
         state.status.login = "loading";
       })
       .addCase(login.fulfilled, (state, action) => {
-        const { token, role, user } = action.payload.data;
+        const { token, user } = action.payload.data;
+        const { role } = user;
+        saveToLocalStorage("token", token);
+        saveToLocalStorage("role", role);
+        saveToLocalStorage("user", user);
         state.isLogin = true;
         state.token = token;
         state.role = role;
