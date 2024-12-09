@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/axios";
 
-const fetchDashboardData = createAsyncThunk(
+export const fetchDashboardData = createAsyncThunk(
   "dashboard/fetchDashboardData",
   async (year, { rejectWithValue }) => {
     try {
@@ -62,5 +62,3 @@ const dashboardSlice = createSlice({
 });
 
 export default dashboardSlice.reducer;
-
-export { fetchDashboardData };

@@ -53,10 +53,7 @@ const AdminDashboard = () => {
                 Total Income
               </h3>
               <p className="text-start font-extrabold text-mainGreen text-3xl">
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                }).format(totalPriceOrder)}
+                Rp. {new Intl.NumberFormat("id-ID").format(totalPriceOrder)}
               </p>
             </section>
           </section>
@@ -68,7 +65,7 @@ const AdminDashboard = () => {
                 Total Profit ({filterYear})
               </h3>
               <p className="text-start font-extrabold text-mainGreen text-3xl">
-                Rp {totalProfit.toLocaleString("id-ID")}
+                Rp. {totalProfit.toLocaleString("id-ID")}
               </p>
             </section>
           </section>
@@ -92,55 +89,13 @@ const AdminDashboard = () => {
                 Total Purchase ({filterYear})
               </h3>
               <p className="text-start font-extrabold text-mainGreen text-3xl">
-                {totalPriceInventory.toLocaleString("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                })}
+                Rp. {totalPriceInventory.toLocaleString("id-ID")}
               </p>
             </section>
           </section>
         </Card>
       </section>
       <section className="flex gap-4">
-        {/* <section className="bg-neutral-50 w-full rounded-xl py-4 px-6">
-          <ChartCompose
-            chartTitle={"Monthly Performance"}
-            data={monthlyPerformance}
-            barDataKey={"profit"}
-            barName={"Profit"}
-            areaDataKey={"totalPriceInventory"}
-            areaName={"Inventory"}
-            formatter={numberToIDR}
-            lineDataKey={"totalPriceOrder"}
-            lineName={"Revenue"}
-            XAxisDataKey={"month"}
-          />
-        </section> */}
-        {/* <MixBarChart
-          data={monthlyPerformance}
-          chartTitle="Monthly Performance"
-          XAxisDataKey="month"
-          formatter={numberToIDR}
-          barGroupOne={true}
-          barGroupTwo={true}
-          barGroupOneBars={[
-            { dataKey: "profit", name: "Profit", fill: "#8884d8" },
-            { dataKey: "totalPriceOrder", name: "Revenue", fill: "#82ca9d" },
-          ]}
-          barGroupTwoBars={[
-            {
-              dataKey: "totalPriceInventory",
-              name: "Inventory",
-              fill: "#82ca9d",
-            },
-            {
-              dataKey: "totalOrder",
-              name: "Total order",
-              fill: "#ffc658",
-            },
-          ]}
-        /> */}
-
         <DynamicGroupBarChart
           data={monthlyPerformance}
           chartTitle="Monthly Performance"
