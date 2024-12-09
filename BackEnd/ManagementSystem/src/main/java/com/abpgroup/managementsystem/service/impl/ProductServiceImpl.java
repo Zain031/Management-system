@@ -19,6 +19,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.AreaBreakType;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
     private final UsersRepository usersRepository;
 
     @Override
+    @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         if (productRequestDTO.getProductName() == null || productRequestDTO.getProductName().isEmpty()) {
             throw new IllegalArgumentException("Product name cannot be empty");

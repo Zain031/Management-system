@@ -17,6 +17,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.AreaBreakType;
 import com.itextpdf.layout.properties.TextAlignment;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +55,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Transactional
     public InventoryResponseDTO createInventory(InventoryRequestDTO inventoryRequestDTO) {
         if(inventoryRequestDTO.getMaterialName() == null || inventoryRequestDTO.getMaterialName().isEmpty()){
             throw new IllegalArgumentException("Material name cannot be empty");

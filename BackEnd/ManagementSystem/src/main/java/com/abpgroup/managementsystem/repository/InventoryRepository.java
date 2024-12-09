@@ -52,4 +52,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT i FROM Inventory i " +
             "WHERE i.dateMaterialBuy = :datePurchases")
     List<Inventory> getInventoryByDatePurchases(LocalDate datePurchases);
+
+    @Query("SELECT i FROM Inventory i " +
+            "WHERE i.years = :years")
+    List<Inventory> getInventoryByYears(Long years);
 }

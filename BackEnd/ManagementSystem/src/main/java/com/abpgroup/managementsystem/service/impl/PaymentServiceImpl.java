@@ -62,34 +62,35 @@ public class PaymentServiceImpl implements PaymentService {
             String midtransTransactionResponse = "pending"; // Default to "pending"
 
             if (paymentMethod == Payments.PaymentMethod.QRIS) {
-                double amount = paymentRequestDTO.getAmount()*0.007;
-                long amountLong = Math.round(paymentRequestDTO.getAmount())+Math.round(amount);
-                qrisTransactionResponse = midtransService.createQrisTransaction(String.valueOf(orderId), amountLong);
-                LocalDate now = LocalDate.now();
-                String idOrder = now + "_UjiCoba_" + orderId;
-                midtransTransactionResponse = midtransService.getTransactionStatus(idOrder);
+                // Tambahkan biaya tambahan untuk QRIS
+                double amountFee = paymentRequestDTO.getAmount() * 0.0075;
+                long totalAmount = Math.round(paymentRequestDTO.getAmount() + amountFee);
 
-                // Log the transaction response for debugging
+                // Buat transaksi QRIS menggunakan orderId
+                qrisTransactionResponse = midtransService.createQrisTransaction(String.valueOf(orderId), totalAmount);
+                midtransTransactionResponse = midtransService.getTransactionStatus(String.valueOf(orderId));
+
+                // Log untuk debugging
                 logger.info("QRIS Transaction Response: {}", midtransTransactionResponse);
 
-                // Update status order based on midtransTransactionResponse
+                // Perbarui status order berdasarkan respons Midtrans
                 updateOrderStatusBasedOnMidtrans(order, midtransTransactionResponse);
             }
 
             if (paymentMethod == Payments.PaymentMethod.CASH) {
-                // For cash payments, settle immediately
+                // Untuk pembayaran tunai, langsung settle
                 midtransTransactionResponse = "settlement";
                 updateOrderStatusBasedOnMidtrans(order, midtransTransactionResponse);
             }
 
-            // Save payment details
+            // Simpan detail pembayaran
             Payments payment = Payments.builder()
                     .order(order)
                     .amount(paymentRequestDTO.getAmount())
                     .method(paymentMethod)
-                    .paymentDate(LocalDateTime.now()) // Adjust if needed
+                    .paymentDate(LocalDateTime.now()) // Sesuaikan jika perlu
                     .qrisResponse(qrisTransactionResponse)
-                    .statusMidtrans(midtransTransactionResponse) // Default is "pending"
+                    .statusMidtrans(midtransTransactionResponse) // Default adalah "pending"
                     .build();
 
             paymentsRepository.save(payment);
@@ -97,18 +98,18 @@ public class PaymentServiceImpl implements PaymentService {
             return convertToResponse(payment);
 
         } catch (IllegalArgumentException e) {
-            // Validation error (e.g., invalid payment method)
+            // Validasi error (contoh: metode pembayaran tidak valid)
             throw e;
 
         } catch (Exception e) {
-            // Log the error before throwing the exception
+            // Log error sebelum melemparkan exception
             logger.error("Failed to process payment for orderId: {}. Error: {}", orderId, e.getMessage(), e);
 
-            // If an error occurs, set order status to CANCELED
+            // Jika terjadi error, set status order menjadi CANCELED
             order.setStatus(Orders.OrderStatus.CANCELED);
             ordersRepository.save(order);
 
-            // Throw a more specific exception
+            // Lempar exception yang lebih spesifik
             throw new RuntimeException("Failed to process payment: " + e.getMessage(), e);
         }
     }

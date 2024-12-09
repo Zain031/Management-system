@@ -166,7 +166,7 @@ const Products = () => {
     e.preventDefault();
     document.getElementById("modal_form_product").close();
     const data = {
-      id_user: 2,
+      id_user: 1,
       product_name: name,
       product_price: price,
       categories,
@@ -234,7 +234,7 @@ const Products = () => {
 
               <select
                 className="select select-bordered w-full my-2"
-                value={isEditing ? productById?.categories : ""}
+                value={categories}
                 onChange={(e) => setCategories(e.target.value)}>
                 <option value="" disabled>
                   Select Category

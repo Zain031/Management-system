@@ -13,6 +13,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UsersResponseDTO register(UsersRequestDTO userRequest) {
+        // Validasi input
+        validateUserRequest(userRequest);
+
+        // Jika validasi berhasil, buat entitas pengguna
+        Users user = Users.builder()
+                .email(userRequest.getEmail())
+                .password(passwordEncoder.encode(userRequest.getPassword())) // Encrypt password
+                .name(userRequest.getName())
+                .role(Users.Role.valueOf(userRequest.getRole()))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        // Simpan pengguna ke database
+        userRepository.save(user);
+
+        // Konversi dan kembalikan respons
+        return convertToResponse(user);
+    }
+
+    // Metode validasi terpisah untuk menjaga kerapian kode
+    private void validateUserRequest(UsersRequestDTO userRequest) {
         if (userRequest.getEmail() == null || userRequest.getEmail().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
@@ -72,19 +96,8 @@ public class UserServiceImpl implements UserService {
         if (!isValidRole(userRequest.getRole())) {
             throw new IllegalArgumentException("Invalid role specified, must be SUPER_ADMIN or ADMIN");
         }
-
-        Users user = Users.builder()
-                .email(userRequest.getEmail())
-                .password(passwordEncoder.encode(userRequest.getPassword())) // Encrypt password
-                .name(userRequest.getName())
-                .role(Users.Role.valueOf(userRequest.getRole()))
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        userRepository.save(user);
-        return convertToResponse(user);
     }
+
 
     private boolean isValidEmail(@Email(message = "Invalid email format") @NotBlank(message = "Email cannot be blank") String email) {
         return email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");

@@ -27,6 +27,7 @@ public class MidtransServiceImpl implements MidtransService {
     private static final OkHttpClient httpClient = new OkHttpClient();
 
     @Override
+
     public String createQrisTransaction(String orderId, long amount) {
         try {
             // Set global Midtrans configuration
@@ -38,7 +39,7 @@ public class MidtransServiceImpl implements MidtransService {
             Map<String, Object> transactionDetails = new HashMap<>();
 
             LocalDate now = LocalDate.now();
-            transactionDetails.put("order_id",  now+"_UjiCoba_"+orderId);
+            transactionDetails.put("order_id",  now+"_UjiCoba2_"+orderId);
             transactionDetails.put("gross_amount", amount);
 
             chargeParams.put("transaction_details", transactionDetails);

@@ -19,6 +19,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductsRepository productsRepository;
 
     @Override
+    @Transactional
     public OrdersResponseDTO createOrder(OrdersRequestDTO ordersRequestDTO) {
         // Membuat entitas Order
         Orders order = Orders.builder()

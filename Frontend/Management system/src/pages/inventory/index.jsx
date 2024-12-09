@@ -186,7 +186,7 @@ const Inventory = () => {
     e.preventDefault();
     document.getElementById("form_modal").showModal();
     const data = {
-      id_user: 2,
+      id_user: 1,
       material_name: name,
       material_category: category,
       material_price_unit: price,
@@ -392,7 +392,7 @@ const Inventory = () => {
               />
 
               <select
-                value={isEditing ? "TOOL" : ""}
+                value={category}
                 className="input input-bordered input-ghost w-full my-2"
                 onChange={(e) => setCategory(e.target.value)}>
                 <option value="">Select Category</option>

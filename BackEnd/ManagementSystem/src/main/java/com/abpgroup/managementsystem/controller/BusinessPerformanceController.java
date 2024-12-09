@@ -19,10 +19,10 @@ import java.util.Optional;
 public class BusinessPerformanceController {
     private final BusinessPerformanceService businessPerformanceService;
 
-    @GetMapping("/period/{period}")
-    public ResponseEntity<CommonResponse<?>> getBusinessPerformanceByPeriod(@PathVariable String period, @RequestParam(name = "years", required = false) Long years) {
+    @GetMapping("/years/{years}")
+    public ResponseEntity<CommonResponse<?>> getBusinessPerformanceByYears(@PathVariable("years") Long years) {
         try {
-            BusinessPerformanceResponseDTO businessPerformanceResponseDTO = businessPerformanceService.getBusinessPerformanceByPeriodAndYears(period.toUpperCase(), years);
+            BusinessPerformanceResponseDTO businessPerformanceResponseDTO = businessPerformanceService.getBusinessPerformanceByYears(years);
             CommonResponse<BusinessPerformanceResponseDTO> commonResponse = CommonResponse.<BusinessPerformanceResponseDTO>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved business performance")
