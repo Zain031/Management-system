@@ -25,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.print.*;
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -153,22 +155,20 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    @Override
     public byte[] generatedReceipt(PaymentResponseDTO paymentResponseDTO) {
         if (paymentResponseDTO == null || paymentResponseDTO.getOrder() == null || paymentResponseDTO.getOrder().getOrderDetails() == null) {
             throw new IllegalArgumentException("Invalid paymentResponseDTO or missing order details");
         }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            // Generate PDF
             PdfWriter writer = new PdfWriter(outputStream);
             PdfDocument pdf = new PdfDocument(writer);
-
-            // Set flexible height but constrain all content to fit on one page
             pdf.setDefaultPageSize(new com.itextpdf.kernel.geom.PageSize(288, 432));
             Document document = new Document(pdf);
             document.setMargins(10, 10, 10, 10);
 
-            // Store Header
+            // Header
             document.add(new Paragraph("Dapoer Ajendam")
                     .setBold().setTextAlignment(TextAlignment.CENTER).setFontSize(10));
             document.add(new Paragraph("Jl. Perjuangan, Cinta Damai, Kec. Medan Helvetia,")
@@ -214,12 +214,38 @@ public class PaymentServiceImpl implements PaymentService {
 
             // Payment Summary
             double totalPrice = paymentResponseDTO.getOrder().getTotalPrice();
-            double paidAmount = paymentResponseDTO.getAmount();
-            double change = paidAmount - totalPrice;
+            double adminFee = 0.0;
+            double grandTotal = 0.0;
+            double paidAmount = 0.0;
+            double change = 0.0;
 
+            // Determine admin fee based on payment method
+            if (!"CASH".equalsIgnoreCase(paymentResponseDTO.getMethod())) {
+                adminFee = totalPrice * 0.0075; // Admin fee 0.75% for non-cash
+                grandTotal = totalPrice + adminFee;
+            }
+
+            if ("CASH".equalsIgnoreCase(paymentResponseDTO.getMethod())) {
+                paidAmount = paymentResponseDTO.getAmount();
+                grandTotal = totalPrice;
+                change = paidAmount - grandTotal;
+            }
+
+            // Display Summary
             document.add(new Paragraph(String.format("Total Items: %d", totalQuantity))
                     .setFontSize(8).setTextAlignment(TextAlignment.CENTER));
             document.add(new Paragraph(String.format("Total: Rp %.2f", totalPrice))
+                    .setBold().setFontSize(8).setTextAlignment(TextAlignment.CENTER));
+
+            if (adminFee > 0) {
+                document.add(new Paragraph(String.format("Admin Fee (0.75%%): Rp %.2f", adminFee))
+                        .setFontSize(8).setTextAlignment(TextAlignment.CENTER));
+            } else {
+                document.add(new Paragraph("Admin Fee: Rp 0 (Cash Payment)")
+                        .setFontSize(8).setTextAlignment(TextAlignment.CENTER));
+            }
+
+            document.add(new Paragraph(String.format("Grand Total: Rp %.2f", grandTotal))
                     .setBold().setFontSize(8).setTextAlignment(TextAlignment.CENTER));
             document.add(new Paragraph(String.format("Paid (%s): Rp %.2f", paymentResponseDTO.getMethod(), paidAmount))
                     .setFontSize(8).setTextAlignment(TextAlignment.CENTER));
@@ -235,11 +261,38 @@ public class PaymentServiceImpl implements PaymentService {
                     .setTextAlignment(TextAlignment.CENTER).setFontSize(7));
 
             document.close();
-            return outputStream.toByteArray();
+
+            byte[] pdfBytes = outputStream.toByteArray();
+
+            // Send PDF to Printer
+//        sendToPrinter(pdfBytes);
+
+            return pdfBytes;
         } catch (Exception e) {
-            throw new RuntimeException("Error generating PDF", e);
+            throw new RuntimeException("Error generating or printing PDF", e);
         }
     }
+
+
+//    private void sendToPrinter(byte[] pdfBytes) {
+//        try {
+//            // Locate default print service
+//            PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+//            if (printService == null) {
+//                throw new RuntimeException("No default print service found");
+//            }
+//
+//            // Create a print job
+//            DocPrintJob printJob = printService.createPrintJob();
+//            Doc pdfDoc = new SimpleDoc(new ByteArrayInputStream(pdfBytes), DocFlavor.INPUT_STREAM.AUTOSENSE, null);
+//
+//            // Print the document
+//            printJob.print(pdfDoc, null);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Error sending PDF to printer", e);
+//        }
+//    }
+
 
     private Cell createHeaderCell(String text) {
         return new Cell()

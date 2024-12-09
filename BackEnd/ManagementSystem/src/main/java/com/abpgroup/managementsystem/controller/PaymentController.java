@@ -12,6 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @RestController
@@ -39,27 +45,55 @@ public class PaymentController {
     }
 
     @GetMapping("/generate-receipt/{id_order}")
-    public ResponseEntity<byte[]> generateReceipt(@PathVariable(name = "id_order" ) Long orderId) {
-        try {
-            // Mendapatkan data PaymentResponseDTO berdasarkan orderId
-            PaymentResponseDTO paymentResponseDTO = paymentService.getPaymentById(orderId);
+    public ResponseEntity<byte[]> generateReceipt(@PathVariable(name = "id_order") Long orderId) {
+        // Mendapatkan data PaymentResponseDTO berdasarkan orderId
+        PaymentResponseDTO paymentResponseDTO = paymentService.getPaymentById(orderId);
 
-            // Menghasilkan struk kasir dalam bentuk PDF
-            byte[] pdfData = paymentService.generatedReceipt(paymentResponseDTO);
+        // Menghasilkan struk kasir dalam bentuk PDF
+        byte[] pdfData = paymentService.generatedReceipt(paymentResponseDTO);
 
-            // Menyiapkan header untuk pengunduhan file PDF
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=receipt_" + orderId + ".pdf");
+        // Tentukan folder tujuan untuk menyimpan file PDF
+        String folderPath = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Project-Fanny" + File.separator + "Data-Receipt";
+        Path path = Paths.get(folderPath);
 
-            // Mengembalikan respons dengan file PDF
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
-                    .body(pdfData);
-        } catch (Exception e) {
-            // Jika terjadi kesalahan, kembalikan status Internal Server Error
+        // Periksa apakah folder sudah ada, jika belum, buat folder
+        File dir = path.toFile();
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();  // Membuat folder jika belum ada
+            if (created) {
+                System.out.println("Folder berhasil dibuat di: " + path.toString());
+            } else {
+                System.out.println("Gagal membuat folder di: " + path.toString());
+            }
+        } else {
+            System.out.println("Folder sudah ada di: " + path.toString());
+        }
+
+        // Tentukan nama file PDF
+        String fileName = "receipt_" + orderId + ".pdf";
+        File file = new File(path.toFile(), fileName);
+
+        // Menyimpan file PDF ke dalam folder
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(pdfData);
+            System.out.println("File berhasil disimpan di: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            System.out.println("Terjadi kesalahan saat menyimpan file: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        // Menyiapkan header untuk pengunduhan file PDF
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=" + fileName);
+
+        // Mengembalikan respons dengan file PDF
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdfData);
+
     }
 
+
 }
+

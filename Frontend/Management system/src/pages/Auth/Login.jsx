@@ -29,7 +29,7 @@ const Login = () => {
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordPattern =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{6,}$/;
 
     if (!email.trim()) {
       setErrorEmail("Email cannot be blank");
@@ -149,7 +149,8 @@ const Login = () => {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                className="inline-block h-4 w-4">
+                className="inline-block h-4 w-4"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -169,7 +170,8 @@ const Login = () => {
           backgroundImage: `url(${logo})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-        }}>
+        }}
+      >
         <div className="absolute inset-0 bg-black opacity-30" />
       </div>
     </div>
