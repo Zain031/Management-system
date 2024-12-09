@@ -17,7 +17,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/@nextui-org/theme/dist/components/pagination.js"
+    "./node_modules/@nextui-org/theme/dist/components/(card|pagination|select|ripple|form|listbox|divider|popover|button|spinner|scroll-shadow).js"
   ],
   safelist: [...safeColors],
   theme: {

@@ -8,6 +8,7 @@ import NotFound from "../components/errors/not-found";
 import Products from "../pages/products";
 import Inventory from "../pages/inventory";
 import Users from "../pages/users";
+import AdminDashboard from "../pages/dashboard";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -16,7 +17,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <div>Dashboard</div>,
+        element: <AdminDashboard />,
       },
       {
         path: "/products",
