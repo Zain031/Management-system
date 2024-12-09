@@ -8,22 +8,26 @@ import {
   Tooltip,
   Legend,
   Line,
+  Area,
 } from "recharts";
 
 const ChartCompose = ({
   data,
   lineDataKey,
   barDataKey,
+  areaDataKey,
+  areaName,
   XAxisDataKey,
   barName,
   lineName,
   formatter,
+  chartTitle,
 }) => {
   return (
     <div className="flex flex-col items-center w-full relative -top-6 h-[500px]">
       <section>
         <h2 className="text-4xl text-mainSoil text-center my-6  font-extrabold">
-          Revenue
+          {chartTitle}
         </h2>
       </section>
       <ResponsiveContainer width="100%" height={400}>
@@ -44,6 +48,15 @@ const ChartCompose = ({
             }}
           />
           <Legend />
+          {areaDataKey && (
+            <Area
+              type="monotone"
+              dataKey={areaDataKey}
+              name={areaName}
+              fill="#8884d8"
+              stroke="#8884d8"
+            />
+          )}
           {barDataKey && (
             <Bar
               dataKey={`${barDataKey}`}
