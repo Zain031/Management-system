@@ -23,6 +23,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     dispatch(fetchDashboardData(2024));
   }, []);
+
   useEffect(() => {
     dispatch(fetchDashboardData(filterYear));
   }, [filterYear]);

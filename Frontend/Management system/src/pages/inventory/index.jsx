@@ -36,6 +36,31 @@ const Inventory = () => {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
+  const [materialNameValid, setMaterialNameValid] = useState({
+    valid: true,
+    message: "",
+  });
+  const [materialPriceValid, setMaterialPriceValid] = useState({
+    valid: true,
+    message: "",
+  });
+  const [materialCategoryValid, setMaterialCategoryValid] = useState({
+    valid: true,
+    message: "",
+  });
+  const [materialQuantityValid, setMaterialQuantityValid] = useState({
+    valid: true,
+    message: "",
+  });
+  const [materialDiscountValid, setMaterialDiscountValid] = useState({
+    valid: true,
+    message: "",
+  });
+  const [materialDateValid, setMaterialDateValid] = useState({
+    valid: true,
+    message: "",
+  });
+
   const [isEditing, setIsEditing] = useState(false);
   const { inventories, paging, page, inventoryById } = useSelector(
     (state) => state.inventories
@@ -93,12 +118,10 @@ const Inventory = () => {
     setDate("");
   };
 
-  // Filter data berdasarkan kategori yang dipilih
   const filterByCategory = (category) => {
-    setSelectedCategory(category); // Set kategori yang dipilih
+    setSelectedCategory(category);
   };
 
-  // Handle delete action
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -205,11 +228,13 @@ const Inventory = () => {
   const onButtonAddClick = () => {
     document.getElementById("form_modal").showModal();
   };
+
   const onButtonEditClick = async (id) => {
     setIsEditing(true);
     await dispatch(fetchInventoryById(id));
     document.getElementById("form_modal").showModal();
   };
+
   const onButtonDeleteClick = (id) => {
     handleDelete(id);
   };
@@ -224,16 +249,10 @@ const Inventory = () => {
     return yearRange;
   };
 
-  useEffect(() => {
-    console.log("date", selectedDate);
-    console.log("month", selectedMonth);
-    console.log("year", selectedYear);
-    console.log("export per", exportPer);
-  }, [selectedDate, selectedMonth, selectedYear, exportPer]);
-
   const onButtonExportClick = () => {
     document.getElementById("export_modal").showModal();
   };
+
   const handleExport = (e) => {
     e.preventDefault();
     if (exportPer == "date") {

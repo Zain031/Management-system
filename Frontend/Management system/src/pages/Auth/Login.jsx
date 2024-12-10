@@ -5,6 +5,10 @@ import Swal from "sweetalert2";
 import { login } from "../../redux/feature/AuthSlice";
 import { LockKeyhole, LockKeyholeOpen } from "lucide-react";
 import logo from "../../assets/logo.jpg";
+import {
+  isEmailValid,
+  isStrongPassword,
+} from "../../../utils/validation/inputValidation";
 
 const Login = () => {
   const [key, setKey] = useState(false);
@@ -27,14 +31,14 @@ const Login = () => {
     setErrorPassword("");
     setErrorEmail("");
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const passwordPattern =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{6,}$/;
+    // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // const passwordPattern =
+    //   /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{6,}$/;
 
     if (!email.trim()) {
       setErrorEmail("Email cannot be blank");
       isValid = false;
-    } else if (!emailPattern.test(email)) {
+    } else if (!isEmailValid(email)) {
       setErrorEmail("Invalid email format");
       isValid = false;
     }
@@ -42,10 +46,10 @@ const Login = () => {
     if (!password.trim()) {
       setErrorPassword("Password cannot be blank");
       isValid = false;
-    } else if (password.length < 6) {
-      setErrorPassword("Password must be at least 6 characters long");
+    } else if (password.length < 8) {
+      setErrorPassword("Password must be at least 8 characters long");
       isValid = false;
-    } else if (!passwordPattern.test(password)) {
+    } else if (!isStrongPassword(password)) {
       setErrorPassword(
         "Password must start with a capital letter, include a number, and a special character"
       );
@@ -75,6 +79,7 @@ const Login = () => {
 
       navigate("/");
     } catch (err) {
+      console.log(err);
       Swal.fire({
         icon: "error",
         title: "Login failed",
@@ -149,8 +154,7 @@ const Login = () => {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                className="inline-block h-4 w-4"
-              >
+                className="inline-block h-4 w-4">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -170,8 +174,7 @@ const Login = () => {
           backgroundImage: `url(${logo})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-        }}
-      >
+        }}>
         <div className="absolute inset-0 bg-black opacity-30" />
       </div>
     </div>

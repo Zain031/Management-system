@@ -18,7 +18,13 @@ import { SquarePen, SquarePlus } from "lucide-react";
 import { Pagination } from "@nextui-org/pagination";
 import ButtonExport from "../../components/ButtonExport";
 import { exportProducts } from "../../redux/feature/exportSlice";
-
+import {
+  dynamicValidation,
+  isBoolean,
+  isNotEmpty,
+  isValidPositiveNumber,
+  validateName,
+} from "../../../utils/validation/inputValidation";
 const Products = () => {
   const [productId, setProductId] = useState(null);
   const [name, setName] = useState("");
@@ -34,6 +40,24 @@ const Products = () => {
     "Available",
     "Action",
   ];
+
+  const [validateProductName, setValidateProductName] = useState({
+    valid: true,
+    message: "",
+  });
+  const [validateProductPrice, setValidateProductPrice] = useState({
+    valid: true,
+    message: "",
+  });
+  const [validateAvailableStock, setValidateAvailableStock] = useState({
+    valid: true,
+    message: "",
+  });
+  const [validateProductCategory, setValidateProductCategory] = useState({
+    valid: true,
+    message: "",
+  });
+
   const [isEditing, setIsEditing] = useState(false);
 
   const [searchByName, setSearchByName] = useState("");
@@ -164,7 +188,6 @@ const Products = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    document.getElementById("modal_form_product").close();
     const data = {
       id_user: 1,
       product_name: name,
@@ -172,6 +195,95 @@ const Products = () => {
       categories,
       available_stock: isStockAvailable,
     };
+
+    const validation = [
+      {
+        name: "product_name",
+        validator: (name) => {
+          console.log("debug name", name);
+          return isNotEmpty(name) && validateName(name);
+        },
+        negativeImpact: () =>
+          setValidateProductName({
+            valid: false,
+            message:
+              "Please enter a valid name, only letters and numbers are allowed",
+          }),
+        positiveImpact: () =>
+          setValidateProductName({
+            valid: true,
+            message: "",
+          }),
+      },
+      {
+        name: "product_price",
+        validator: (price) => {
+          console.log("debug price", price);
+          return isNotEmpty(price) && isValidPositiveNumber(price);
+        },
+        negativeImpact: () =>
+          setValidateProductPrice({
+            valid: false,
+            message:
+              "Please enter a valid price, only positive numbers are allowed",
+          }),
+        positiveImpact: () =>
+          setValidateProductPrice({
+            valid: true,
+            message: "",
+          }),
+      },
+      {
+        name: "categories",
+        validator: (categories) => {
+          console.log("debug categories", categories);
+          return isNotEmpty(categories);
+        },
+        negativeImpact: () =>
+          setValidateProductCategory({
+            valid: false,
+            message: "Please select a valid category",
+          }),
+        positiveImpact: () =>
+          setValidateProductCategory({
+            valid: true,
+            message: "",
+          }),
+      },
+      {
+        name: "available_stock",
+        validator: (isStockAvailable) => {
+          console.log("isStockAvailable", isStockAvailable);
+          return isBoolean(isStockAvailable);
+        },
+        negativeImpact: () =>
+          setValidateAvailableStock({
+            valid: false,
+            message: "Please select a valid available stock",
+          }),
+        positiveImpact: () =>
+          setValidateAvailableStock({
+            valid: true,
+            message: "",
+          }),
+      },
+    ];
+
+    let allValid = dynamicValidation(validation, data);
+    // for (let i = 0; i < validation.length; i++) {
+    //   if (!validation[i].validator(data[validation[i].name])) {
+    //     validation[i].negativeImpact();
+    //     allValid = false;
+    //   } else {
+    //     validation[i].positiveImpact();
+    //   }
+    // }
+
+    if (!allValid) {
+      return;
+    }
+
+    document.getElementById("modal_form_product").close();
     if (isEditing) {
       handleEdit({ id: productId, ...data });
     } else {
@@ -223,6 +335,9 @@ const Products = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
+              {!validateProductName.valid && (
+                <p className="text-error">{validateProductName.message}</p>
+              )}
 
               <input
                 type="number"
@@ -231,6 +346,9 @@ const Products = () => {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
+              {!validateProductPrice.valid && (
+                <p className="text-error">{validateProductPrice.message}</p>
+              )}
 
               <select
                 className="select select-bordered w-full my-2"
@@ -242,6 +360,9 @@ const Products = () => {
                 <option value="DRINKS">Drink</option>
                 <option value="FOODS">Food</option>
               </select>
+              {!validateProductCategory.valid && (
+                <p className="text-error">{validateProductCategory.message}</p>
+              )}
 
               <select
                 className="select select-bordered w-full my-2"
@@ -255,6 +376,9 @@ const Products = () => {
                 <option value="true">Ready</option>
                 <option value="false">Not Ready</option>
               </select>
+              {!validateAvailableStock.valid && (
+                <p className="text-error">{validateAvailableStock.message}</p>
+              )}
 
               <button className="btn btn-outline btn-primary w-full">
                 Submit
