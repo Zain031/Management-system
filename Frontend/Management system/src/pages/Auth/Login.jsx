@@ -24,16 +24,12 @@ const Login = () => {
     if (isLogin) {
       navigate("/");
     }
-  }, []);
+  }, [isLogin, navigate]);
 
   const validateInputs = () => {
     let isValid = true;
     setErrorPassword("");
     setErrorEmail("");
-
-    // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // const passwordPattern =
-    //   /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{6,}$/;
 
     if (!email.trim()) {
       setErrorEmail("Email cannot be blank");
@@ -93,10 +89,10 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen w-full   bg-gradient-to-r from-indigo-500 via-[#acdeff] to-[#acdeff]   ">
-      <div className="mb-12 mt-40 flex items-center px-8 text-center md:px-12 lg:w-1/2 lg:text-left  ">
-        <div className="xs:p-0 mx-auto mt-10 rounded-lg bg-white  p-4 shadow-md outline outline-1 outline-gray-300 md:w-3/4 opacity-80">
-          <h1 className="mb-5 mt-5 text-center text-2xl font-bold">Login</h1>
+    <div className="flex h-screen w-full bg-gradient-to-r from-indigo-500 via-[#acdeff] to-[#acdeff]">
+      <div className="mb-12 mt-16 flex items-center px-8 text-center md:px-12 lg:w-1/2 lg:text-left">
+        <div className="xs:p-0 mx-auto mt-10 rounded-lg bg-white p-4 shadow-md outline outline-1 outline-gray-300 md:w-3/4 opacity-80">
+          <h1 className="mb-5 mt-5 text-center text-xl md:text-2xl font-bold">Login</h1>
           <form className="px-5 py-7" onSubmit={handleSubmit}>
             <input
               type="text"
@@ -125,7 +121,7 @@ const Login = () => {
               {key ? (
                 <LockKeyholeOpen
                   onClick={handleKey}
-                  className="mt-2  cursor-pointer  "
+                  className="mt-2 cursor-pointer"
                   size={30}
                   color="#000000"
                   strokeWidth={1.25}
@@ -168,7 +164,7 @@ const Login = () => {
       </div>
 
       <div
-        className="relative hidden items-center justify-center lg:flex lg:w-1/2 brightness-150"
+        className="relative hidden lg:flex lg:w-1/2 brightness-150"
         style={{
           clipPath: "polygon(10% 0, 100% 0%, 100% 100%, 0 100%)",
           backgroundImage: `url(${logo})`,

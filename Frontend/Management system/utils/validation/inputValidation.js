@@ -58,6 +58,15 @@ export const isNikValid = (nik) => {
   return re.test(nik);
 };
 
+export const isPersentaseValid = (persentase) => {
+  if (persentase.length === 0) {
+    return true;
+  }
+  const number = Number(persentase);
+  const re = /^[0-9]+$/;
+  return re.test(persentase) && number <= 100;
+};
+
 export const validateImageType = (file) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
   return allowedTypes.includes(file.type);
