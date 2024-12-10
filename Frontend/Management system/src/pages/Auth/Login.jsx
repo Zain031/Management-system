@@ -62,14 +62,7 @@ const Login = () => {
 
     try {
       const authData = { email, password };
-      await dispatch(login(authData))
-        .unwrap()
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      await dispatch(login(authData)).unwrap();
 
       Swal.fire({
         icon: "success",
