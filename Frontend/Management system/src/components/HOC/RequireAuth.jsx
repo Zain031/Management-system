@@ -9,32 +9,34 @@ const RequireAuth = ({ children }) => {
   const { isLogin } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    const user = JSON.parse(localStorage.getItem("user"));
+    if (!isLogin) {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const user = JSON.parse(localStorage.getItem("user"));
 
-    const roles = ["ADMIN", "SUPER_ADMIN"];
+      const roles = ["ADMIN", "SUPER_ADMIN"];
 
-    const getKeepLogin = async () => {
-      if (!token || !role || !user) {
-        return false;
-      }
+      const getKeepLogin = async () => {
+        if (!token || !role || !user) {
+          return false;
+        }
 
-      const jwt = jwtDecode(token);
+        const jwt = jwtDecode(token);
 
-      if (!roles.includes(role)) {
-        return false;
-      }
+        if (!roles.includes(role)) {
+          return false;
+        }
 
-      const isTokenExpired = jwt.exp < Date.now() / 1000;
+        const isTokenExpired = jwt.exp < Date.now() / 1000;
 
-      if (isTokenExpired) {
-        localStorage.removeItem("token");
-        return false;
-      }
-      dispatch(setAuth({ token, role, user: JSON.stringify(user) }));
-    };
-    getKeepLogin();
+        if (isTokenExpired) {
+          localStorage.removeItem("token");
+          return false;
+        }
+        dispatch(setAuth({ token, role, user }));
+      };
+      getKeepLogin();
+    }
   }, [dispatch]);
 
   if (!isLogin) {

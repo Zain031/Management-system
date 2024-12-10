@@ -169,6 +169,7 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         const { token, user } = action.payload.data;
+        console.log("Payload", action.payload.data);
         const { role } = user;
         saveToLocalStorage("token", token);
         saveToLocalStorage("role", role);
