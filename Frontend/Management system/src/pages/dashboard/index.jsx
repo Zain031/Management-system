@@ -41,7 +41,6 @@ const AdminDashboard = () => {
           {yearOptionRange().map((year) => (
             <SelectItem key={String(year)} textValue={String(year)}>
               {year}
-              {console.log("year", year)}
             </SelectItem>
           ))}
         </Select>

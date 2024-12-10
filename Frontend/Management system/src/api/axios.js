@@ -8,6 +8,7 @@ axiosInstance.interceptors.request.use(
   (config) => {
     console.log("url when request", config.baseURL + config.url);
     const token = localStorage.getItem("token");
+    console.log("token", token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,7 +22,6 @@ axiosInstance.interceptors.response.use(
   (error) => {
     // if (error.response && error.response.status === 401) return Promise.reject(error)
     if (error.response.status === 404) {
-      console.log("Not Found Error", error.response.data);
       return error.response;
     }
     return Promise.reject(error.response.data);

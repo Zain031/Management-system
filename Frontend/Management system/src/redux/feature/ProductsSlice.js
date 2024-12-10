@@ -41,7 +41,6 @@ export const fetchProductsByName = createAsyncThunk(
       const response = await axiosInstance.get(
         `/products/search/${searchTerm}`
       );
-      console.log("404 payload", response.status);
       if (response.status === 404) {
         return 404;
       }

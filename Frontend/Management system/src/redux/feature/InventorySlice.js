@@ -131,7 +131,6 @@ const InventoriesSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchInventories.fulfilled, (state, action) => {
-        console.log("payload inventory", action.payload.data);
         state.inventories = action.payload.data.content || [];
         state.paging = {
           totalElements: action.payload.data.totalElements,
@@ -209,7 +208,6 @@ const InventoriesSlice = createSlice({
         state.status = "loading";
       })
       .addCase(updateInventory.fulfilled, (state, action) => {
-        console.log(action.payload.data);
         const index = state.inventories.findIndex(
           (p) => p.id_material === action.payload.data.id_material
         );

@@ -125,7 +125,6 @@ export const deletePurchase = createAsyncThunk(
       const response = await axiosInstance.delete(`/purchases/${id}`);
       return response.data;
     } catch (e) {
-      console.log(e);
       return rejectWithValue(e || "Failed to delete purchase");
     }
   }

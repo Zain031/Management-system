@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAuth } from "../../redux/feature/AuthSlice";
 import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-// import { useEffect } from "react";
-// import { keepLogin } from "../../redux/feature/AuthSlice";
 
 const RequireAuth = ({ children }) => {
   const dispatch = useDispatch();

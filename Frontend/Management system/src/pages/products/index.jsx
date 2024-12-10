@@ -94,8 +94,9 @@ const Products = () => {
 
   useEffect(() => {
     dispatch(setPage(1));
-    if (selectedCategory === "") {
+    if (selectedCategory.trim() === "") {
       dispatch(fetchProducts());
+      return;
     }
     dispatch(fetchProductsByCategory(selectedCategory));
   }, [selectedCategory, dispatch]);
@@ -219,7 +220,6 @@ const Products = () => {
       {
         name: "product_price",
         validator: (price) => {
-          console.log("debug price", price);
           return isNotEmpty(price) && isValidPositiveNumber(price);
         },
         negativeImpact: () =>
@@ -237,7 +237,6 @@ const Products = () => {
       {
         name: "categories",
         validator: (categories) => {
-          console.log("debug categories", categories);
           return isNotEmpty(categories);
         },
         negativeImpact: () =>
@@ -254,7 +253,6 @@ const Products = () => {
       {
         name: "available_stock",
         validator: (isStockAvailable) => {
-          console.log("isStockAvailable", isStockAvailable);
           return isBoolean(isStockAvailable);
         },
         negativeImpact: () =>

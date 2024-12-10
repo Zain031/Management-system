@@ -17,12 +17,8 @@ export const login = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(`/auth/login`, data);
-
-      console.log("🚀 ~ response:", response);
-
       return response.data;
     } catch (e) {
-      console.log("Response Error", e);
       return rejectWithValue(e || "Login failed");
     }
   }
@@ -53,8 +49,6 @@ export const fetchUsers = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      console.log(e);
-
       return rejectWithValue(
         e.response?.data?.message || "Failed to fetch users"
       );
@@ -97,7 +91,6 @@ export const fetchUsersById = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "auth/updateUser",
   async ({ id, data }, { rejectWithValue }) => {
-    console.log(id, data);
     try {
       const response = await axiosInstance.put(`/auth/update/${id}`, data);
       return response.data;
