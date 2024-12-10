@@ -61,10 +61,16 @@ const Products = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [searchByName, setSearchByName] = useState("");
-
   const { products, paging, productById, page } = useSelector(
     (state) => state.products
   );
+
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    console.log(user);
+    console.log(user.id_user);
+  }, [user]);
 
   useEffect(() => {
     setName(productById?.product_name || "");
@@ -189,12 +195,14 @@ const Products = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = {
-      id_user: 1,
+      id_user: user.id_user,
       product_name: name,
       product_price: price,
       categories,
       available_stock: isStockAvailable,
     };
+
+    console.log("Send data", data);
 
     const validation = [
       {
@@ -270,15 +278,6 @@ const Products = () => {
     ];
 
     let allValid = dynamicValidation(validation, data);
-    // for (let i = 0; i < validation.length; i++) {
-    //   if (!validation[i].validator(data[validation[i].name])) {
-    //     validation[i].negativeImpact();
-    //     allValid = false;
-    //   } else {
-    //     validation[i].positiveImpact();
-    //   }
-    // }
-
     if (!allValid) {
       return;
     }
