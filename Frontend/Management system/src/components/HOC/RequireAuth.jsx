@@ -34,9 +34,9 @@ const RequireAuth = ({ children }) => {
         localStorage.removeItem("token");
         return false;
       }
+      dispatch(setAuth({ token, role, user: JSON.stringify(user) }));
     };
     getKeepLogin();
-    dispatch(setAuth({ token, role, user: JSON.stringify(user) }));
   }, [dispatch]);
 
   if (!isLogin) {
