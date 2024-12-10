@@ -5,6 +5,7 @@ import { Card } from "@nextui-org/card";
 import { fetchDashboardData } from "../../redux/feature/dashboardSlice";
 import DynamicGroupBarChart from "../../components/DynamicGroupBarChart";
 import { numberToIDR } from "../../../utils/numberFormatter/numberToIDR";
+import yearOptionRange from "../../../utils/yearOptionRange";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -33,12 +34,19 @@ const AdminDashboard = () => {
       <section className="absolute top-2 right-10 flex gap-6 w-1/4">
         <Select
           label="Year"
-          selectedKeys={[String(filterYear)]}
+          selectedKeys={[filterYear]}
+          defaultValue={filterYear}
           variant="bordered"
           onChange={(e) => setFilterYear(e.target.value)}>
-          {Array.from({ length: 5 }, (_, index) => (
+          {/* {Array.from({ length: 5 }, (_, index) => (
             <SelectItem key={String(new Date().getFullYear() - index)}>
               {String(new Date().getFullYear() - index)}
+            </SelectItem>
+          ))} */}
+          {yearOptionRange().map((year) => (
+            <SelectItem key={String(year)} textValue={String(year)}>
+              {year}
+              {console.log("year", year)}
             </SelectItem>
           ))}
         </Select>

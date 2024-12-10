@@ -27,6 +27,7 @@ import {
   isValidPositiveNumber,
   validateName,
 } from "../../../utils/validation/inputValidation";
+import yearOptionRange from "../../../utils/yearOptionRange";
 
 const Inventory = () => {
   const [name, setName] = useState("");
@@ -348,16 +349,6 @@ const Inventory = () => {
 
   const onButtonDeleteClick = (id) => {
     handleDelete(id);
-  };
-
-  const yearOptionRange = () => {
-    const currentYear = new Date().getFullYear();
-    const endRangeYear = 2023;
-    const yearRange = [];
-    for (let i = currentYear; i >= endRangeYear; i--) {
-      yearRange.push(i);
-    }
-    return yearRange;
   };
 
   const onButtonExportClick = () => {
