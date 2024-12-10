@@ -6,7 +6,7 @@ export const isEmailValid = (email) => {
 
 export const isStrongPassword = (password) => {
   const re =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
   return re.test(password);
 };
 
@@ -56,6 +56,15 @@ export const isNikValid = (nik) => {
   }
   const re = /^[0-9]{16}$/;
   return re.test(nik);
+};
+
+export const isPersentaseValid = (persentase) => {
+  if (persentase.length === 0) {
+    return true;
+  }
+  const number = Number(persentase);
+  const re = /^[0-9]+$/;
+  return re.test(persentase) && number <= 100;
 };
 
 export const validateImageType = (file) => {

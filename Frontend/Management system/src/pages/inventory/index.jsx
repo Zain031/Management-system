@@ -24,6 +24,7 @@ import {
 import {
   dynamicValidation,
   isNotEmpty,
+  isPersentaseValid,
   isValidPositiveNumber,
   validateName,
 } from "../../../utils/validation/inputValidation";
@@ -292,13 +293,15 @@ const Inventory = () => {
       {
         name: "material_discount",
         validator: (discount) => {
-          return isNotEmpty(discount) && isValidPositiveNumber(discount);
+          const number = Number(discount);
+          return isNotEmpty(discount) && isValidPositiveNumber(discount) &&
+            (number <= 100 || isPersentaseValid(discount));
         },
         negativeImpact: () =>
           setMaterialDiscountValid({
             valid: false,
             message:
-              "Please enter a valid discount, only positive numbers are allowed",
+              "Please enter a valid discount, only positive numbers are allowed and not more than 100%",
           }),
         positiveImpact: () =>
           setMaterialDiscountValid({
@@ -492,7 +495,7 @@ const Inventory = () => {
               )}
 
               <input
-                type="text"
+                type="number"
                 placeholder="Material Price"
                 className="input input-bordered input-ghost w-full my-2"
                 value={price}
@@ -503,7 +506,7 @@ const Inventory = () => {
               )}
 
               <input
-                type="text"
+                type="number"
                 placeholder="Material Quantity"
                 className="input input-bordered input-ghost w-full my-2"
                 value={quantity}
@@ -514,7 +517,7 @@ const Inventory = () => {
               )}
 
               <input
-                type="text"
+                type="number"
                 placeholder="Material Discount"
                 className="input input-bordered input-ghost w-full my-2"
                 value={discount}
