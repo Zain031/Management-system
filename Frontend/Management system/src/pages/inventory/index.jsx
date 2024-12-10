@@ -21,6 +21,12 @@ import {
   exportInventoryPerDate,
   exportInventoryPerMonth,
 } from "../../redux/feature/exportSlice";
+import {
+  dynamicValidation,
+  isNotEmpty,
+  isValidPositiveNumber,
+  validateName,
+} from "../../../utils/validation/inputValidation";
 
 const Inventory = () => {
   const [name, setName] = useState("");
@@ -35,6 +41,8 @@ const Inventory = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+
+  const { user } = useSelector((state) => state.auth);
 
   const [materialNameValid, setMaterialNameValid] = useState({
     valid: true,
@@ -94,9 +102,7 @@ const Inventory = () => {
   }, [page]);
 
   useEffect(() => {
-    console.log("inventoryById", inventoryById);
     if (isEditing) {
-      console.log("ini runninng");
       setName(inventoryById.material_name);
       setPrice(inventoryById.material_price_unit);
       setCategory(inventoryById.material_category);
@@ -106,9 +112,6 @@ const Inventory = () => {
     }
   }, [inventoryById]);
 
-  useEffect(() => {
-    console.log("test form", name, price, category, quantity, discount, date);
-  }, [name, price, category, quantity, discount, date]);
   const resetForm = () => {
     setName("");
     setPrice("");
@@ -207,9 +210,8 @@ const Inventory = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    document.getElementById("form_modal").showModal();
     const data = {
-      id_user: 1,
+      id_user: user.id_user,
       material_name: name,
       material_category: category,
       material_price_unit: price,
@@ -218,6 +220,115 @@ const Inventory = () => {
       date_material_buy: date,
     };
 
+    const validation = [
+      {
+        name: "material_name",
+        validator: (name) => {
+          return isNotEmpty(name) && validateName(name);
+        },
+        negativeImpact: () =>
+          setMaterialNameValid({
+            valid: false,
+            message:
+              "Please enter a valid name, only letters and numbers are allowed",
+          }),
+        positiveImpact: () =>
+          setMaterialNameValid({
+            valid: true,
+            message: "",
+          }),
+      },
+      {
+        name: "material_category",
+        validator: (categories) => {
+          return isNotEmpty(categories);
+        },
+        negativeImpact: () =>
+          setMaterialCategoryValid({
+            valid: false,
+            message: "Please select a valid category",
+          }),
+        positiveImpact: () =>
+          setMaterialCategoryValid({
+            valid: true,
+            message: "",
+          }),
+      },
+      {
+        name: "material_price_unit",
+        validator: (price) => {
+          return isNotEmpty(price) && isValidPositiveNumber(price);
+        },
+        negativeImpact: () =>
+          setMaterialPriceValid({
+            valid: false,
+            message:
+              "Please enter a valid price, only positive numbers are allowed",
+          }),
+        positiveImpact: () =>
+          setMaterialPriceValid({
+            valid: true,
+            message: "",
+          }),
+      },
+      {
+        name: "material_quantity",
+        validator: (quantity) => {
+          return isNotEmpty(quantity) && isValidPositiveNumber(quantity);
+        },
+        negativeImpact: () =>
+          setMaterialQuantityValid({
+            valid: false,
+            message:
+              "Please enter a valid quantity, only positive numbers are allowed",
+          }),
+        positiveImpact: () =>
+          setMaterialQuantityValid({
+            valid: true,
+            message: "",
+          }),
+      },
+      {
+        name: "material_discount",
+        validator: (discount) => {
+          return isNotEmpty(discount) && isValidPositiveNumber(discount);
+        },
+        negativeImpact: () =>
+          setMaterialDiscountValid({
+            valid: false,
+            message:
+              "Please enter a valid discount, only positive numbers are allowed",
+          }),
+        positiveImpact: () =>
+          setMaterialDiscountValid({
+            valid: true,
+            message: "",
+          }),
+      },
+      {
+        name: "date_material_buy",
+        validator: (date) => {
+          return isNotEmpty(date);
+        },
+        negativeImpact: () =>
+          setMaterialDateValid({
+            valid: false,
+            message: "Please enter a valid date",
+          }),
+        positiveImpact: () =>
+          setMaterialDateValid({
+            valid: true,
+            message: "",
+          }),
+      },
+    ];
+
+    let allValid = dynamicValidation(validation, data);
+    if (!allValid) {
+      return;
+    }
+
+    document.getElementById("form_modal").showModal();
     if (isEditing) {
       handleEdit(data);
     } else {
@@ -385,6 +496,9 @@ const Inventory = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
+              {!materialNameValid.valid && (
+                <p className="text-red-500">{materialNameValid.message}</p>
+              )}
 
               <input
                 type="text"
@@ -393,6 +507,9 @@ const Inventory = () => {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
+              {!materialPriceValid.valid && (
+                <p className="text-red-500">{materialPriceValid.message}</p>
+              )}
 
               <input
                 type="text"
@@ -401,6 +518,9 @@ const Inventory = () => {
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
               />
+              {!materialQuantityValid.valid && (
+                <p className="text-red-500">{materialQuantityValid.message}</p>
+              )}
 
               <input
                 type="text"
@@ -409,6 +529,9 @@ const Inventory = () => {
                 value={discount}
                 onChange={(e) => setDiscount(e.target.value)}
               />
+              {!materialDiscountValid.valid && (
+                <p className="text-red-500">{materialDiscountValid.message}</p>
+              )}
 
               <select
                 value={category}
@@ -419,6 +542,9 @@ const Inventory = () => {
                 <option value="TOOL">Tool</option>
                 <option value="ETC">Others</option>
               </select>
+              {!materialCategoryValid.valid && (
+                <p className="text-red-500">{materialCategoryValid.message}</p>
+              )}
 
               <input
                 type="date"
@@ -426,6 +552,9 @@ const Inventory = () => {
                 defaultValue={isEditing ? date : ""}
                 onChange={(e) => setDate(e.target.value)}
               />
+              {!materialDateValid.valid && (
+                <p className="text-red-500">{materialDateValid.message}</p>
+              )}
 
               <button className="btn btn-outline btn-primary w-full">
                 Submit

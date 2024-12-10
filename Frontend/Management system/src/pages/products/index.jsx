@@ -68,11 +68,6 @@ const Products = () => {
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log(user);
-    console.log(user.id_user);
-  }, [user]);
-
-  useEffect(() => {
     setName(productById?.product_name || "");
     setPrice(productById?.product_price) || "";
     setCategories(productById?.categories || "");
@@ -201,8 +196,6 @@ const Products = () => {
       categories,
       available_stock: isStockAvailable,
     };
-
-    console.log("Send data", data);
 
     const validation = [
       {
