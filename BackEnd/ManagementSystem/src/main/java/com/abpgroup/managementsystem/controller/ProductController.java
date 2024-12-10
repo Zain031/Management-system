@@ -170,6 +170,16 @@ public class ProductController {
                 .body(pdfContent);
     }
 
+    @GetMapping("/list-products")
+    public ResponseEntity<CommonResponse<?>> listProducts() {
+        List<ProductResponseDTO> productResponseDTOList = productService.getAllProducts();
+        CommonResponse<List<ProductResponseDTO>> commonResponse = CommonResponse.<List<ProductResponseDTO>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Successfully retrieved products")
+                .data(Optional.of(productResponseDTOList))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
     private ResponseEntity<CommonResponse<?>> createErrorResponse(HttpStatus status, String errorMessage) {
         CommonResponse<?> errorResponse = CommonResponse.builder()
                 .statusCode(status.value())

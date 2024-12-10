@@ -8,6 +8,7 @@ import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.InventoryRepository;
 import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.InventoryService;
+import com.abpgroup.managementsystem.utils.CapitalizeFirstLetter;
 import com.itextpdf.io.source.ByteArrayOutputStream;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -77,7 +78,7 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory inventory = Inventory.builder()
                 .user(user)
                 .category(Inventory.Category.valueOf(inventoryRequestDTO.getMaterialCategory().toUpperCase()))
-                .materialName(inventoryRequestDTO.getMaterialName())
+                .materialName(CapitalizeFirstLetter.capitalizeFirstLetter(inventoryRequestDTO.getMaterialName()))
                 .materialPriceUnit(inventoryRequestDTO.getMaterialPriceUnit())
                 .materialQuantity(inventoryRequestDTO.getMaterialQuantity())
                 .materialDiscount(inventoryRequestDTO.getMaterialDiscount())
@@ -103,7 +104,7 @@ public class InventoryServiceImpl implements InventoryService {
         Double materialTotalPrice = materialPriceDiscount * inventoryRequestDTO.getMaterialQuantity();
         inventory.setUser(user);
         inventory.setCategory(Inventory.Category.valueOf(inventoryRequestDTO.getMaterialCategory().toUpperCase()));
-        inventory.setMaterialName(inventoryRequestDTO.getMaterialName());
+        inventory.setMaterialName(CapitalizeFirstLetter.capitalizeFirstLetter(inventoryRequestDTO.getMaterialName()));
         inventory.setMaterialPriceUnit(inventoryRequestDTO.getMaterialPriceUnit());
         inventory.setMaterialQuantity(inventoryRequestDTO.getMaterialQuantity());
         inventory.setMaterialDiscount(inventoryRequestDTO.getMaterialDiscount());
@@ -371,6 +372,7 @@ public class InventoryServiceImpl implements InventoryService {
                 .idUser(user.getIdUser())
                 .email(user.getEmail())
                 .name(user.getName())
+                .role(user.getRole().name())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();

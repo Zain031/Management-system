@@ -8,6 +8,7 @@ import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.ProductsRepository;
 import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.ProductService;
+import com.abpgroup.managementsystem.utils.CapitalizeFirstLetter;
 import com.itextpdf.io.source.ByteArrayOutputStream;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,9 +56,11 @@ public class ProductServiceImpl implements ProductService {
         Users user = usersRepository.findById(productRequestDTO.getIdUser())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        String productNameFormatted = CapitalizeFirstLetter.capitalizeFirstLetter(productRequestDTO.getProductName());
+
         Products product = Products.builder()
                 .user(user)
-                .productName(productRequestDTO.getProductName())
+                .productName(productNameFormatted)
                 .productPrice(productRequestDTO.getProductPrice())
                 .categories(Products.ProductCategory.valueOf(productRequestDTO.getCategories().toUpperCase()))
                 .availableStock(productRequestDTO.getAvailableStock())
@@ -81,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
         Users user = usersRepository.findById(productRequestDTO.getIdUser())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         product.setUser(user);
-        product.setProductName(productRequestDTO.getProductName());
+        product.setProductName(CapitalizeFirstLetter.capitalizeFirstLetter(productRequestDTO.getProductName()));
         product.setProductPrice(productRequestDTO.getProductPrice());
         product.setCategories(Products.ProductCategory.valueOf(productRequestDTO.getCategories().toUpperCase()));
         product.setAvailableStock(productRequestDTO.getAvailableStock());
@@ -215,6 +219,12 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+
+    @Override
+    public List<ProductResponseDTO> getAllProducts() {
+        List<Products> products = productRepository.findAll();
+        return products.stream().map(this::convertToResponse).collect(Collectors.toList());
+    }
 
     private ProductResponseDTO convertToResponse(Products product) {
         return ProductResponseDTO.builder()

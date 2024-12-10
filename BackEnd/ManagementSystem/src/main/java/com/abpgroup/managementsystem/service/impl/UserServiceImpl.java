@@ -6,6 +6,7 @@ import com.abpgroup.managementsystem.model.entity.AppUser;
 import com.abpgroup.managementsystem.model.entity.Users;
 import com.abpgroup.managementsystem.repository.UsersRepository;
 import com.abpgroup.managementsystem.service.UserService;
+import com.abpgroup.managementsystem.utils.CapitalizeFirstLetter;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -56,9 +57,9 @@ public class UserServiceImpl implements UserService {
 
         // Jika validasi berhasil, buat entitas pengguna
         Users user = Users.builder()
-                .email(userRequest.getEmail())
+                .email(CapitalizeFirstLetter.capitalizeFirstLetter(userRequest.getEmail()))
                 .password(passwordEncoder.encode(userRequest.getPassword())) // Encrypt password
-                .name(userRequest.getName())
+                .name(CapitalizeFirstLetter.capitalizeFirstLetter(userRequest.getName()))
                 .role(Users.Role.valueOf(userRequest.getRole()))
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -132,8 +133,8 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Invalid role specified, must be SUPER_ADMIN or ADMIN");
         }
 
-        user.setEmail(userRequest.getEmail());
-        user.setName(userRequest.getName());
+        user.setEmail(CapitalizeFirstLetter.capitalizeFirstLetter(userRequest.getEmail()));
+        user.setName(CapitalizeFirstLetter.capitalizeFirstLetter(userRequest.getName()));
 
         if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
