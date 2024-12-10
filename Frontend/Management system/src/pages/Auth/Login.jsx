@@ -22,6 +22,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isLogin) {
+      // dispatch(setAuth({ token: localStorage.getItem("token") }));
       navigate("/");
     }
   }, [isLogin, navigate]);
@@ -61,7 +62,14 @@ const Login = () => {
 
     try {
       const authData = { email, password };
-      await dispatch(login(authData)).unwrap();
+      await dispatch(login(authData))
+        .unwrap()
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
       Swal.fire({
         icon: "success",
@@ -92,7 +100,9 @@ const Login = () => {
     <div className="flex h-screen w-full bg-gradient-to-r from-indigo-500 via-[#acdeff] to-[#acdeff]">
       <div className="mb-12 mt-16 flex items-center px-8 text-center md:px-12 lg:w-1/2 lg:text-left">
         <div className="xs:p-0 mx-auto mt-10 rounded-lg bg-white p-4 shadow-md outline outline-1 outline-gray-300 md:w-3/4 opacity-80">
-          <h1 className="mb-5 mt-5 text-center text-xl md:text-2xl font-bold">Login</h1>
+          <h1 className="mb-5 mt-5 text-center text-xl md:text-2xl font-bold">
+            Login
+          </h1>
           <form className="px-5 py-7" onSubmit={handleSubmit}>
             <input
               type="text"

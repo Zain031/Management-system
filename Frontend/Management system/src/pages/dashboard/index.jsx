@@ -33,16 +33,11 @@ const AdminDashboard = () => {
     <section className="flex flex-col gap-6">
       <section className="absolute top-2 right-10 flex gap-6 w-1/4">
         <Select
-          label="Year"
+          label="Filter by year"
           selectedKeys={[filterYear]}
           defaultValue={filterYear}
           variant="bordered"
           onChange={(e) => setFilterYear(e.target.value)}>
-          {/* {Array.from({ length: 5 }, (_, index) => (
-            <SelectItem key={String(new Date().getFullYear() - index)}>
-              {String(new Date().getFullYear() - index)}
-            </SelectItem>
-          ))} */}
           {yearOptionRange().map((year) => (
             <SelectItem key={String(year)} textValue={String(year)}>
               {year}
