@@ -8,16 +8,22 @@ import { numberToIDR } from "../../../utils/numberFormatter/numberToIDR";
 import formatDate from "../../../utils/formatDate";
 import { Eye, SquarePlus } from "lucide-react";
 import ButtonExport from "../../components/ButtonExport";
-import { exportOrdersPerMonth } from "../../redux/feature/exportSlice";
+import {
+  exportOrdersPerDate,
+  exportOrdersPerMonth,
+} from "../../redux/feature/exportSlice";
 import SelectMonth from "../../components/SelectMonth";
 import SelectYear from "../../components/SelectYear";
 import months from "../../constans/months";
+import SelectMonthOrDate from "../../components/SelectMonthOrDate";
 
 const Order = () => {
   const dispatch = useDispatch();
   const { orders, paging } = useSelector((state) => state.order);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [exportPer, setExportPer] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const currentTime = new Date();
   const [selectedMonth, setSelectedMonth] = useState(
@@ -56,6 +62,21 @@ const Order = () => {
     console.log("Export data");
   };
 
+  const onButtonExportClick = () => {
+    document.getElementById("export_modal").showModal();
+  };
+
+  const handleExport = (e) => {
+    e.preventDefault();
+    if (exportPer == "date") {
+      dispatch(exportOrdersPerDate({ date: selectedDate }));
+    } else {
+      dispatch(
+        exportOrdersPerMonth({ month: selectedMonth, year: selectedYear })
+      );
+    }
+  };
+
   return (
     <PaginationLayout
       headerTitle={"Order"}
@@ -87,7 +108,7 @@ const Order = () => {
             />
           </label>
 
-          <ButtonExport onPress={() => dispatch(exportOrdersPerMonth())}>
+          <ButtonExport onPress={() => onButtonExportClick()}>
             Export Products
           </ButtonExport>
           <button
@@ -129,6 +150,44 @@ const Order = () => {
         notFoundMessage="No orders found"
         excludeColumns={["order_details", "id"]}
       />
+      <dialog id="export_modal" className="modal">
+        <div className="modal-box">
+          <form onSubmit={handleExport}>
+            <SelectMonthOrDate
+              exportPer={exportPer}
+              setExportPer={setExportPer}
+            />
+            {exportPer === "month" && (
+              <>
+                <SelectMonth
+                  selectedMonth={selectedMonth}
+                  setSelectedMonth={setSelectedMonth}
+                />
+                <SelectYear
+                  selectedYear={selectedYear}
+                  setSelectedYear={setSelectedYear}
+                />
+              </>
+            )}
+            {exportPer === "date" && (
+              <input
+                type="date"
+                className="input input-bordered input-ghost w-full my-2"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value.split("T")[0])}
+              />
+            )}
+            <button className="btn btn-outline btn-primary w-full">
+              Submit
+            </button>
+          </form>
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
     </PaginationLayout>
   );
 };

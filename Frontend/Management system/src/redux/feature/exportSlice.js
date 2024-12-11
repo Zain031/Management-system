@@ -137,8 +137,7 @@ export const exportOrdersPerMonth = createAsyncThunk(
   async ({ year, month }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `/orders/export-pdf-month/${month}`,
-        { year },
+        `/orders/export-pdf-month/${month}?year=${year}`,
         {
           responseType: "blob",
         }
