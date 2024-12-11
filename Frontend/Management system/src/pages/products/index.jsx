@@ -378,7 +378,14 @@ const Products = () => {
             </form>
             <div className="modal-action">
               <form method="dialog">
-                <button className="btn">Close</button>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    setIsEditing(false);
+                    resetForm();
+                  }}>
+                  Close
+                </button>
               </form>
             </div>
           </div>
