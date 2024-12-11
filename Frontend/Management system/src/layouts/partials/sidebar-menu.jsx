@@ -3,6 +3,7 @@ import {
   BaggageClaim,
   LayoutDashboard,
   PackageSearch,
+  ShoppingCart,
   UserPlus,
 } from "lucide-react";
 
@@ -31,6 +32,12 @@ function SidebarMenu() {
         <NavLink to="/users">
           <UserPlus size={30} strokeWidth={1.5} />
           User
+        </NavLink>
+      </li>
+      <li>
+        <NavLink to="/order">
+          <ShoppingCart size={30} strokeWidth={1.5} />
+          Order
         </NavLink>
       </li>
     </>

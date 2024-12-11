@@ -10,6 +10,7 @@ import Inventory from "../pages/inventory";
 import Users from "../pages/users";
 import AdminDashboard from "../pages/dashboard";
 import RequireAuth from "../components/HOC/RequireAuth";
+import Order from "../pages/order";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "/users",
         element: <Users />,
+      },
+      {
+        path: "/order",
+        element: <Order />,
       },
     ],
   },

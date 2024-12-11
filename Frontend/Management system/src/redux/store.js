@@ -8,6 +8,7 @@ import productsReducer from "../redux/feature/ProductsSlice";
 import inventoryReducer from "../redux/feature/InventorySlice";
 import exportReducer from "../redux/feature/exportSlice";
 import dashboardReducer from "../redux/feature/dashboardSlice";
+import orderReducer from "../redux/feature/orderSlice";
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -18,6 +19,7 @@ const store = configureStore({
     sales: salesReducer,
     dashboard: dashboardReducer,
     inventories: inventoryReducer,
+    order: orderReducer,
   },
 });
 

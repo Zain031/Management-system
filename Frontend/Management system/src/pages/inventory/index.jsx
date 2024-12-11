@@ -28,7 +28,9 @@ import {
   isValidPositiveNumber,
   validateName,
 } from "../../../utils/validation/inputValidation";
-import yearOptionRange from "../../../utils/yearOptionRange";
+import SelectMonth from "../../components/SelectMonth";
+import SelectYear from "../../components/SelectYear";
+import SelectMonthOrDate from "../../components/SelectMonthOrDate";
 
 const Inventory = () => {
   const [name, setName] = useState("");
@@ -75,6 +77,15 @@ const Inventory = () => {
   const { inventories, paging, page, inventoryById } = useSelector(
     (state) => state.inventories
   );
+
+  const tableHeader = [
+    "Name",
+    "Category",
+    "Price",
+    "Quantity",
+    "Discount",
+    "Date Material Buy",
+  ];
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -294,8 +305,11 @@ const Inventory = () => {
         name: "material_discount",
         validator: (discount) => {
           const number = Number(discount);
-          return isNotEmpty(discount) && isValidPositiveNumber(discount) &&
-            (number <= 100 || isPersentaseValid(discount));
+          return (
+            isNotEmpty(discount) &&
+            isValidPositiveNumber(discount) &&
+            (number <= 100 || isPersentaseValid(discount))
+          );
         },
         negativeImpact: () =>
           setMaterialDiscountValid({
@@ -408,54 +422,20 @@ const Inventory = () => {
         <dialog id="export_modal" className="modal">
           <div className="modal-box">
             <form onSubmit={handleExport}>
-              <select
-                className="select select-bordered w-full my-2"
-                value={exportPer}
-                onChange={(e) => setExportPer(e.target.value)}>
-                <option value="" disabled>
-                  Select Export Per Date Or Month
-                </option>
-                <option value="month">Month</option>
-                <option value="date">Date</option>
-              </select>
+              <SelectMonthOrDate
+                exportPer={exportPer}
+                setExportPer={setExportPer}
+              />
               {exportPer === "month" && (
                 <>
-                  <select
-                    className="select select-bordered w-full my-2"
-                    defaultValue={selectedMonth}
-                    placeholder="Select Month"
-                    onChange={(e) => setSelectedMonth(e.target.value)}>
-                    <option value="" disabled>
-                      Select Month
-                    </option>
-                    Select Month
-                    <option value="january">January</option>
-                    <option value="february">February</option>
-                    <option value="march">March</option>
-                    <option value="april">April</option>
-                    <option value="may">May</option>
-                    <option value="june">June</option>
-                    <option value="july">July</option>
-                    <option value="august">August</option>
-                    <option value="september">September</option>
-                    <option value="october">October</option>
-                    <option value="november">November</option>
-                    <option value="december">December</option>
-                  </select>
-                  <select
-                    className="select select-bordered w-full my-2"
-                    defaultValue={selectedYear}
-                    placeholder="Select Year"
-                    onChange={(e) => setSelectedYear(e.target.value)}>
-                    <option value="" disabled>
-                      Select Year
-                    </option>
-                    {yearOptionRange().map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                  <SelectMonth
+                    selectedMonth={selectedMonth}
+                    setSelectedMonth={setSelectedMonth}
+                  />
+                  <SelectYear
+                    selectedYear={selectedYear}
+                    setSelectedYear={setSelectedYear}
+                  />
                 </>
               )}
               {exportPer === "date" && (
@@ -568,6 +548,50 @@ const Inventory = () => {
             </div>
           </div>
         </dialog>
+
+        {/* <Table
+          arrayData={inventories.map((item) => ({
+            id: item.id_material,
+            name: item.material_name,
+            category: item.material_category,
+            price: item.material_price_unit,
+            quantity: item.material_quantity,
+            discount: item.material_discount,
+            total: item.material_total_price,
+            user: item.user.name,
+            date: item.date_material_buy,
+          }))}
+          page={page}
+          tableHeader={tableHeader}
+          onButtonDeleteClick={handleDelete}
+          onButtonEditClick={handleEdit}
+          notFoundMessage="No material found"
+          customRender={{
+            category: (item) => (
+              <td>
+                <p
+                  className={` ${
+                    item === "FOODSTUFF"
+                      ? "bg-red-600 w-14 px-2 py-1 text-white rounded-md text-center"
+                      : item === "TOOL"
+                      ? "bg-blue-600 w-14 px-2 py-1 text-white rounded-md text-center"
+                      : item === "ETC"
+                      ? "bg-green-600 w-14 px-2 py-1 text-white rounded-md text-center"
+                      : ""
+                  } font-bold`}>
+                  {item === "FOODSTUFF"
+                    ? "Food"
+                    : item === "TOOL"
+                    ? "Tool"
+                    : item === "ETC"
+                    ? "Other"
+                    : item}
+                </p>
+              </td>
+            ),
+          }}
+          excludeColumns={["id"]}
+        /> */}
 
         <div className="overflow-x-auto shadow-lg outline outline-1 outline-slate-300 rounded-md mt-2">
           <table className="table">
