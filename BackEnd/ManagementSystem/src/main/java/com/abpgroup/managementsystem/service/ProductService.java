@@ -19,4 +19,5 @@ public interface ProductService {
     Page<ProductResponseDTO> getProductByProductName(String productName, Pageable pageable);
     Page<ProductResponseDTO> getAllProducts(Pageable pageable);
     byte[] generatedPdf(List<Products> products) ;
+    List<ProductResponseDTO> getAllProducts();
 }

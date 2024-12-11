@@ -66,6 +66,7 @@ const Products = () => {
   );
 
   const { user } = useSelector((state) => state.auth);
+  console.log("user", user);
 
   useEffect(() => {
     setName(productById?.product_name || "");
@@ -198,6 +199,7 @@ const Products = () => {
       available_stock: isStockAvailable,
     };
 
+    console.log("data", data);
     const validation = [
       {
         name: "product_name",
