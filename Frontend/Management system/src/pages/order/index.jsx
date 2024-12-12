@@ -32,7 +32,7 @@ const Order = () => {
   const [selectedYear, setSelectedYear] = useState(currentTime.getFullYear());
 
   const [selectedOrderForShowingDetail, setSelectedOrderForShowingDetail] =
-    useState(null);
+    useState([]);
   useEffect(() => {
     dispatch(fetchOrders({ page: 1, size: 10 }));
   }, []);
@@ -74,13 +74,8 @@ const Order = () => {
   };
 
   const onShowDetailClose = () => {
-    setSelectedOrderForShowingDetail(null);
-    setSelectedOrderForShowingDetail(null);
+    setSelectedOrderForShowingDetail([]);
   };
-
-  useEffect(() => {
-    console.log(selectedOrderForShowingDetail);
-  }, ["Showing detail", selectedOrderForShowingDetail]);
 
   const handleDelete = (id) => {
     console.log("Hapus data dengan ID:", id);
@@ -225,47 +220,33 @@ const Order = () => {
           <h3 className="font-bold text-3xl">Order</h3>
           <section className="overflow-x-auto">
             <h3 className="font-bold text-lg">Order</h3>
-            <table className="table w-full">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer Name</th>
-                  <th>Order Date</th>
-                  <th>Status</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{selectedOrderForShowingDetail?.id}</td>
-                  <td>{selectedOrderForShowingDetail?.name}</td>
-                  <td>{selectedOrderForShowingDetail?.orderDate}</td>
-                  <td>{selectedOrderForShowingDetail?.status}</td>
-                  <td>{selectedOrderForShowingDetail?.total}</td>
-                </tr>
-              </tbody>
-            </table>
+            <Table
+              arrayData={[selectedOrderForShowingDetail]}
+              tableHeader={[
+                "Id Order",
+                "Product Name",
+                "Order Date",
+                "Status",
+                "Total",
+              ]}
+              excludeColumns={["details"]}
+              customRender={{
+                orderDate: (value) => (
+                  <span
+                    className="tooltip w-32 text-start"
+                    data-tip="Order Date">
+                    {value}
+                  </span>
+                ),
+              }}
+            />
           </section>
           <section className="overflow-x-auto">
             <h3 className="font-bold text-lg">Order details:</h3>
-            <table className="table w-full">
-              <thead>
-                <tr>
-                  <th>name</th>
-                  <th>quantity</th>
-                  <th>price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedOrderForShowingDetail?.details.map((detail) => (
-                  <tr key={detail.id}>
-                    <td>{detail.name}</td>
-                    <td>{detail.quantity}</td>
-                    <td>{detail.price}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Table
+              arrayData={selectedOrderForShowingDetail?.details}
+              tableHeader={["Id Order Details", "name", "quantity", "price"]}
+            />
           </section>
           <div className="modal-action">
             <form method="dialog">
