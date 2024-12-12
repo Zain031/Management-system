@@ -3,10 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import PaginationLayout from "../../components/HOC/PaginationLayout";
 import Table from "../../components/Table";
 import { useEffect } from "react";
-import { fetchOrderByMonth, fetchOrders } from "../../redux/feature/orderSlice";
+import {
+  addProductToCart,
+  createOrder,
+  fetchAllProducts,
+  fetchOrderByMonth,
+  fetchOrders,
+  setCustomerNameForCart,
+} from "../../redux/feature/orderSlice";
 import { numberToIDR } from "../../../utils/numberFormatter/numberToIDR";
 import formatDate from "../../../utils/formatDate";
-import { Eye, SquarePlus } from "lucide-react";
+import { Eye, SquarePlus, Trash2 } from "lucide-react";
 import ButtonExport from "../../components/ButtonExport";
 import {
   exportOrdersPerDate,
@@ -19,8 +26,9 @@ import SelectMonthOrDate from "../../components/SelectMonthOrDate";
 
 const Order = () => {
   const dispatch = useDispatch();
-  const { orders, paging } = useSelector((state) => state.order);
-  const [search, setSearch] = useState("");
+  const { orders, paging, cart, products } = useSelector(
+    (state) => state.order
+  );
   const [selectedCategory, setSelectedCategory] = useState("");
   const [exportPer, setExportPer] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
@@ -30,27 +38,43 @@ const Order = () => {
     months[currentTime.getMonth()]
   );
   const [selectedYear, setSelectedYear] = useState(currentTime.getFullYear());
-
   const [selectedOrderForShowingDetail, setSelectedOrderForShowingDetail] =
     useState([]);
+
+  const [customerNameForCreatingOrder, setCustomerNameForCreatingOrder] =
+    useState("");
+  const [idProductForCreatingOrder, setIdProductForCreatingOrder] =
+    useState("");
+  const [quantityForCreatingOrder, setQuantityForCreatingOrder] = useState(1);
+
   useEffect(() => {
     dispatch(fetchOrders({ page: 1, size: 10 }));
+    dispatch(fetchAllProducts());
   }, []);
+
+  useEffect(() => {
+    let product = products.find(
+      (product) => product.id_product == idProductForCreatingOrder
+    );
+    console.log(products);
+    console.log(
+      "Find prodcuct",
+      product,
+      "Id product",
+      idProductForCreatingOrder
+    );
+  }, [idProductForCreatingOrder]);
+
   useEffect(() => {
     dispatch(fetchOrderByMonth({ month: selectedMonth, year: selectedYear }));
   }, [selectedMonth, selectedYear]);
 
   useEffect(() => {
-    console.log(selectedMonth, selectedYear);
-  }, [selectedMonth, selectedYear]);
-
-  const handleShowDetail = (id) => {
-    console.log("Edit data dengan ID:", id);
-  };
+    console.log("Cart data", cart);
+  }, [cart]);
 
   const onButtonShowDetailClick = (id) => {
     const selectedOrder = orders.find((order) => order.id_order === id);
-    console.log(selectedOrder);
 
     if (selectedOrder) {
       setSelectedOrderForShowingDetail({
@@ -69,24 +93,11 @@ const Order = () => {
     } else {
       console.error("Order not found for the given ID:", id);
     }
-
     document.getElementById("show_detail_modal").showModal();
   };
 
   const onShowDetailClose = () => {
     setSelectedOrderForShowingDetail([]);
-  };
-
-  const handleDelete = (id) => {
-    console.log("Hapus data dengan ID:", id);
-  };
-
-  const onButtonAddClick = (id) => {
-    console.log("Tambah data", id);
-  };
-
-  const exportData = () => {
-    console.log("Export data");
   };
 
   const onButtonExportClick = () => {
@@ -104,22 +115,61 @@ const Order = () => {
     }
   };
 
+  const onButtonAddClick = () => {
+    document.getElementById("add_new_order_modal").showModal();
+  };
+
+  const resetStateForCreatingOrder = () => {
+    setCustomerNameForCreatingOrder("");
+    setIdProductForCreatingOrder("");
+    setQuantityForCreatingOrder(1);
+  };
+
+  const addProductForOrder = async () => {
+    if (!idProductForCreatingOrder || !quantityForCreatingOrder) {
+      console.error("Product ID and quantity are required.");
+      return;
+    }
+    dispatch(setCustomerNameForCart(customerNameForCreatingOrder));
+    dispatch(
+      addProductToCart({
+        id: idProductForCreatingOrder,
+        quantity: quantityForCreatingOrder,
+      })
+    );
+    resetStateForCreatingOrder();
+  };
+
+  const onButtonCloseAddNewOrder = () => {
+    document.getElementById("add_new_order_modal").close();
+  };
+
+  const clearStateCart = () => {
+    dispatch({ type: "cart/clearCart" });
+  };
+
+  const handleAddNewOrder = (e) => {
+    e.preventDefault();
+    console.log(cart);
+    const data = {
+      customer_name: cart.customerName,
+      order_details: cart.orderDetails.map((detail) => ({
+        id_product: detail.id_product,
+        quantity: Number(detail.quantity),
+      })),
+    };
+    dispatch(createOrder(data));
+    clearStateCart();
+  };
+
   return (
     <PaginationLayout
       headerTitle={"Order"}
       pagingData={orders}
-      search={search}
-      setSearch={setSearch}
-      onButtonAddClick={onButtonAddClick}
-      exportData={exportData}
-      onButtonEditClick={handleShowDetail}
-      onButtonDeleteClick={handleDelete}
       selectedCategory={selectedCategory}
       setSelectedCategory={setSelectedCategory}
       page={paging.page}
-      setPage={(page) =>
-        dispatch(fetchOrders({ page, size: 10, search, selectedCategory }))
-      }
+      setPage={(page) => dispatch(fetchOrders({ page, size: 10 }))}
       headerRenderAction={
         <div className="flex justify-end gap-5">
           <label className="form-control max-w-xs">
@@ -148,35 +198,6 @@ const Order = () => {
       }
       dispatch={dispatch}
       paging={paging}>
-      <Table
-        arrayData={orders.map((item) => ({
-          id: item.id_order,
-          name: item.customer_name,
-          orderDate: formatDate(item.order_date.split(" ")[0]),
-          status: item.status,
-          total: numberToIDR(item.total_price),
-        }))}
-        tableHeader={[
-          "Customer Name",
-          "Order Date",
-          "status",
-          "Total",
-          "Action",
-        ]}
-        renderActions={(item) => (
-          <td className="flex gap-8">
-            <button
-              className="tooltip"
-              data-tip="Details"
-              onClick={() => onButtonShowDetailClick(item.id)}>
-              <Eye size={28} color="#00d15b" />
-            </button>
-          </td>
-        )}
-        page={paging.page}
-        notFoundMessage="No orders found"
-        excludeColumns={["order_details", "id"]}
-      />
       <dialog id="export_modal" className="modal">
         <div className="modal-box">
           <form onSubmit={handleExport}>
@@ -215,6 +236,7 @@ const Order = () => {
           </div>
         </div>
       </dialog>
+
       <dialog id="show_detail_modal" className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-3xl">Order</h3>
@@ -224,7 +246,7 @@ const Order = () => {
               arrayData={[selectedOrderForShowingDetail]}
               tableHeader={[
                 "Id Order",
-                "Product Name",
+                "Customer Name",
                 "Order Date",
                 "Status",
                 "Total",
@@ -245,7 +267,8 @@ const Order = () => {
             <h3 className="font-bold text-lg">Order details:</h3>
             <Table
               arrayData={selectedOrderForShowingDetail?.details}
-              tableHeader={["Id Order Details", "name", "quantity", "price"]}
+              tableHeader={["Product name", "quantity", "price"]}
+              excludeColumns={["id"]}
             />
           </section>
           <div className="modal-action">
@@ -257,6 +280,114 @@ const Order = () => {
           </div>
         </div>
       </dialog>
+
+      <dialog id="add_new_order_modal" className="modal">
+        <div className="modal-box">
+          <form onSubmit={handleAddNewOrder}>
+            <input
+              type="name"
+              name="customerName"
+              className="input input-bordered input-ghost w-full my-2"
+              placeholder="Customer Name"
+              value={customerNameForCreatingOrder}
+              onChange={(e) => setCustomerNameForCreatingOrder(e.target.value)}
+            />
+            <section className="flex gap-2 justify-center items-center">
+              <select
+                name="customer_name"
+                value={idProductForCreatingOrder}
+                onChange={(e) => setIdProductForCreatingOrder(e.target.value)}
+                className="select select-bordered w-full">
+                <option selected value="">
+                  Select Product Name
+                </option>
+                {products.map((product) => (
+                  <option key={product.id_product} value={product.id_product}>
+                    {product.product_name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                name="quantity"
+                value={quantityForCreatingOrder}
+                onChange={(e) => setQuantityForCreatingOrder(e.target.value)}
+                className="input input-bordered input-ghost w-full my-2"
+                placeholder="Quantity"
+              />
+              <button
+                type="button"
+                className="tooltip"
+                data-tip="Add Product"
+                onClick={addProductForOrder}>
+                <SquarePlus size={50} color="#00d12a" />
+              </button>
+            </section>
+            <section>
+              {cart.orderDetails.map((detail) => (
+                <div
+                  key={detail.id_order_details}
+                  className="flex gap-2 justify-center items-center">
+                  <span>{detail.product_name}</span>
+                  <span>{detail.quantity}</span>
+                  <button
+                    type="button"
+                    className="tooltip"
+                    data-tip="Remove Product">
+                    <Trash2 size={50} color="red" />
+                  </button>
+                </div>
+              ))}
+              {cart.totalPrice > 0 && (
+                <div className="flex gap-2 justify-center items-center">
+                  <span>Total:</span>
+                  <span>{numberToIDR(cart.totalPrice)}</span>
+                </div>
+              )}
+            </section>
+            <button className="btn btn-outline btn-primary w-full">
+              Submit
+            </button>
+          </form>
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn" onClick={onButtonCloseAddNewOrder}>
+                Close
+              </button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+
+      <Table
+        arrayData={orders.map((item) => ({
+          id: item.id_order,
+          name: item.customer_name,
+          orderDate: formatDate(item.order_date.split(" ")[0]),
+          status: item.status,
+          total: numberToIDR(item.total_price),
+        }))}
+        tableHeader={[
+          "Customer Name",
+          "Order Date",
+          "status",
+          "Total",
+          "Action",
+        ]}
+        renderActions={(item) => (
+          <td className="flex gap-8">
+            <button
+              className="tooltip"
+              data-tip="Details"
+              onClick={() => onButtonShowDetailClick(item.id)}>
+              <Eye size={28} color="#00d15b" />
+            </button>
+          </td>
+        )}
+        page={paging.page}
+        notFoundMessage="No orders found"
+        excludeColumns={["order_details", "id"]}
+      />
     </PaginationLayout>
   );
 };
