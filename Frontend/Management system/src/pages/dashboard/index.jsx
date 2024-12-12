@@ -115,13 +115,13 @@ const AdminDashboard = () => {
               dataKey: "totalPriceOrder",
               name: "Income",
               fill: "#82ca9d",
-              stackId: "group1",
+              stackId: "group2",
             },
             {
               dataKey: "totalPriceInventory",
               name: "Purchase",
               fill: "#FA4032",
-              stackId: "group2",
+              stackId: "group3",
             },
           ]}
         />

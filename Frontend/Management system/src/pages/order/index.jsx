@@ -31,6 +31,8 @@ const Order = () => {
   );
   const [selectedYear, setSelectedYear] = useState(currentTime.getFullYear());
 
+  const [selectedOrderForShowingDetail, setSelectedOrderForShowingDetail] =
+    useState(null);
   useEffect(() => {
     dispatch(fetchOrders({ page: 1, size: 10 }));
   }, []);
@@ -42,13 +44,43 @@ const Order = () => {
     console.log(selectedMonth, selectedYear);
   }, [selectedMonth, selectedYear]);
 
-  const handleEdit = (id) => {
+  const handleShowDetail = (id) => {
     console.log("Edit data dengan ID:", id);
   };
 
-  const onButtonDeleteClick = (id) => {
-    console.log("Hapus data dengan ID:", id);
+  const onButtonShowDetailClick = (id) => {
+    const selectedOrder = orders.find((order) => order.id_order === id);
+    console.log(selectedOrder);
+
+    if (selectedOrder) {
+      setSelectedOrderForShowingDetail({
+        id: selectedOrder.id_order,
+        name: selectedOrder.customer_name,
+        orderDate: formatDate(selectedOrder.order_date.split(" ")[0]),
+        status: selectedOrder.status,
+        total: numberToIDR(selectedOrder.total_price),
+        details: selectedOrder.order_details.map((detail) => ({
+          id: detail.id_order_detail,
+          name: detail.product_name,
+          quantity: detail.quantity,
+          price: numberToIDR(detail.price_per_unit),
+        })),
+      });
+    } else {
+      console.error("Order not found for the given ID:", id);
+    }
+
+    document.getElementById("show_detail_modal").showModal();
   };
+
+  const onShowDetailClose = () => {
+    setSelectedOrderForShowingDetail(null);
+    setSelectedOrderForShowingDetail(null);
+  };
+
+  useEffect(() => {
+    console.log(selectedOrderForShowingDetail);
+  }, ["Showing detail", selectedOrderForShowingDetail]);
 
   const handleDelete = (id) => {
     console.log("Hapus data dengan ID:", id);
@@ -85,7 +117,7 @@ const Order = () => {
       setSearch={setSearch}
       onButtonAddClick={onButtonAddClick}
       exportData={exportData}
-      onButtonEditClick={handleEdit}
+      onButtonEditClick={handleShowDetail}
       onButtonDeleteClick={handleDelete}
       selectedCategory={selectedCategory}
       setSelectedCategory={setSelectedCategory}
@@ -141,7 +173,7 @@ const Order = () => {
             <button
               className="tooltip"
               data-tip="Details"
-              onClick={() => onButtonAddClick(item.id)}>
+              onClick={() => onButtonShowDetailClick(item.id)}>
               <Eye size={28} color="#00d15b" />
             </button>
           </td>
@@ -184,6 +216,62 @@ const Order = () => {
           <div className="modal-action">
             <form method="dialog">
               <button className="btn">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+      <dialog id="show_detail_modal" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-3xl">Order</h3>
+          <section className="overflow-x-auto">
+            <h3 className="font-bold text-lg">Order</h3>
+            <table className="table w-full">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Name</th>
+                  <th>Order Date</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{selectedOrderForShowingDetail?.id}</td>
+                  <td>{selectedOrderForShowingDetail?.name}</td>
+                  <td>{selectedOrderForShowingDetail?.orderDate}</td>
+                  <td>{selectedOrderForShowingDetail?.status}</td>
+                  <td>{selectedOrderForShowingDetail?.total}</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <section className="overflow-x-auto">
+            <h3 className="font-bold text-lg">Order details:</h3>
+            <table className="table w-full">
+              <thead>
+                <tr>
+                  <th>name</th>
+                  <th>quantity</th>
+                  <th>price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedOrderForShowingDetail?.details.map((detail) => (
+                  <tr key={detail.id}>
+                    <td>{detail.name}</td>
+                    <td>{detail.quantity}</td>
+                    <td>{detail.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn" onClick={onShowDetailClose}>
+                Close
+              </button>
             </form>
           </div>
         </div>
