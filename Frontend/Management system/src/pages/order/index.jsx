@@ -5,11 +5,13 @@ import Table from "../../components/Table";
 import { useEffect } from "react";
 import {
   addProductToCart,
+  clearProductCartState,
   createOrder,
   fetchAllProducts,
   fetchOrderByMonth,
   fetchOrders,
   setCustomerNameForCart,
+  setPage,
 } from "../../redux/feature/orderSlice";
 import { numberToIDR } from "../../../utils/numberFormatter/numberToIDR";
 import formatDate from "../../../utils/formatDate";
@@ -26,7 +28,7 @@ import SelectMonthOrDate from "../../components/SelectMonthOrDate";
 
 const Order = () => {
   const dispatch = useDispatch();
-  const { orders, paging, cart, products } = useSelector(
+  const { orders, paging, cart, products, page } = useSelector(
     (state) => state.order
   );
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -72,6 +74,10 @@ const Order = () => {
   useEffect(() => {
     console.log("Cart data", cart);
   }, [cart]);
+
+  useEffect(() => {
+    dispatch(fetchOrders({ page, size: 10 }));
+  }, [page]);
 
   const onButtonShowDetailClick = (id) => {
     const selectedOrder = orders.find((order) => order.id_order === id);
@@ -148,7 +154,7 @@ const Order = () => {
     dispatch({ type: "cart/clearCart" });
   };
 
-  const handleAddNewOrder = (e) => {
+  const handleAddNewOrder = async (e) => {
     e.preventDefault();
     console.log(cart);
     const data = {
@@ -158,7 +164,11 @@ const Order = () => {
         quantity: Number(detail.quantity),
       })),
     };
-    dispatch(createOrder(data));
+    await dispatch(createOrder(data))
+      .unwrap()
+      .then(() => {
+        dispatch(clearProductCartState());
+      });
     clearStateCart();
   };
 
@@ -169,7 +179,8 @@ const Order = () => {
       selectedCategory={selectedCategory}
       setSelectedCategory={setSelectedCategory}
       page={paging.page}
-      setPage={(page) => dispatch(fetchOrders({ page, size: 10 }))}
+      dispatch={dispatch}
+      setPage={setPage}
       headerRenderAction={
         <div className="flex justify-end gap-5">
           <label className="form-control max-w-xs">
@@ -196,7 +207,6 @@ const Order = () => {
           </button>
         </div>
       }
-      dispatch={dispatch}
       paging={paging}>
       <dialog id="export_modal" className="modal">
         <div className="modal-box">
@@ -360,6 +370,7 @@ const Order = () => {
       </dialog>
 
       <Table
+        page={page}
         arrayData={orders.map((item) => ({
           id: item.id_order,
           name: item.customer_name,
@@ -384,7 +395,6 @@ const Order = () => {
             </button>
           </td>
         )}
-        page={paging.page}
         notFoundMessage="No orders found"
         excludeColumns={["order_details", "id"]}
       />

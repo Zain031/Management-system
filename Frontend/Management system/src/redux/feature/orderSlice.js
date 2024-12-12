@@ -85,6 +85,7 @@ const orderSlice = createSlice({
       totalPrice: 0,
     },
     paging: {},
+    page: 1,
     order: {},
     loading: false,
     error: null,
@@ -144,6 +145,16 @@ const orderSlice = createSlice({
         0
       );
     },
+    clearProductCartState: (state) => {
+      state.cart = {
+        customerName: "",
+        orderDetails: [],
+        totalPrice: 0,
+      };
+    },
+    setPage: (state, action) => {
+      state.page = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -154,6 +165,10 @@ const orderSlice = createSlice({
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.loading = false;
         state.orders = action.payload.data.content;
+        state.paging = {
+          totalElements: action.payload.data.totalElements,
+          totalPages: action.payload.data.totalPages,
+        };
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.loading = false;
@@ -214,6 +229,8 @@ export const {
   setCustomerNameForCart,
   addProductToCart,
   removeProductFromCart,
+  clearProductCartState,
+  setPage,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
