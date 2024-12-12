@@ -33,11 +33,23 @@ export const fetchOrderById = createAsyncThunk(
 
 export const createOrder = createAsyncThunk(
   "orders/createOrder",
-  async (order, { rejectWithValue }) => {
+  async ({ order, payment_method = "QRIS" }, { rejectWithValue }) => {
     console.log("Order", order);
     try {
       const response = await axiosInstance.post(`/orders/create`, order);
-      return response.data;
+      console.log("Response", response.data.data);
+      const paymentData = await axiosInstance.post(
+        `/payment/process-payment?id_order=${response.data.data.id_order}`,
+        {
+          payment_method,
+          amount: response.data.data.total_price,
+        }
+      );
+      console.log("Payment Data", paymentData.data);
+      return {
+        createOrderData: response.data.data,
+        paymentData: paymentData.data.data.qrisResponse,
+      };
     } catch (e) {
       return rejectWithValue(
         e.response?.data?.message || "Failed to create order"
@@ -74,6 +86,24 @@ export const fetchAllProducts = createAsyncThunk(
   }
 );
 
+export const payOrder = createAsyncThunk(
+  "orders/payOrder",
+  async ({ orderId, payment_method, amount }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `/payment/process-payment?id_order=${orderId}`,
+        {
+          payment_method,
+          amount,
+        }
+      );
+      return response.data;
+    } catch (e) {
+      return rejectWithValue(e || "Failed to pay order");
+    }
+  }
+);
+
 const orderSlice = createSlice({
   name: "orders",
   initialState: {
@@ -84,6 +114,8 @@ const orderSlice = createSlice({
       orderDetails: [],
       totalPrice: 0,
     },
+    createdOrder: null,
+    redirectURL: null,
     paging: {},
     page: 1,
     order: {},
@@ -204,7 +236,9 @@ const orderSlice = createSlice({
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders.push(action.payload.data);
+        state.createdOrder = action.payload.createOrderData;
+        state.redirectURL = JSON.parse(action.payload.paymentData).redirect_url;
+        state.orders.push(action.payload.createOrderData);
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;

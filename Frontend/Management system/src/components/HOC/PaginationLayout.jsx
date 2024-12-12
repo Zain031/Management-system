@@ -16,6 +16,7 @@ const PaginationLayout = ({
     dispatch(setPage(newPage));
   };
 
+  console.log("Initial page", page);
   return (
     <Container>
       <Header title={headerTitle} />

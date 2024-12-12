@@ -28,7 +28,7 @@ import SelectMonthOrDate from "../../components/SelectMonthOrDate";
 
 const Order = () => {
   const dispatch = useDispatch();
-  const { orders, paging, cart, products, page } = useSelector(
+  const { orders, paging, cart, products, page, redirectURL } = useSelector(
     (state) => state.order
   );
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -49,31 +49,16 @@ const Order = () => {
     useState("");
   const [quantityForCreatingOrder, setQuantityForCreatingOrder] = useState(1);
 
-  useEffect(() => {
-    dispatch(fetchOrders({ page: 1, size: 10 }));
-    dispatch(fetchAllProducts());
-  }, []);
+  const [isSuccessAddOrder, setIsSuccessAddOrder] = useState(false);
 
   useEffect(() => {
-    let product = products.find(
-      (product) => product.id_product == idProductForCreatingOrder
-    );
-    console.log(products);
-    console.log(
-      "Find prodcuct",
-      product,
-      "Id product",
-      idProductForCreatingOrder
-    );
-  }, [idProductForCreatingOrder]);
+    dispatch(fetchOrders({ page, size: 10 }));
+    dispatch(fetchAllProducts());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(fetchOrderByMonth({ month: selectedMonth, year: selectedYear }));
   }, [selectedMonth, selectedYear]);
-
-  useEffect(() => {
-    console.log("Cart data", cart);
-  }, [cart]);
 
   useEffect(() => {
     dispatch(fetchOrders({ page, size: 10 }));
@@ -81,7 +66,6 @@ const Order = () => {
 
   const onButtonShowDetailClick = (id) => {
     const selectedOrder = orders.find((order) => order.id_order === id);
-
     if (selectedOrder) {
       setSelectedOrderForShowingDetail({
         id: selectedOrder.id_order,
@@ -126,7 +110,6 @@ const Order = () => {
   };
 
   const resetStateForCreatingOrder = () => {
-    setCustomerNameForCreatingOrder("");
     setIdProductForCreatingOrder("");
     setQuantityForCreatingOrder(1);
   };
@@ -150,13 +133,8 @@ const Order = () => {
     document.getElementById("add_new_order_modal").close();
   };
 
-  const clearStateCart = () => {
-    dispatch({ type: "cart/clearCart" });
-  };
-
   const handleAddNewOrder = async (e) => {
     e.preventDefault();
-    console.log(cart);
     const data = {
       customer_name: cart.customerName,
       order_details: cart.orderDetails.map((detail) => ({
@@ -164,12 +142,23 @@ const Order = () => {
         quantity: Number(detail.quantity),
       })),
     };
-    await dispatch(createOrder(data))
-      .unwrap()
-      .then(() => {
-        dispatch(clearProductCartState());
-      });
-    clearStateCart();
+    try {
+      await dispatch(createOrder({ order: data })).unwrap();
+      dispatch(clearProductCartState());
+      // await dispatch(
+      //   payOrder({
+      //     id_order: createdOrder.id_order,
+      //     payment_method: "QRIS",
+      //     amount: createdOrder.total_price,
+      //   })
+      // ).unwrap();
+      setIsSuccessAddOrder(true);
+      resetStateForCreatingOrder();
+      setCustomerNameForCreatingOrder("");
+    } catch (error) {
+      console.error(error);
+      setIsSuccessAddOrder(false);
+    }
   };
 
   return (
@@ -178,7 +167,7 @@ const Order = () => {
       pagingData={orders}
       selectedCategory={selectedCategory}
       setSelectedCategory={setSelectedCategory}
-      page={paging.page}
+      page={page}
       dispatch={dispatch}
       setPage={setPage}
       headerRenderAction={
@@ -355,9 +344,27 @@ const Order = () => {
                 </div>
               )}
             </section>
-            <button className="btn btn-outline btn-primary w-full">
-              Submit
-            </button>
+
+            {isSuccessAddOrder ? (
+              <button
+                className="btn btn-outline btn-primary w-full"
+                type="button"
+                onClick={() => {
+                  if (redirectURL) {
+                    window.location.href = redirectURL;
+                  } else {
+                    alert("Redirect URL tidak ditemukan!");
+                  }
+                }}>
+                PAY
+              </button>
+            ) : (
+              <button
+                className="btn btn-outline btn-primary w-full"
+                type="submit">
+                Submit
+              </button>
+            )}
           </form>
           <div className="modal-action">
             <form method="dialog">
