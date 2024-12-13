@@ -158,6 +158,32 @@ export const exportOrdersPerMonth = createAsyncThunk(
   }
 );
 
+export const generateReceipt = createAsyncThunk(
+  "export/generateReceipt",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/payment/generate-receipt/${id}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `payment-receipt-${id}-${Date.now()}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+
+      return true;
+    } catch (e) {
+      return rejectWithValue(e.message || "Failed to generate receipt");
+    }
+  }
+);
+
 export const exportOrdersPerDate = createAsyncThunk(
   "export/exportOrderPerDate",
   async ({ date }, { rejectWithValue }) => {
@@ -287,6 +313,19 @@ const exportSlice = createSlice({
         state.success = "Orders exported successfully!";
       })
       .addCase(exportOrdersPerDate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(generateReceipt.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
+      })
+      .addCase(generateReceipt.fulfilled, (state) => {
+        state.loading = false;
+        state.success = "Receipt generated successfully!";
+      })
+      .addCase(generateReceipt.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -18,6 +18,7 @@ import formatDate from "../../../utils/formatDate";
 import {
   exportOrdersPerDate,
   exportOrdersPerMonth,
+  generateReceipt,
 } from "../../redux/feature/exportSlice";
 import months from "../../constans/months";
 import ExportModal from "../../components/ExportModal";
@@ -28,6 +29,7 @@ import ButtonEye from "../../components/buttons/ButtonEye";
 import removePaymentDataInLocalStorage from "../../../utils/removePaymentDataInLocalStorage";
 import Swal from "sweetalert2";
 import { isNotEmpty } from "../../../utils/validation/inputValidation";
+import ButtonExport from "../../components/ButtonExport";
 
 const Order = () => {
   const dispatch = useDispatch();
@@ -293,18 +295,23 @@ const Order = () => {
           orderDate: formatDate(item.order_date.split(" ")[0]),
           status: item.status,
           total: numberToIDR(item.total_price),
-          qrisResponse: item.qrisResponse,
+          qrisResponse: item.link_qris,
         }))}
         tableHeader={[
           "Customer Name",
           "Order Date",
           "status",
           "Total",
-          "QRIS Response",
           "Action",
         ]}
         renderActions={(item) => (
           <td className="flex gap-8">
+            <ButtonExport
+              className="tooltip"
+              data-tip="Export"
+              onClick={() => dispatch(generateReceipt(item.id))}>
+              Export Receipt
+            </ButtonExport>
             <ButtonEye
               className="tooltip"
               data-tip="Details"
@@ -315,7 +322,10 @@ const Order = () => {
                 className="btn btn-outline btn-primary px-8"
                 type="button"
                 onClick={() => {
-                  const redirectURL = JSON.parse(item.link_qris).redirect_url;
+                  console.log("Link QRIS", item);
+                  const redirectURL = JSON.parse(
+                    item.qrisResponse
+                  ).redirect_url;
                   if (redirectURL) {
                     window.open(redirectURL, "_blank");
                   } else {
@@ -328,7 +338,7 @@ const Order = () => {
           </td>
         )}
         notFoundMessage="No orders found"
-        excludeColumns={["order_details", "id"]}
+        excludeColumns={["order_details", "id", "qrisResponse"]}
       />
     </PaginationLayout>
   );
