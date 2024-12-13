@@ -128,9 +128,8 @@ const orderSlice = createSlice({
       state.cart.customerName = action.payload;
     },
     addProductToCart: (state, action) => {
-      const { id, quantity } = action.payload;
-      console.log(id, quantity);
-
+      let { id } = action.payload;
+      const quantity = parseInt(action.payload.quantity);
       const existingProduct = state.cart.orderDetails.find(
         (item) => item.id_product == id
       );
@@ -156,22 +155,28 @@ const orderSlice = createSlice({
       );
     },
     removeProductFromCart: (state, action) => {
-      const { id, quantityToRemove } = action.payload;
+      const { id } = action.payload;
+      state.cart.orderDetails = state.cart.orderDetails.filter(
+        (item) => item.id !== id
+      );
 
+      state.cart.totalPrice = state.cart.orderDetails.reduce(
+        (total, item) => total + item.quantity * item.product_price,
+        0
+      );
+    },
+    changeQuantityInCart: (state, action) => {
+      const { id } = action.payload;
+      const quantity = parseInt(action.payload.quantity, 10) || 0;
+      if (quantity < 1) {
+        return;
+      }
       const existingProduct = state.cart.orderDetails.find(
         (item) => item.id === id
       );
-
       if (existingProduct) {
-        existingProduct.quantity -= quantityToRemove;
-
-        if (existingProduct.quantity <= 0) {
-          state.cart.orderDetails = state.cart.orderDetails.filter(
-            (item) => item.id !== id
-          );
-        }
+        existingProduct.quantity = quantity;
       }
-
       state.cart.totalPrice = state.cart.orderDetails.reduce(
         (total, item) => total + item.quantity * item.product_price,
         0
@@ -235,10 +240,17 @@ const orderSlice = createSlice({
         state.error = null;
       })
       .addCase(createOrder.fulfilled, (state, action) => {
+        const { createOrderData, paymentData } = action.payload;
+        const { redirect_url } = JSON.parse(paymentData);
+
         state.loading = false;
-        state.createdOrder = action.payload.createOrderData;
-        state.redirectURL = JSON.parse(action.payload.paymentData).redirect_url;
-        state.orders.push(action.payload.createOrderData);
+        state.createdOrder = createOrderData;
+        state.redirectURL = redirect_url;
+        localStorage.setItem(
+          `payment-${createOrderData.id_order}`,
+          redirect_url
+        );
+        state.orders.push(createOrderData);
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;
@@ -265,6 +277,7 @@ export const {
   removeProductFromCart,
   clearProductCartState,
   setPage,
+  changeQuantityInCart,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

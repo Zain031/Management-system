@@ -5,7 +5,6 @@ import Table from "../../components/Table";
 import { useEffect } from "react";
 import {
   addProductToCart,
-  clearProductCartState,
   createOrder,
   fetchAllProducts,
   fetchOrderByMonth,
@@ -15,7 +14,6 @@ import {
 } from "../../redux/feature/orderSlice";
 import { numberToIDR } from "../../../utils/numberFormatter/numberToIDR";
 import formatDate from "../../../utils/formatDate";
-import { Eye } from "lucide-react";
 import {
   exportOrdersPerDate,
   exportOrdersPerMonth,
@@ -25,6 +23,9 @@ import ExportModal from "../../components/ExportModal";
 import ShowDetailOrderModal from "../../components/order/ShowDetailOrderModal";
 import AddNewOrderModal from "../../components/order/AddNewOrderModal";
 import HeaderAction from "../../components/order/HeaderAction";
+import ButtonEye from "../../components/buttons/ButtonEye";
+import removePaymentDataInLocalStorage from "../../../utils/removePaymentDataInLocalStorage";
+import Swal from "sweetalert2";
 
 const Order = () => {
   const dispatch = useDispatch();
@@ -51,9 +52,14 @@ const Order = () => {
 
   const [isSuccessAddOrder, setIsSuccessAddOrder] = useState(false);
 
+  const initialActions = async () => {
+    await dispatch(fetchOrders({ page, size: 10 })).unwrap();
+    await dispatch(fetchAllProducts()).unwrap();
+    removePaymentDataInLocalStorage(orders);
+  };
+
   useEffect(() => {
-    dispatch(fetchOrders({ page, size: 10 }));
-    dispatch(fetchAllProducts());
+    initialActions();
   }, [dispatch]);
 
   useEffect(() => {
@@ -135,6 +141,31 @@ const Order = () => {
 
   const handleAddNewOrder = async (e) => {
     e.preventDefault();
+    onButtonCloseAddNewOrder();
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Add new order!",
+      customClass: {
+        popup: "highest-z-index",
+      },
+    });
+    if (!result.isConfirmed) return;
+    onButtonAddClick();
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
     const data = {
       customer_name: cart.customerName,
       order_details: cart.orderDetails.map((detail) => ({
@@ -144,10 +175,15 @@ const Order = () => {
     };
     try {
       await dispatch(createOrder({ order: data })).unwrap();
-      dispatch(clearProductCartState());
+      // dispatch(clearProductCartState());
       setIsSuccessAddOrder(true);
       resetStateForCreatingOrder();
-      setCustomerNameForCreatingOrder("");
+
+      Toast.fire({
+        icon: "success",
+        title: "Material has been added",
+      });
+      // setCustomerNameForCreatingOrder("");
     } catch (error) {
       console.error(error);
       setIsSuccessAddOrder(false);
@@ -224,12 +260,11 @@ const Order = () => {
         ]}
         renderActions={(item) => (
           <td className="flex gap-8">
-            <button
+            <ButtonEye
               className="tooltip"
               data-tip="Details"
-              onClick={() => onButtonShowDetailClick(item.id)}>
-              <Eye size={28} color="#00d15b" />
-            </button>
+              onClick={() => onButtonShowDetailClick(item.id)}
+            />
           </td>
         )}
         notFoundMessage="No orders found"

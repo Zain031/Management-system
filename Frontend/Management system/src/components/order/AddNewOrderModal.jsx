@@ -1,6 +1,12 @@
 import { numberToIDR } from "../../../utils/numberFormatter/numberToIDR";
 import ButtonAdd from "../buttons/ButtonAdd";
 import { Trash2 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import {
+  addProductToCart,
+  changeQuantityInCart,
+  removeProductFromCart,
+} from "../../redux/feature/orderSlice";
 
 const AddNewOrderModal = ({
   handleAddNewOrder,
@@ -17,6 +23,15 @@ const AddNewOrderModal = ({
   redirectURL,
   onButtonCloseAddNewOrder,
 }) => {
+  const dispatch = useDispatch();
+  const addQuantity = (id, quantity) => {
+    dispatch(addProductToCart({ id, quantity }));
+  };
+
+  const removeQuantity = (id, quantity) => {
+    dispatch(removeProductFromCart({ id, quantity }));
+  };
+
   return (
     <dialog id="add_new_order_modal" className="modal">
       <div className="modal-box">
@@ -29,52 +44,88 @@ const AddNewOrderModal = ({
             value={customerNameForCreatingOrder}
             onChange={(e) => setCustomerNameForCreatingOrder(e.target.value)}
           />
-          <section className="flex gap-2 justify-center items-center">
-            <select
-              name="customer_name"
-              value={idProductForCreatingOrder}
-              onChange={(e) => setIdProductForCreatingOrder(e.target.value)}
-              className="select select-bordered w-full">
-              <option selected value="">
-                Select Product Name
-              </option>
-              {products.map((product) => (
-                <option key={product.id_product} value={product.id_product}>
-                  {product.product_name}
+          {!isSuccessAddOrder && (
+            <section className="flex gap-2 justify-center items-center">
+              <select
+                name="customer_name"
+                value={idProductForCreatingOrder}
+                onChange={(e) => setIdProductForCreatingOrder(e.target.value)}
+                className="select select-bordered w-full">
+                <option selected value="">
+                  Select Product Name
                 </option>
-              ))}
-            </select>
-            <input
-              type="number"
-              name="quantity"
-              value={quantityForCreatingOrder}
-              onChange={(e) => setQuantityForCreatingOrder(e.target.value)}
-              className="input input-bordered input-ghost w-full my-2"
-              placeholder="Quantity"
-            />
-            <ButtonAdd onPress={addProductForOrder} dataTip={"Product"} />
-          </section>
+                {products.map((product) => (
+                  <option key={product.id_product} value={product.id_product}>
+                    {product.product_name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                name="quantity"
+                value={quantityForCreatingOrder}
+                onChange={(e) => setQuantityForCreatingOrder(e.target.value)}
+                className="input input-bordered input-ghost w-full my-2"
+                placeholder="Quantity"
+              />
+              <ButtonAdd onPress={addProductForOrder} dataTip={"Product"} />
+            </section>
+          )}
           <section>
-            {cart?.orderDetails.map((detail) => (
-              <div
-                key={detail.id_order_details}
-                className="flex gap-2 justify-center items-center">
-                <span>{detail.product_name}</span>
-                <span>{detail.quantity}</span>
-                <button
-                  type="button"
-                  className="tooltip"
-                  data-tip="Remove Product">
-                  <Trash2 size={50} color="red" />
-                </button>
-              </div>
-            ))}
-            {cart.totalPrice > 0 && (
-              <div className="flex gap-2 justify-center items-center">
-                <span>Total:</span>
-                <span>{numberToIDR(cart.totalPrice)}</span>
-              </div>
-            )}
+            <div className="overflow-x-auto shadow-lg outline outline-1 outline-slate-300 rounded-md mt-2">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.isArray(cart?.orderDetails) &&
+                  cart?.orderDetails.length > 0 ? (
+                    <>
+                      {cart?.orderDetails.map((item, index) => (
+                        <tr key={item.id_order_details}>
+                          <th>{++index}</th>
+                          <td>{item.product_name}</td>
+                          <td className="flex items-center">
+                            <input
+                              value={item.quantity}
+                              onChange={(e) => {
+                                dispatch(
+                                  changeQuantityInCart({
+                                    id: item.id,
+                                    quantity: e.target.value,
+                                  })
+                                );
+                              }}
+                              className="w-1/2 rounded-md border-1 py-1 px-2"
+                            />
+                            <button
+                              type="button"
+                              className="tooltip"
+                              data-tip="Remove Product">
+                              <Trash2 size={24} color="red" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      <tr>
+                        <td>Total</td>
+                        <td>{numberToIDR(cart?.totalPrice)}</td>
+                      </tr>
+                    </>
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="text-center">
+                        No Materials available
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </section>
 
           {isSuccessAddOrder ? (

@@ -40,3 +40,6 @@
 .read-the-docs {
   color: #888;
 }
+.highest-z-index {
+  z-index: 9999 !important;
+}

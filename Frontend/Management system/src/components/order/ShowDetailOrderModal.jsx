@@ -9,7 +9,6 @@ const ShowDetailOrderModal = ({
       <div className="modal-box">
         <h3 className="font-bold text-3xl">Order</h3>
         <section className="overflow-x-auto">
-          <h3 className="font-bold text-lg">Order</h3>
           <Table
             arrayData={[selectedOrderForShowingDetail]}
             tableHeader={[

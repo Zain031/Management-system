@@ -548,51 +548,7 @@ const Inventory = () => {
             </div>
           </div>
         </dialog>
-
-        {/* <Table
-          arrayData={inventories.map((item) => ({
-            id: item.id_material,
-            name: item.material_name,
-            category: item.material_category,
-            price: item.material_price_unit,
-            quantity: item.material_quantity,
-            discount: item.material_discount,
-            total: item.material_total_price,
-            user: item.user.name,
-            date: item.date_material_buy,
-          }))}
-          page={page}
-          tableHeader={tableHeader}
-          onButtonDeleteClick={handleDelete}
-          onButtonEditClick={handleEdit}
-          notFoundMessage="No material found"
-          customRender={{
-            category: (item) => (
-              <td>
-                <p
-                  className={` ${
-                    item === "FOODSTUFF"
-                      ? "bg-red-600 w-14 px-2 py-1 text-white rounded-md text-center"
-                      : item === "TOOL"
-                      ? "bg-blue-600 w-14 px-2 py-1 text-white rounded-md text-center"
-                      : item === "ETC"
-                      ? "bg-green-600 w-14 px-2 py-1 text-white rounded-md text-center"
-                      : ""
-                  } font-bold`}>
-                  {item === "FOODSTUFF"
-                    ? "Food"
-                    : item === "TOOL"
-                    ? "Tool"
-                    : item === "ETC"
-                    ? "Other"
-                    : item}
-                </p>
-              </td>
-            ),
-          }}
-          excludeColumns={["id"]}
-        /> */}
-
+        
         <div className="overflow-x-auto shadow-lg outline outline-1 outline-slate-300 rounded-md mt-2">
           <table className="table">
             <thead>
