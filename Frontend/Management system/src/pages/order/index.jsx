@@ -15,16 +15,16 @@ import {
 } from "../../redux/feature/orderSlice";
 import { numberToIDR } from "../../../utils/numberFormatter/numberToIDR";
 import formatDate from "../../../utils/formatDate";
-import { Eye, SquarePlus, Trash2 } from "lucide-react";
-import ButtonExport from "../../components/ButtonExport";
+import { Eye } from "lucide-react";
 import {
   exportOrdersPerDate,
   exportOrdersPerMonth,
 } from "../../redux/feature/exportSlice";
-import SelectMonth from "../../components/SelectMonth";
-import SelectYear from "../../components/SelectYear";
 import months from "../../constans/months";
-import SelectMonthOrDate from "../../components/SelectMonthOrDate";
+import ExportModal from "../../components/ExportModal";
+import ShowDetailOrderModal from "../../components/order/ShowDetailOrderModal";
+import AddNewOrderModal from "../../components/order/AddNewOrderModal";
+import HeaderAction from "../../components/order/HeaderAction";
 
 const Order = () => {
   const dispatch = useDispatch();
@@ -145,13 +145,6 @@ const Order = () => {
     try {
       await dispatch(createOrder({ order: data })).unwrap();
       dispatch(clearProductCartState());
-      // await dispatch(
-      //   payOrder({
-      //     id_order: createdOrder.id_order,
-      //     payment_method: "QRIS",
-      //     amount: createdOrder.total_price,
-      //   })
-      // ).unwrap();
       setIsSuccessAddOrder(true);
       resetStateForCreatingOrder();
       setCustomerNameForCreatingOrder("");
@@ -171,211 +164,48 @@ const Order = () => {
       dispatch={dispatch}
       setPage={setPage}
       headerRenderAction={
-        <div className="flex justify-end gap-5">
-          <label className="form-control max-w-xs">
-            <SelectMonth
-              selectedMonth={selectedMonth}
-              setSelectedMonth={setSelectedMonth}
-            />
-          </label>
-          <label className="form-control max-w-xs">
-            <SelectYear
-              selectedYear={selectedYear}
-              setSelectedYear={setSelectedYear}
-            />
-          </label>
-
-          <ButtonExport onPress={() => onButtonExportClick()}>
-            Export Products
-          </ButtonExport>
-          <button
-            onClick={onButtonAddClick}
-            className="tooltip"
-            data-tip="Add Product">
-            <SquarePlus size={50} color="#00d12a" />
-          </button>
-        </div>
+        <HeaderAction
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          selectedMonth={selectedMonth}
+          setSelectedMonth={setSelectedMonth}
+          selectedYear={selectedYear}
+          setSelectedYear={setSelectedYear}
+          onButtonExportClick={onButtonExportClick}
+          onButtonAddClick={onButtonAddClick}
+        />
       }
       paging={paging}>
-      <dialog id="export_modal" className="modal">
-        <div className="modal-box">
-          <form onSubmit={handleExport}>
-            <SelectMonthOrDate
-              exportPer={exportPer}
-              setExportPer={setExportPer}
-            />
-            {exportPer === "month" && (
-              <>
-                <SelectMonth
-                  selectedMonth={selectedMonth}
-                  setSelectedMonth={setSelectedMonth}
-                />
-                <SelectYear
-                  selectedYear={selectedYear}
-                  setSelectedYear={setSelectedYear}
-                />
-              </>
-            )}
-            {exportPer === "date" && (
-              <input
-                type="date"
-                className="input input-bordered input-ghost w-full my-2"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value.split("T")[0])}
-              />
-            )}
-            <button className="btn btn-outline btn-primary w-full">
-              Submit
-            </button>
-          </form>
-          <div className="modal-action">
-            <form method="dialog">
-              <button className="btn">Close</button>
-            </form>
-          </div>
-        </div>
-      </dialog>
-
-      <dialog id="show_detail_modal" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-3xl">Order</h3>
-          <section className="overflow-x-auto">
-            <h3 className="font-bold text-lg">Order</h3>
-            <Table
-              arrayData={[selectedOrderForShowingDetail]}
-              tableHeader={[
-                "Id Order",
-                "Customer Name",
-                "Order Date",
-                "Status",
-                "Total",
-              ]}
-              excludeColumns={["details"]}
-              customRender={{
-                orderDate: (value) => (
-                  <span
-                    className="tooltip w-32 text-start"
-                    data-tip="Order Date">
-                    {value}
-                  </span>
-                ),
-              }}
-            />
-          </section>
-          <section className="overflow-x-auto">
-            <h3 className="font-bold text-lg">Order details:</h3>
-            <Table
-              arrayData={selectedOrderForShowingDetail?.details}
-              tableHeader={["Product name", "quantity", "price"]}
-              excludeColumns={["id"]}
-            />
-          </section>
-          <div className="modal-action">
-            <form method="dialog">
-              <button className="btn" onClick={onShowDetailClose}>
-                Close
-              </button>
-            </form>
-          </div>
-        </div>
-      </dialog>
-
-      <dialog id="add_new_order_modal" className="modal">
-        <div className="modal-box">
-          <form onSubmit={handleAddNewOrder}>
-            <input
-              type="name"
-              name="customerName"
-              className="input input-bordered input-ghost w-full my-2"
-              placeholder="Customer Name"
-              value={customerNameForCreatingOrder}
-              onChange={(e) => setCustomerNameForCreatingOrder(e.target.value)}
-            />
-            <section className="flex gap-2 justify-center items-center">
-              <select
-                name="customer_name"
-                value={idProductForCreatingOrder}
-                onChange={(e) => setIdProductForCreatingOrder(e.target.value)}
-                className="select select-bordered w-full">
-                <option selected value="">
-                  Select Product Name
-                </option>
-                {products.map((product) => (
-                  <option key={product.id_product} value={product.id_product}>
-                    {product.product_name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                name="quantity"
-                value={quantityForCreatingOrder}
-                onChange={(e) => setQuantityForCreatingOrder(e.target.value)}
-                className="input input-bordered input-ghost w-full my-2"
-                placeholder="Quantity"
-              />
-              <button
-                type="button"
-                className="tooltip"
-                data-tip="Add Product"
-                onClick={addProductForOrder}>
-                <SquarePlus size={50} color="#00d12a" />
-              </button>
-            </section>
-            <section>
-              {cart.orderDetails.map((detail) => (
-                <div
-                  key={detail.id_order_details}
-                  className="flex gap-2 justify-center items-center">
-                  <span>{detail.product_name}</span>
-                  <span>{detail.quantity}</span>
-                  <button
-                    type="button"
-                    className="tooltip"
-                    data-tip="Remove Product">
-                    <Trash2 size={50} color="red" />
-                  </button>
-                </div>
-              ))}
-              {cart.totalPrice > 0 && (
-                <div className="flex gap-2 justify-center items-center">
-                  <span>Total:</span>
-                  <span>{numberToIDR(cart.totalPrice)}</span>
-                </div>
-              )}
-            </section>
-
-            {isSuccessAddOrder ? (
-              <button
-                className="btn btn-outline btn-primary w-full"
-                type="button"
-                onClick={() => {
-                  if (redirectURL) {
-                    window.location.href = redirectURL;
-                  } else {
-                    alert("Redirect URL tidak ditemukan!");
-                  }
-                }}>
-                PAY
-              </button>
-            ) : (
-              <button
-                className="btn btn-outline btn-primary w-full"
-                type="submit">
-                Submit
-              </button>
-            )}
-          </form>
-          <div className="modal-action">
-            <form method="dialog">
-              <button className="btn" onClick={onButtonCloseAddNewOrder}>
-                Close
-              </button>
-            </form>
-          </div>
-        </div>
-      </dialog>
-
+      <ExportModal
+        handleExport={handleExport}
+        exportPer={exportPer}
+        setExportPer={setExportPer}
+        selectedMonth={selectedMonth}
+        setSelectedMonth={setSelectedMonth}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
+      <ShowDetailOrderModal
+        onShowDetailClose={onShowDetailClose}
+        selectedOrderForShowingDetail={selectedOrderForShowingDetail}
+      />
+      <AddNewOrderModal
+        handleAddNewOrder={handleAddNewOrder}
+        setCustomerNameForCreatingOrder={setCustomerNameForCreatingOrder}
+        customerNameForCreatingOrder={customerNameForCreatingOrder}
+        products={products}
+        idProductForCreatingOrder={idProductForCreatingOrder}
+        setIdProductForCreatingOrder={setIdProductForCreatingOrder}
+        quantityForCreatingOrder={quantityForCreatingOrder}
+        setQuantityForCreatingOrder={setQuantityForCreatingOrder}
+        addProductForOrder={addProductForOrder}
+        cart={cart}
+        isSuccessAddOrder={isSuccessAddOrder}
+        redirectURL={redirectURL}
+        onButtonCloseAddNewOrder={onButtonCloseAddNewOrder}
+      />
       <Table
         page={page}
         arrayData={orders.map((item) => ({
