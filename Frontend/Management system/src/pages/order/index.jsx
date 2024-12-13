@@ -58,6 +58,8 @@ const Order = () => {
   };
   const [isCustomerNameValid, setIsCustomerNameValid] = useState(true);
   const [isOrderDetailsValid, setIsOrderDetailsValid] = useState(true);
+  const [payWith, setPayWith] = useState("");
+  const [amount, setAmount] = useState(0);
 
   useEffect(() => {
     initialActions();
@@ -205,7 +207,9 @@ const Order = () => {
       })),
     };
     try {
-      await dispatch(createOrder({ order: data })).unwrap();
+      await dispatch(
+        createOrder({ order: data, payment_method: payWith, amount })
+      ).unwrap();
       // dispatch(clearProductCartState());
       setIsSuccessAddOrder(true);
       resetStateForCreatingOrder();
@@ -276,6 +280,10 @@ const Order = () => {
         onButtonCloseAddNewOrder={onButtonCloseAddNewOrder}
         isCustomerNameValid={isCustomerNameValid}
         isOrderDetailsValid={isOrderDetailsValid}
+        payWith={payWith}
+        setPayWith={setPayWith}
+        amount={amount}
+        setAmount={setAmount}
       />
       <Table
         page={page}
@@ -285,12 +293,14 @@ const Order = () => {
           orderDate: formatDate(item.order_date.split(" ")[0]),
           status: item.status,
           total: numberToIDR(item.total_price),
+          qrisResponse: item.qrisResponse,
         }))}
         tableHeader={[
           "Customer Name",
           "Order Date",
           "status",
           "Total",
+          "QRIS Response",
           "Action",
         ]}
         renderActions={(item) => (
@@ -305,9 +315,7 @@ const Order = () => {
                 className="btn btn-outline btn-primary px-8"
                 type="button"
                 onClick={() => {
-                  const redirectURL = localStorage.getItem(
-                    `payment-${item.id}`
-                  );
+                  const redirectURL = JSON.parse(item.link_qris).redirect_url;
                   if (redirectURL) {
                     window.open(redirectURL, "_blank");
                   } else {
