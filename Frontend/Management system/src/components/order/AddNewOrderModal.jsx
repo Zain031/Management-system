@@ -22,6 +22,8 @@ const AddNewOrderModal = ({
   isSuccessAddOrder,
   redirectURL,
   onButtonCloseAddNewOrder,
+  isCustomerNameValid = true,
+  isOrderDetailsValid = true,
 }) => {
   const dispatch = useDispatch();
   const addQuantity = (id, quantity) => {
@@ -41,9 +43,13 @@ const AddNewOrderModal = ({
             name="customerName"
             className="input input-bordered input-ghost w-full my-2"
             placeholder="Customer Name"
+            disabled={isSuccessAddOrder}
             value={customerNameForCreatingOrder}
             onChange={(e) => setCustomerNameForCreatingOrder(e.target.value)}
           />
+          {!isCustomerNameValid && (
+            <p className="text-red-500">Customer Name is required</p>
+          )}
           {!isSuccessAddOrder && (
             <section className="flex gap-2 justify-center items-center">
               <select
@@ -92,6 +98,7 @@ const AddNewOrderModal = ({
                           <td className="flex items-center">
                             <input
                               value={item.quantity}
+                              disabled={isSuccessAddOrder}
                               onChange={(e) => {
                                 console.log("Id pro", item.id_product);
                                 dispatch(
@@ -103,21 +110,23 @@ const AddNewOrderModal = ({
                               }}
                               className="w-1/2 rounded-md border-1 py-1 px-2"
                             />
-                            <button
-                              type="button"
-                              className="tooltip"
-                              data-tip="Remove Product">
-                              <Trash2
-                                size={24}
-                                color="red"
-                                onClick={() =>
-                                  removeQuantity(
-                                    item.id_product,
-                                    item?.quantity
-                                  )
-                                }
-                              />
-                            </button>
+                            {!isSuccessAddOrder && (
+                              <button
+                                type="button"
+                                className="tooltip"
+                                data-tip="Remove Product">
+                                <Trash2
+                                  size={24}
+                                  color="red"
+                                  onClick={() =>
+                                    removeQuantity(
+                                      item.id_product,
+                                      item?.quantity
+                                    )
+                                  }
+                                />
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -139,6 +148,9 @@ const AddNewOrderModal = ({
                   )}
                 </tbody>
               </table>
+              {!isOrderDetailsValid && (
+                <p className="text-red-500">Order Details is greater than 0</p>
+              )}
             </div>
           </section>
 
@@ -148,7 +160,7 @@ const AddNewOrderModal = ({
               type="button"
               onClick={() => {
                 if (redirectURL) {
-                  window.location.href = redirectURL;
+                  window.open(redirectURL, "_blank");
                 } else {
                   alert("Redirect URL tidak ditemukan!");
                 }

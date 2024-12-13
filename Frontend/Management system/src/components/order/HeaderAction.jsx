@@ -21,7 +21,7 @@ const HeaderAction = ({
           defaultValue={selectedStatus}
           placeholder="Select Status"
           onChange={(e) => setSelectedStatus(e.target.value)}>
-          <option value="">Select Status</option>
+          <option value="">All Status</option>
           <option value="COMPLETED">Completed</option>
           <option value="PENDING">Pending</option>
           <option value="CANCELED">Canceled</option>

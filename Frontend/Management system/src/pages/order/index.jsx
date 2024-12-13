@@ -5,6 +5,7 @@ import Table from "../../components/Table";
 import { useEffect } from "react";
 import {
   addProductToCart,
+  clearProductCartState,
   createOrder,
   fetchAllProducts,
   fetchOrderByMonth,
@@ -55,6 +56,8 @@ const Order = () => {
     await dispatch(fetchAllProducts()).unwrap();
     removePaymentDataInLocalStorage(orders);
   };
+  const [isCustomerNameValid, setIsCustomerNameValid] = useState(true);
+  const [isOrderDetailsValid, setIsOrderDetailsValid] = useState(true);
 
   useEffect(() => {
     initialActions();
@@ -145,13 +148,30 @@ const Order = () => {
 
   const onButtonCloseAddNewOrder = () => {
     document.getElementById("add_new_order_modal").close();
+    dispatch(clearProductCartState());
+    setIsSuccessAddOrder(false);
+    dispatch(setCustomerNameForCreatingOrder(""));
   };
 
   const handleAddNewOrder = async (e) => {
     e.preventDefault();
-    if (!isNotEmpty(cart.customerName)) return;
-    console.log("Cart", cart);
-    if (cart.orderDetails.length <= 0) return;
+    let allValid = true;
+    if (!isNotEmpty(cart.customerName)) {
+      setIsCustomerNameValid(false);
+      allValid = false;
+    } else {
+      setIsCustomerNameValid(true);
+    }
+
+    if (cart.orderDetails.length <= 0) {
+      setIsOrderDetailsValid(false);
+      allValid = false;
+    } else {
+      setIsOrderDetailsValid(true);
+    }
+    if (!allValid) {
+      return;
+    }
     onButtonCloseAddNewOrder();
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -254,6 +274,8 @@ const Order = () => {
         isSuccessAddOrder={isSuccessAddOrder}
         redirectURL={redirectURL}
         onButtonCloseAddNewOrder={onButtonCloseAddNewOrder}
+        isCustomerNameValid={isCustomerNameValid}
+        isOrderDetailsValid={isOrderDetailsValid}
       />
       <Table
         page={page}
