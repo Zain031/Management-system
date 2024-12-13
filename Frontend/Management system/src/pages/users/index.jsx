@@ -33,7 +33,7 @@ const Users = () => {
 
   useEffect(() => {
     dispatch(fetchUsers({ page: 1 }));
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     dispatch(setPage(1));
@@ -134,7 +134,7 @@ const Users = () => {
     });
 
     document.getElementById("modal_form_User").close();
-    await dispatch(fetchUsers());
+    await dispatch(fetchUsers({ page })).unwrap();
   };
 
   const handleSubmit = async (e) => {

@@ -26,6 +26,7 @@ import HeaderAction from "../../components/order/HeaderAction";
 import ButtonEye from "../../components/buttons/ButtonEye";
 import removePaymentDataInLocalStorage from "../../../utils/removePaymentDataInLocalStorage";
 import Swal from "sweetalert2";
+import { isNotEmpty } from "../../../utils/validation/inputValidation";
 
 const Order = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ const Order = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [exportPer, setExportPer] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-
+  const [selectedStatus, setSelectedStatus] = useState("");
   const currentTime = new Date();
   const [selectedMonth, setSelectedMonth] = useState(
     months[currentTime.getMonth()]
@@ -43,15 +44,12 @@ const Order = () => {
   const [selectedYear, setSelectedYear] = useState(currentTime.getFullYear());
   const [selectedOrderForShowingDetail, setSelectedOrderForShowingDetail] =
     useState([]);
-
   const [customerNameForCreatingOrder, setCustomerNameForCreatingOrder] =
     useState("");
   const [idProductForCreatingOrder, setIdProductForCreatingOrder] =
     useState("");
   const [quantityForCreatingOrder, setQuantityForCreatingOrder] = useState(1);
-
   const [isSuccessAddOrder, setIsSuccessAddOrder] = useState(false);
-
   const initialActions = async () => {
     await dispatch(fetchOrders({ page, size: 10 })).unwrap();
     await dispatch(fetchAllProducts()).unwrap();
@@ -63,8 +61,14 @@ const Order = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchOrderByMonth({ month: selectedMonth, year: selectedYear }));
-  }, [selectedMonth, selectedYear]);
+    dispatch(
+      fetchOrderByMonth({
+        month: selectedMonth,
+        year: selectedYear,
+        status: selectedStatus,
+      })
+    );
+  }, [selectedMonth, selectedYear, selectedStatus]);
 
   useEffect(() => {
     dispatch(fetchOrders({ page, size: 10 }));
@@ -135,12 +139,19 @@ const Order = () => {
     resetStateForCreatingOrder();
   };
 
+  useEffect(() => {
+    console.log("Cart", cart);
+  }, [cart]);
+
   const onButtonCloseAddNewOrder = () => {
     document.getElementById("add_new_order_modal").close();
   };
 
   const handleAddNewOrder = async (e) => {
     e.preventDefault();
+    if (!isNotEmpty(cart.customerName)) return;
+    console.log("Cart", cart);
+    if (cart.orderDetails.length <= 0) return;
     onButtonCloseAddNewOrder();
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -201,6 +212,8 @@ const Order = () => {
       setPage={setPage}
       headerRenderAction={
         <HeaderAction
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           selectedMonth={selectedMonth}

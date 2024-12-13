@@ -93,9 +93,10 @@ const AddNewOrderModal = ({
                             <input
                               value={item.quantity}
                               onChange={(e) => {
+                                console.log("Id pro", item.id_product);
                                 dispatch(
                                   changeQuantityInCart({
-                                    id: item.id,
+                                    id: item.id_product,
                                     quantity: e.target.value,
                                   })
                                 );
@@ -106,7 +107,16 @@ const AddNewOrderModal = ({
                               type="button"
                               className="tooltip"
                               data-tip="Remove Product">
-                              <Trash2 size={24} color="red" />
+                              <Trash2
+                                size={24}
+                                color="red"
+                                onClick={() =>
+                                  removeQuantity(
+                                    item.id_product,
+                                    item?.quantity
+                                  )
+                                }
+                              />
                             </button>
                           </td>
                         </tr>

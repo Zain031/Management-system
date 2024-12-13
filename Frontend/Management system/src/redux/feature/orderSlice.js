@@ -60,10 +60,10 @@ export const createOrder = createAsyncThunk(
 
 export const fetchOrderByMonth = createAsyncThunk(
   "orders/fetchByMonth",
-  async ({ month, year }, { rejectWithValue }) => {
+  async ({ month, year, status }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `/orders/month/${month}?year=${year}`
+        `/orders/month/${month}?year=${year}&status=${status}`
       );
       return response.data;
     } catch (e) {
@@ -156,9 +156,12 @@ const orderSlice = createSlice({
     },
     removeProductFromCart: (state, action) => {
       const { id } = action.payload;
-      state.cart.orderDetails = state.cart.orderDetails.filter(
-        (item) => item.id !== id
+      const index = state.cart.orderDetails.findIndex(
+        (item) => item.id_product === id
       );
+      if (index >= 0) {
+        state.cart.orderDetails.splice(index, 1);
+      }
 
       state.cart.totalPrice = state.cart.orderDetails.reduce(
         (total, item) => total + item.quantity * item.product_price,
@@ -166,16 +169,12 @@ const orderSlice = createSlice({
       );
     },
     changeQuantityInCart: (state, action) => {
-      const { id } = action.payload;
-      const quantity = parseInt(action.payload.quantity, 10) || 0;
-      if (quantity < 1) {
-        return;
-      }
+      const { id, quantity } = action.payload;
       const existingProduct = state.cart.orderDetails.find(
-        (item) => item.id === id
+        (item) => item.id_product === id
       );
       if (existingProduct) {
-        existingProduct.quantity = quantity;
+        existingProduct.quantity = parseInt(quantity, 10) || 0;
       }
       state.cart.totalPrice = state.cart.orderDetails.reduce(
         (total, item) => total + item.quantity * item.product_price,
