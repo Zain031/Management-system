@@ -72,7 +72,7 @@ const AddNewOrderModal = ({
             </section>
           )}
           <section>
-            <div className="overflow-x-auto shadow-lg outline outline-1 outline-slate-300 rounded-md mt-2">
+            <div className="overflow-x-auto shadow-lg outline outline-1 outline-slate-300 rounded-md mt-2 mb-4">
               <table className="table">
                 <thead>
                   <tr>
@@ -111,6 +111,10 @@ const AddNewOrderModal = ({
                           </td>
                         </tr>
                       ))}
+                      <tr>
+                        <td>Customer Name</td>
+                        <td>{cart?.customerName}</td>
+                      </tr>
                       <tr>
                         <td>Total</td>
                         <td>{numberToIDR(cart?.totalPrice)}</td>
