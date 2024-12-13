@@ -150,13 +150,13 @@ const Order = () => {
     document.getElementById("add_new_order_modal").close();
     dispatch(clearProductCartState());
     setIsSuccessAddOrder(false);
-    dispatch(setCustomerNameForCreatingOrder(""));
+    setCustomerNameForCreatingOrder("");
   };
 
   const handleAddNewOrder = async (e) => {
     e.preventDefault();
     let allValid = true;
-    if (!isNotEmpty(cart.customerName)) {
+    if (!isNotEmpty(cart?.customerName)) {
       setIsCustomerNameValid(false);
       allValid = false;
     } else {
@@ -172,7 +172,7 @@ const Order = () => {
     if (!allValid) {
       return;
     }
-    onButtonCloseAddNewOrder();
+    document.getElementById("add_new_order_modal").close();
     const result = await Swal.fire({
       title: "Are you sure?",
       icon: "warning",
@@ -185,7 +185,7 @@ const Order = () => {
       },
     });
     if (!result.isConfirmed) return;
-    onButtonAddClick();
+    document.getElementById("add_new_order_modal").showModal();
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",
@@ -300,6 +300,23 @@ const Order = () => {
               data-tip="Details"
               onClick={() => onButtonShowDetailClick(item.id)}
             />
+            {item.status.toLowerCase() === "pending" && (
+              <button
+                className="btn btn-outline btn-primary px-8"
+                type="button"
+                onClick={() => {
+                  const redirectURL = localStorage.getItem(
+                    `payment-${item.id}`
+                  );
+                  if (redirectURL) {
+                    window.open(redirectURL, "_blank");
+                  } else {
+                    alert("Redirect URL tidak ditemukan!");
+                  }
+                }}>
+                PAY
+              </button>
+            )}
           </td>
         )}
         notFoundMessage="No orders found"

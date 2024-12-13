@@ -120,7 +120,7 @@ const AddNewOrderModal = ({
                                   color="red"
                                   onClick={() =>
                                     removeQuantity(
-                                      item.id_product,
+                                      item?.id_product,
                                       item?.quantity
                                     )
                                   }
