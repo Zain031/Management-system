@@ -192,6 +192,7 @@ const Order = () => {
       {
         name: "amount",
         validator: (amount) => {
+          if (payWith != "CASH") return true;
           return amount >= cart?.totalPrice;
         },
         negativeImpact: () => setIsAmountValid(false),
@@ -348,26 +349,24 @@ const Order = () => {
                 Export Receipt
               </ButtonExport>
             )}
-            {item.status.toLowerCase() === "pending" &&
-              item.method &&
-              item.method.toLowerCase() === "qris" && (
-                <button
-                  className="btn btn-outline btn-primary px-8"
-                  type="button"
-                  onClick={() => {
-                    console.log("Link QRIS", item);
-                    const redirectURL = JSON.parse(
-                      item.qrisResponse
-                    ).redirect_url;
-                    if (redirectURL) {
-                      window.open(redirectURL, "_blank");
-                    } else {
-                      alert("Redirect URL tidak ditemukan!");
-                    }
-                  }}>
-                  PAY
-                </button>
-              )}
+            {item.status.toLowerCase() === "pending" && item.qrisResponse && (
+              <button
+                className="btn btn-outline btn-primary px-8"
+                type="button"
+                onClick={() => {
+                  console.log("Link QRIS", item);
+                  const redirectURL = JSON.parse(
+                    item.qrisResponse
+                  ).redirect_url;
+                  if (redirectURL) {
+                    window.open(redirectURL, "_blank");
+                  } else {
+                    alert("Redirect URL tidak ditemukan!");
+                  }
+                }}>
+                PAY
+              </button>
+            )}
           </td>
         )}
         notFoundMessage="No orders found"
