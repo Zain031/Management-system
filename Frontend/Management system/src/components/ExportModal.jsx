@@ -21,6 +21,11 @@ const ExportModal = ({
             exportPer={exportPer}
             setExportPer={setExportPer}
           />
+          {!exportPer && (
+            <p className="text-sm text-gray-500 mb-4">
+              Default export per month
+            </p>
+          )}
           {exportPer === "month" && (
             <>
               <SelectMonth

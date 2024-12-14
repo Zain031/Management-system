@@ -41,7 +41,7 @@ const HeaderAction = ({
       </label>
 
       <ButtonExport onPress={() => onButtonExportClick()}>
-        Export Products
+        Export Order
       </ButtonExport>
       <ButtonAdd onPress={onButtonAddClick} dataTip="Product" />
     </div>

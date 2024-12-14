@@ -42,11 +42,7 @@ const AddNewOrderModal = ({
 
   const validateAmount = (amount) => {
     const numericAmount = extractNumber(amount);
-    if (cart?.totalPrice && numericAmount < cart.totalPrice) {
-      setAmount(cart.totalPrice);
-    } else {
-      setAmount(numericAmount);
-    }
+    setAmount(numericAmount);
   };
 
   useEffect(() => {
@@ -163,7 +159,6 @@ const AddNewOrderModal = ({
                               value={item.quantity}
                               disabled={isSuccessAddOrder}
                               onChange={(e) => {
-                                console.log("Id pro", item.id_product);
                                 dispatch(
                                   changeQuantityInCart({
                                     id: item.id_product,
@@ -228,26 +223,11 @@ const AddNewOrderModal = ({
               )}
             </div>
           </section>
-
-          {isSuccessAddOrder ? (
-            <></>
-          ) : (
-            // <button
-            //   className="btn btn-outline btn-primary w-full"
-            //   type="button"
-            //   onClick={() => {
-            //     if (redirectURL) {
-            //       window.open(redirectURL, "_blank");
-            //     } else {
-            //       alert("Redirect URL tidak ditemukan!");
-            //     }
-            //   }}>
-            //   PAY
-            // </button>
+          {!isSuccessAddOrder && (
             <button
               className="btn btn-outline btn-primary w-full"
               type="submit">
-              Submit
+              PAY
             </button>
           )}
         </form>

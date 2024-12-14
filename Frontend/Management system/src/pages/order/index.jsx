@@ -307,17 +307,19 @@ const Order = () => {
         ]}
         renderActions={(item) => (
           <td className="flex gap-8">
-            <ButtonExport
-              className="tooltip"
-              data-tip="Export"
-              onClick={() => dispatch(generateReceipt(item.id))}>
-              Export Receipt
-            </ButtonExport>
             <ButtonEye
               className="tooltip"
               data-tip="Details"
               onClick={() => onButtonShowDetailClick(item.id)}
             />
+            {item.status === "COMPLETED" && (
+              <ButtonExport
+                className="tooltip"
+                data-tip="Export"
+                onClick={() => dispatch(generateReceipt(item.id))}>
+                Export Receipt
+              </ButtonExport>
+            )}
             {item.status.toLowerCase() === "pending" &&
               item.method &&
               item.method.toLowerCase() === "qris" && (
