@@ -22,7 +22,6 @@ const Login = () => {
 
   useEffect(() => {
     if (isLogin) {
-      // dispatch(setAuth({ token: localStorage.getItem("token") }));
       navigate("/");
     }
   }, [isLogin, navigate]);

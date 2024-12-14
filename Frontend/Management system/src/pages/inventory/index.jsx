@@ -548,7 +548,7 @@ const Inventory = () => {
             </div>
           </div>
         </dialog>
-        
+
         <div className="overflow-x-auto shadow-lg outline outline-1 outline-slate-300 rounded-md mt-2">
           <table className="table">
             <thead>

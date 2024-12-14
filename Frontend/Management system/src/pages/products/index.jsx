@@ -66,7 +66,6 @@ const Products = () => {
   );
 
   const { user } = useSelector((state) => state.auth);
-  console.log("user", user);
 
   useEffect(() => {
     setName(productById?.product_name || "");
