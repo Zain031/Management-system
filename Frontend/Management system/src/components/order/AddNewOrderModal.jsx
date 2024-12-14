@@ -28,6 +28,7 @@ const AddNewOrderModal = ({
   setPayWith,
   amount,
   setAmount,
+  isAmountValid = true,
 }) => {
   const dispatch = useDispatch();
 
@@ -46,9 +47,9 @@ const AddNewOrderModal = ({
   };
 
   useEffect(() => {
-    if (!isSuccessAddOrder && !redirectURL && payWith !== "QRIS") return;
+    if (!isSuccessAddOrder || !redirectURL || payWith !== "QRIS") return;
     window.open(redirectURL, "_blank");
-  }, [redirectURL, isSuccessAddOrder]);
+  }, [redirectURL, isSuccessAddOrder, payWith]);
 
   return (
     <dialog id="add_new_order_modal" className="modal">
@@ -132,6 +133,9 @@ const AddNewOrderModal = ({
                     className="input input-bordered input-ghost w-full my-2"
                     placeholder="Price"
                   />
+                  {!isAmountValid && (
+                    <p className="text-red-500">Amount is more than total</p>
+                  )}
                 </>
               )}
             </>

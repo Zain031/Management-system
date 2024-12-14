@@ -34,10 +34,8 @@ export const fetchOrderById = createAsyncThunk(
 export const createOrder = createAsyncThunk(
   "orders/createOrder",
   async ({ order, payment_method = "QRIS", amount }, { rejectWithValue }) => {
-    console.log("Order", order);
     try {
       const response = await axiosInstance.post(`/orders/create`, order);
-      console.log("Response", response.data.data);
       let paymentData;
       if (payment_method != "QRIS") {
         paymentData = await axiosInstance.post(
@@ -56,7 +54,6 @@ export const createOrder = createAsyncThunk(
           }
         );
       }
-      console.log("Payment Data", paymentData.data);
       return {
         createOrderData: response.data.data,
         paymentData: paymentData.data.data,
@@ -137,7 +134,6 @@ const orderSlice = createSlice({
   },
   reducers: {
     setCustomerNameForCart: (state, action) => {
-      console.log(action.payload);
       state.cart.customerName = action.payload;
     },
     addProductToCart: (state, action) => {
@@ -146,16 +142,13 @@ const orderSlice = createSlice({
       const existingProduct = state.cart.orderDetails.find(
         (item) => item.id_product == id
       );
-      console.log("Existing product", existingProduct);
 
       if (existingProduct) {
         existingProduct.quantity += quantity;
       } else {
         const product = state.products.find((item) => {
-          console.log(item);
           return item.id_product == id;
         });
-        console.log("Product", product);
         state.cart.orderDetails.push({
           ...product,
           quantity,
@@ -258,17 +251,12 @@ const orderSlice = createSlice({
       .addCase(createOrder.fulfilled, (state, action) => {
         const { createOrderData, paymentData, payment } = action.payload;
         if (payment == "QRIS") {
-          console.log("Link qris", paymentData.link_qris);
           const { redirect_url } = JSON.parse(paymentData.link_qris);
           state.redirectURL = redirect_url;
         }
 
         state.loading = false;
         state.createdOrder = createOrderData;
-        // localStorage.setItem(
-        //   `payment-${createOrderData.id_order}`,
-        //   redirect_url
-        // );
         state.orders.push(createOrderData);
       })
       .addCase(createOrder.rejected, (state, action) => {

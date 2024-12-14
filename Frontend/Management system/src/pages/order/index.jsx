@@ -28,7 +28,11 @@ import HeaderAction from "../../components/order/HeaderAction";
 import ButtonEye from "../../components/buttons/ButtonEye";
 import removePaymentDataInLocalStorage from "../../../utils/removePaymentDataInLocalStorage";
 import Swal from "sweetalert2";
-import { isNotEmpty } from "../../../utils/validation/inputValidation";
+import {
+  dynamicValidation,
+  isNotEmpty,
+  validateName,
+} from "../../../utils/validation/inputValidation";
 import ButtonExport from "../../components/ButtonExport";
 
 const Order = () => {
@@ -60,6 +64,7 @@ const Order = () => {
   };
   const [isCustomerNameValid, setIsCustomerNameValid] = useState(true);
   const [isOrderDetailsValid, setIsOrderDetailsValid] = useState(true);
+  const [isAmountValid, setIsAmountValid] = useState(true);
   const [payWith, setPayWith] = useState("");
   const [amount, setAmount] = useState(0);
 
@@ -132,10 +137,7 @@ const Order = () => {
   };
 
   const addProductForOrder = async () => {
-    if (!idProductForCreatingOrder || !quantityForCreatingOrder) {
-      console.error("Product ID and quantity are required.");
-      return;
-    }
+    if (!idProductForCreatingOrder || !quantityForCreatingOrder) return;
     dispatch(setCustomerNameForCart(customerNameForCreatingOrder));
     dispatch(
       addProductToCart({
@@ -146,10 +148,6 @@ const Order = () => {
     resetStateForCreatingOrder();
   };
 
-  useEffect(() => {
-    console.log("Cart", cart);
-  }, [cart]);
-
   const onButtonCloseAddNewOrder = () => {
     document.getElementById("add_new_order_modal").close();
     dispatch(clearProductCartState());
@@ -159,35 +157,59 @@ const Order = () => {
 
   const handleAddNewOrder = async (e) => {
     e.preventDefault();
-    let allValid = true;
-    if (!isNotEmpty(cart?.customerName)) {
-      setIsCustomerNameValid(false);
-      allValid = false;
-    } else {
-      setIsCustomerNameValid(true);
-    }
-
-    if (cart.orderDetails.length <= 0) {
-      setIsOrderDetailsValid(false);
-      allValid = false;
-    } else {
-      setIsOrderDetailsValid(true);
-    }
+    const data = {
+      customer_name: cart.customerName,
+      order_details: cart.orderDetails.map((detail) => ({
+        id_product: detail.id_product,
+        quantity: Number(detail.quantity),
+      })),
+      amount,
+    };
+    const validation = [
+      {
+        name: "customer_name",
+        validator: (name) => {
+          return isNotEmpty(name) && validateName(name);
+        },
+        negativeImpact: () => setIsCustomerNameValid(false),
+        positiveImpact: () => setIsCustomerNameValid(true),
+      },
+      {
+        name: "order_details",
+        validator: (details) => {
+          return details.length > 0;
+        },
+        negativeImpact: () => setIsOrderDetailsValid(false),
+        positiveImpact: () => setIsOrderDetailsValid(true),
+      },
+      {
+        name: "amount",
+        validator: (amount) => {
+          return amount >= cart?.totalPrice;
+        },
+        negativeImpact: () => setIsAmountValid(false),
+        positiveImpact: () => setIsAmountValid(true),
+      },
+    ];
+    let allValid = dynamicValidation(validation, data);
     if (!allValid) {
       return;
     }
     document.getElementById("add_new_order_modal").close();
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, Add new order!",
-      customClass: {
-        popup: "highest-z-index",
+    const result = await Swal.fire(
+      {
+        title: "Are you sure?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Add new order!",
+        customClass: {
+          popup: "highest-z-index",
+        },
       },
-    });
+      data
+    );
     if (!result.isConfirmed) return;
     document.getElementById("add_new_order_modal").showModal();
     const Toast = Swal.mixin({
@@ -201,18 +223,17 @@ const Order = () => {
         toast.onmouseleave = Swal.resumeTimer;
       },
     });
-    const data = {
-      customer_name: cart.customerName,
-      order_details: cart.orderDetails.map((detail) => ({
-        id_product: detail.id_product,
-        quantity: Number(detail.quantity),
-      })),
-    };
     try {
       await dispatch(
-        createOrder({ order: data, payment_method: payWith, amount })
+        createOrder({
+          order: {
+            customer_name: data.customer_name,
+            order_details: data.order_details,
+          },
+          payment_method: payWith,
+          amount: data.amount,
+        })
       ).unwrap();
-      // dispatch(clearProductCartState());
       setIsSuccessAddOrder(true);
       resetStateForCreatingOrder();
 
@@ -220,7 +241,6 @@ const Order = () => {
         icon: "success",
         title: "Material has been added",
       });
-      // setCustomerNameForCreatingOrder("");
     } catch (error) {
       console.error(error);
       setIsSuccessAddOrder(false);
@@ -282,6 +302,7 @@ const Order = () => {
         onButtonCloseAddNewOrder={onButtonCloseAddNewOrder}
         isCustomerNameValid={isCustomerNameValid}
         isOrderDetailsValid={isOrderDetailsValid}
+        isAmountValid={isAmountValid}
         payWith={payWith}
         setPayWith={setPayWith}
         amount={amount}
