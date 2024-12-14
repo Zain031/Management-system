@@ -157,6 +157,7 @@ const Order = () => {
     dispatch(clearProductCartState());
     setIsSuccessAddOrder(false);
     setCustomerNameForCreatingOrder("");
+    dispatch(fetchOrders({ page, size: 10 }));
   };
 
   const handleAddNewOrder = async (e) => {
@@ -215,7 +216,10 @@ const Order = () => {
       },
       data
     );
-    if (!result.isConfirmed) return;
+    if (!result.isConfirmed) {
+      dispatch(fetchOrders({ page, size: 10 }));
+      return;
+    }
     document.getElementById("add_new_order_modal").showModal();
     const Toast = Swal.mixin({
       toast: true,
