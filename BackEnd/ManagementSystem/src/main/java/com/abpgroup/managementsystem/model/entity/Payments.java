@@ -32,11 +32,9 @@ public class Payments {
     @Column(name = "amount", nullable = false)
     private Double amount;
 
-    @Lob
     @Column(name = "qris_response")
     private String qrisResponse;
 
-    @Lob
     @Column(name = "status_midtrans")
     private String statusMidtrans;
 
