@@ -59,7 +59,7 @@ export const createOrder = createAsyncThunk(
       console.log("Payment Data", paymentData.data);
       return {
         createOrderData: response.data.data,
-        paymentData: paymentData.data.data.qrisResponse,
+        paymentData: paymentData.data.data,
         payment: payment_method,
       };
     } catch (e) {
@@ -258,7 +258,8 @@ const orderSlice = createSlice({
       .addCase(createOrder.fulfilled, (state, action) => {
         const { createOrderData, paymentData, payment } = action.payload;
         if (payment == "QRIS") {
-          const { redirect_url } = JSON.parse(paymentData);
+          console.log("Link qris", paymentData.link_qris);
+          const { redirect_url } = JSON.parse(paymentData.link_qris);
           state.redirectURL = redirect_url;
         }
 

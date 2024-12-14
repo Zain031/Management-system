@@ -50,13 +50,8 @@ const AddNewOrderModal = ({
   };
 
   useEffect(() => {
-    if (isSuccessAddOrder) {
-      if (redirectURL) {
-        window.open(redirectURL, "_blank");
-      } else {
-        alert("Redirect URL tidak ditemukan!");
-      }
-    }
+    if (!isSuccessAddOrder && !redirectURL && payWith !== "QRIS") return;
+    window.open(redirectURL, "_blank");
   }, [redirectURL, isSuccessAddOrder]);
 
   return (
@@ -235,19 +230,20 @@ const AddNewOrderModal = ({
           </section>
 
           {isSuccessAddOrder ? (
-            <button
-              className="btn btn-outline btn-primary w-full"
-              type="button"
-              onClick={() => {
-                if (redirectURL) {
-                  window.open(redirectURL, "_blank");
-                } else {
-                  alert("Redirect URL tidak ditemukan!");
-                }
-              }}>
-              PAY
-            </button>
+            <></>
           ) : (
+            // <button
+            //   className="btn btn-outline btn-primary w-full"
+            //   type="button"
+            //   onClick={() => {
+            //     if (redirectURL) {
+            //       window.open(redirectURL, "_blank");
+            //     } else {
+            //       alert("Redirect URL tidak ditemukan!");
+            //     }
+            //   }}>
+            //   PAY
+            // </button>
             <button
               className="btn btn-outline btn-primary w-full"
               type="submit">
