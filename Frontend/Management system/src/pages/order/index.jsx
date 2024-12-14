@@ -73,16 +73,23 @@ const Order = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(
-      fetchOrderByMonth({
-        month: selectedMonth,
-        year: selectedYear,
-        status: selectedStatus,
-      })
-    );
+    if (selectedStatus === "") {
+      dispatch(fetchOrders({ page, size: 10 }));
+    } else {
+      dispatch(
+        fetchOrderByMonth({
+          month: selectedMonth,
+          year: selectedYear,
+          status: selectedStatus,
+        })
+      );
+    }
   }, [selectedMonth, selectedYear, selectedStatus]);
 
   useEffect(() => {
+    if (selectedStatus !== "") {
+      return;
+    }
     dispatch(fetchOrders({ page, size: 10 }));
   }, [page]);
 
