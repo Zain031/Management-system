@@ -71,6 +71,9 @@ const Order = () => {
   useEffect(() => {
     initialActions();
   }, [dispatch]);
+  useEffect(() => {
+    dispatch(setPage(1));
+  }, [selectedStatus, selectedMonth, selectedYear]);
 
   useEffect(() => {
     if (selectedStatus !== "" || selectedMonth || selectedYear) {
