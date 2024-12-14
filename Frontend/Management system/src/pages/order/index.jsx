@@ -295,6 +295,7 @@ const Order = () => {
           orderDate: formatDate(item.order_date.split(" ")[0]),
           status: item.status,
           total: numberToIDR(item.total_price),
+          method: item?.method,
           qrisResponse: item.link_qris,
         }))}
         tableHeader={[
@@ -317,28 +318,30 @@ const Order = () => {
               data-tip="Details"
               onClick={() => onButtonShowDetailClick(item.id)}
             />
-            {item.status.toLowerCase() === "pending" && (
-              <button
-                className="btn btn-outline btn-primary px-8"
-                type="button"
-                onClick={() => {
-                  console.log("Link QRIS", item);
-                  const redirectURL = JSON.parse(
-                    item.qrisResponse
-                  ).redirect_url;
-                  if (redirectURL) {
-                    window.open(redirectURL, "_blank");
-                  } else {
-                    alert("Redirect URL tidak ditemukan!");
-                  }
-                }}>
-                PAY
-              </button>
-            )}
+            {item.status.toLowerCase() === "pending" &&
+              item.method &&
+              item.method.toLowerCase() === "qris" && (
+                <button
+                  className="btn btn-outline btn-primary px-8"
+                  type="button"
+                  onClick={() => {
+                    console.log("Link QRIS", item);
+                    const redirectURL = JSON.parse(
+                      item.qrisResponse
+                    ).redirect_url;
+                    if (redirectURL) {
+                      window.open(redirectURL, "_blank");
+                    } else {
+                      alert("Redirect URL tidak ditemukan!");
+                    }
+                  }}>
+                  PAY
+                </button>
+              )}
           </td>
         )}
         notFoundMessage="No orders found"
-        excludeColumns={["order_details", "id", "qrisResponse"]}
+        excludeColumns={["order_details", "id", "qrisResponse", "method"]}
       />
     </PaginationLayout>
   );

@@ -6,7 +6,7 @@ export const fetchOrders = createAsyncThunk(
   async ({ page = 1, size = 10 } = {}, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `/orders?page=${page - 1}&size=${size}`
+        `/payment?page=${page - 1}&size=${size}`
       );
       return response.data;
     } catch (e) {
@@ -213,7 +213,11 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload.data.content;
+        state.orders = action.payload.data.content.map((order) => ({
+          ...order.order,
+          method: order?.method,
+          link_qris: order.link_qris,
+        }));
         state.paging = {
           totalElements: action.payload.data.totalElements,
           totalPages: action.payload.data.totalPages,

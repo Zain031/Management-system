@@ -34,6 +34,19 @@ const AddNewOrderModal = ({
     dispatch(removeProductFromCart({ id, quantity }));
   };
 
+  const extractNumber = (value) => {
+    const sanitizedValue = value.replace(/[^0-9]/g, "");
+    return parseInt(sanitizedValue, 10) || 0;
+  };
+
+  const validateAmount = (amount) => {
+    const numericAmount = extractNumber(amount);
+    if (cart?.totalPrice && numericAmount < cart.totalPrice) {
+      setAmount(cart.totalPrice);
+    } else {
+      setAmount(numericAmount);
+    }
+  };
   return (
     <dialog id="add_new_order_modal" className="modal">
       <div className="modal-box">
@@ -99,14 +112,22 @@ const AddNewOrderModal = ({
                 </section>
               )}
               {payWith === "CASH" && (
-                <input
-                  type="number"
-                  name="price"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="input input-bordered input-ghost w-full my-2"
-                  placeholder="Price"
-                />
+                <>
+                  <label
+                    className="text-gray-800 font-semibold block mt-3 mb-1 text-md"
+                    htmlFor="price">
+                    Amount
+                  </label>
+                  <input
+                    type="text"
+                    name="price"
+                    min={cart?.totalPrice}
+                    onChange={(e) => validateAmount(e.target.value)}
+                    value={amount}
+                    className="input input-bordered input-ghost w-full my-2"
+                    placeholder="Price"
+                  />
+                </>
               )}
             </>
           )}
@@ -165,12 +186,24 @@ const AddNewOrderModal = ({
                       ))}
                       <tr>
                         <td>Customer Name</td>
-                        <td>{cart?.customerName}</td>
+                        <td colSpan="2">{cart?.customerName}</td>
                       </tr>
+                      {payWith === "CASH" && (
+                        <tr>
+                          <td>Amount</td>
+                          <td colSpan="2">{numberToIDR(amount)}</td>
+                        </tr>
+                      )}
                       <tr>
                         <td>Total</td>
-                        <td>{numberToIDR(cart?.totalPrice)}</td>
+                        <td colSpan="2">{numberToIDR(cart?.totalPrice)}</td>
                       </tr>
+                      {
+                        <tr>
+                          <td>Change</td>
+                          <td>{numberToIDR(amount - cart?.totalPrice)}</td>
+                        </tr>
+                      }
                     </>
                   ) : (
                     <tr>
