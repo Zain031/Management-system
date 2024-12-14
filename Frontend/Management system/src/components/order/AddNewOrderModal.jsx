@@ -6,6 +6,7 @@ import {
   changeQuantityInCart,
   removeProductFromCart,
 } from "../../redux/feature/orderSlice";
+import { useEffect } from "react";
 
 const AddNewOrderModal = ({
   handleAddNewOrder,
@@ -47,6 +48,17 @@ const AddNewOrderModal = ({
       setAmount(numericAmount);
     }
   };
+
+  useEffect(() => {
+    if (isSuccessAddOrder) {
+      if (redirectURL) {
+        window.open(redirectURL, "_blank");
+      } else {
+        alert("Redirect URL tidak ditemukan!");
+      }
+    }
+  }, [redirectURL, isSuccessAddOrder]);
+
   return (
     <dialog id="add_new_order_modal" className="modal">
       <div className="modal-box">
@@ -54,6 +66,7 @@ const AddNewOrderModal = ({
           <select
             name="pay_with"
             value={payWith}
+            disabled={isSuccessAddOrder}
             onChange={(e) => setPayWith(e.target.value)}
             className="select select-bordered w-full">
             <option selected value="">
@@ -122,6 +135,7 @@ const AddNewOrderModal = ({
                     type="text"
                     name="price"
                     min={cart?.totalPrice}
+                    disabled={isSuccessAddOrder}
                     onChange={(e) => validateAmount(e.target.value)}
                     value={amount}
                     className="input input-bordered input-ghost w-full my-2"
@@ -198,12 +212,12 @@ const AddNewOrderModal = ({
                         <td>Total</td>
                         <td colSpan="2">{numberToIDR(cart?.totalPrice)}</td>
                       </tr>
-                      {
+                      {payWith === "CASH" && (
                         <tr>
                           <td>Change</td>
                           <td>{numberToIDR(amount - cart?.totalPrice)}</td>
                         </tr>
-                      }
+                      )}
                     </>
                   ) : (
                     <tr>
