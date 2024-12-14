@@ -73,25 +73,19 @@ const Order = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (selectedStatus === "") {
-      dispatch(fetchOrders({ page, size: 10 }));
-    } else {
+    if (selectedStatus !== "" || selectedMonth || selectedYear) {
       dispatch(
         fetchOrderByMonth({
           month: selectedMonth,
           year: selectedYear,
           status: selectedStatus,
+          page,
         })
       );
+    } else {
+      dispatch(fetchOrders({ page, size: 10 }));
     }
-  }, [selectedMonth, selectedYear, selectedStatus]);
-
-  useEffect(() => {
-    if (selectedStatus !== "") {
-      return;
-    }
-    dispatch(fetchOrders({ page, size: 10 }));
-  }, [page]);
+  }, [selectedMonth, selectedYear, selectedStatus, page]);
 
   const onButtonShowDetailClick = (id) => {
     const selectedOrder = orders.find((order) => order.id_order === id);

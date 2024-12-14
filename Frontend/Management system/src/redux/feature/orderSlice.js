@@ -69,11 +69,12 @@ export const createOrder = createAsyncThunk(
 
 export const fetchOrderByMonth = createAsyncThunk(
   "orders/fetchByMonth",
-  async ({ month, year, status }, { rejectWithValue }) => {
+  async ({ month, year, status, page = 1, size = 10 }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
         `/orders/month/${month}?year=${year}` +
-          (status ? `&status=${status}` : "")
+          (status ? `&status=${status}` : "") +
+          `&page=${page - 1}&size=${size}`
       );
       return response.data;
     } catch (e) {
