@@ -4,9 +4,14 @@ import com.abpgroup.managementsystem.constant.APIUrl;
 import com.abpgroup.managementsystem.model.dto.request.PaymentRequestDTO;
 import com.abpgroup.managementsystem.model.dto.response.CommonResponse;
 import com.abpgroup.managementsystem.model.dto.response.PaymentResponseDTO;
+import com.abpgroup.managementsystem.model.entity.Orders;
+import com.abpgroup.managementsystem.repository.OrdersRepository;
 import com.abpgroup.managementsystem.service.PaymentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -26,8 +30,10 @@ import java.util.Optional;
 @SecurityRequirement(name = "bearerAuth")
 public class PaymentController {
     private final PaymentService paymentService;
+    private final OrdersRepository ordersRepository;
+
     @PostMapping("/process-payment")
-    public ResponseEntity<CommonResponse<?>> processPayment(@RequestParam("id_order") Long orderId, @RequestBody PaymentRequestDTO paymentRequestDTO) {
+    public ResponseEntity<CommonResponse<?>> processPayment(@RequestParam("id_order") String orderId, @RequestBody PaymentRequestDTO paymentRequestDTO) {
         try {
             PaymentResponseDTO paymentResponseDTO = paymentService.processPayment(orderId, paymentRequestDTO);
             CommonResponse<?> commonResponse = CommonResponse.<Object>builder()
@@ -44,10 +50,31 @@ public class PaymentController {
         }
     }
 
+    @GetMapping("/status/{id_order}")
+    public ResponseEntity<CommonResponse<?>> getStatus(@PathVariable("id_order") String id) {
+        try {
+            Orders orders = ordersRepository.findById(id).orElse(null);
+            PaymentResponseDTO paymentResponseDTO = paymentService.getPaymentById(id, orders);
+            CommonResponse<PaymentResponseDTO> commonResponse = CommonResponse.<PaymentResponseDTO>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully retrieved payment status")
+                    .data(Optional.of(paymentResponseDTO))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResponse.<Object>builder()
+                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Failed to retrieve payment status: " + e.getMessage())
+                    .build());
+        }
+
+    }
+
     @GetMapping("/generate-receipt/{id_order}")
-    public ResponseEntity<byte[]> generateReceipt(@PathVariable(name = "id_order") Long orderId) {
+    public ResponseEntity<byte[]> generateReceipt(@PathVariable(name = "id_order") String orderId) {
         // Mendapatkan data PaymentResponseDTO berdasarkan orderId
-        PaymentResponseDTO paymentResponseDTO = paymentService.getPaymentById(orderId);
+        Orders orders = ordersRepository.findById(orderId).orElse(null);
+        PaymentResponseDTO paymentResponseDTO = paymentService.getPaymentById(orderId, orders);
 
         // Menghasilkan struk kasir dalam bentuk PDF
         byte[] pdfData = paymentService.generatedReceipt(paymentResponseDTO);
@@ -92,6 +119,25 @@ public class PaymentController {
                 .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
                 .body(pdfData);
 
+    }
+
+    @GetMapping("")
+    public ResponseEntity<CommonResponse<?>> getAllPayments(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        try {
+            Page<PaymentResponseDTO> paymentResponseDTOS = paymentService.getAllPayments(pageable);
+            CommonResponse<Page<PaymentResponseDTO>> commonResponse = CommonResponse.<Page<PaymentResponseDTO>>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Successfully retrieved all payments")
+                    .data(Optional.of(paymentResponseDTOS))
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResponse.<Object>builder()
+                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Failed to retrieve all payments: " + e.getMessage())
+                    .build());
+        }
     }
 
 

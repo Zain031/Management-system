@@ -17,7 +17,7 @@ import java.util.List;
 public class OrdersResponseDTO {
 
     @JsonProperty("id_order")
-    private Long idOrder;
+    private String idOrder;
 
     @JsonProperty("customer_name")
     private String customerName;
@@ -37,6 +37,9 @@ public class OrdersResponseDTO {
 
     @JsonProperty("status")
     private String status;
+
+    @JsonProperty("link_qris")
+    private String linkQris;
 
     @JsonProperty("order_details")
     private List<OrderDetailResponseDTO> orderDetails;

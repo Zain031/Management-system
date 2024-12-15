@@ -22,14 +22,16 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.print.*;
-import java.io.ByteArrayInputStream;
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -45,81 +47,168 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public PaymentResponseDTO processPayment(Long orderId, PaymentRequestDTO paymentRequestDTO) {
+    public PaymentResponseDTO processPayment(String orderId, PaymentRequestDTO paymentRequestDTO) {
+        // Retrieve order by ID and validate its existence
         Orders order = ordersRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
 
-        // Validasi status order
-        if (order.getStatus().equals(Orders.OrderStatus.COMPLETED)) {
+        // Validate order status
+        if (order.getStatus() == Orders.OrderStatus.COMPLETED) {
             throw new IllegalArgumentException("Order already completed with ID: " + orderId);
         }
 
         try {
+            // Parse payment method and amount
             Payments.PaymentMethod paymentMethod = Payments.PaymentMethod.valueOf(paymentRequestDTO.getPaymentMethod());
+            BigDecimal amount = BigDecimal.valueOf(paymentRequestDTO.getAmount());
+            BigDecimal totalPrice = BigDecimal.valueOf(order.getTotalPrice());
 
-            // Validasi jumlah pembayaran berdasarkan metode pembayaran
+            // Validate payment amount
             validatePaymentAmount(paymentRequestDTO, order, paymentMethod);
 
-            String qrisTransactionResponse = null; // QRIS response (if applicable)
-            String midtransTransactionResponse = "pending"; // Default to "pending"
+            // Process payment based on payment method
+            Payments payment = processPaymentByMethod(order, paymentMethod, amount, totalPrice);
 
-            if (paymentMethod == Payments.PaymentMethod.QRIS) {
-                // Tambahkan biaya tambahan untuk QRIS
-                double amountFee = paymentRequestDTO.getAmount() * 0.0075;
-                long totalAmount = Math.round(paymentRequestDTO.getAmount() + amountFee);
-
-                // Buat transaksi QRIS menggunakan orderId
-                qrisTransactionResponse = midtransService.createQrisTransaction(String.valueOf(orderId), totalAmount);
-                midtransTransactionResponse = midtransService.getTransactionStatus(String.valueOf(orderId));
-
-                // Log untuk debugging
-                logger.info("QRIS Transaction Response: {}", midtransTransactionResponse);
-
-                // Perbarui status order berdasarkan respons Midtrans
-                updateOrderStatusBasedOnMidtrans(order, midtransTransactionResponse);
-            }
-
-            if (paymentMethod == Payments.PaymentMethod.CASH) {
-                // Untuk pembayaran tunai, langsung settle
-                midtransTransactionResponse = "settlement";
-                updateOrderStatusBasedOnMidtrans(order, midtransTransactionResponse);
-            }
-
-            // Simpan detail pembayaran
-            Payments payment = Payments.builder()
-                    .order(order)
-                    .amount(paymentRequestDTO.getAmount())
-                    .method(paymentMethod)
-                    .paymentDate(LocalDateTime.now()) // Sesuaikan jika perlu
-                    .qrisResponse(qrisTransactionResponse)
-                    .statusMidtrans(midtransTransactionResponse) // Default adalah "pending"
-                    .build();
-
+            // Save payment and update order status
             paymentsRepository.save(payment);
-
             return convertToResponse(payment);
 
         } catch (IllegalArgumentException e) {
-            // Validasi error (contoh: metode pembayaran tidak valid)
+            logger.error("Validation error for orderId: {}. Error: {}", orderId, e.getMessage());
             throw e;
 
         } catch (Exception e) {
-            // Log error sebelum melemparkan exception
             logger.error("Failed to process payment for orderId: {}. Error: {}", orderId, e.getMessage(), e);
 
-            // Jika terjadi error, set status order menjadi CANCELED
+            // Cancel the order if payment fails
             order.setStatus(Orders.OrderStatus.CANCELED);
             ordersRepository.save(order);
 
-            // Lempar exception yang lebih spesifik
             throw new RuntimeException("Failed to process payment: " + e.getMessage(), e);
         }
     }
 
-    private void updateOrderStatusBasedOnMidtrans(Orders order, String midtransTransactionResponse) {
-        // Log the transaction status for debugging
-        logger.info("Updating order status based on midtrans transaction response: {}", midtransTransactionResponse);
+    @Override
+    public Page<PaymentResponseDTO> getAllPayments(Pageable pageable) {
+        Page<Payments> payments = paymentsRepository.findAllOrderByDatePaymentNow(pageable);
 
+        // Use a Set to keep track of unique Order IDs (as String)
+        Set<String> uniqueOrderIds = new HashSet<>();
+
+        for (Payments payment : payments.getContent()) {
+            // Ensure that we only process unique Order IDs
+            String orderId = payment.getOrder() != null ? payment.getOrder().getIdOrder() : null;
+
+            if (orderId != null && !uniqueOrderIds.contains(orderId)) {
+                uniqueOrderIds.add(orderId); // Add to set to track uniqueness
+                System.out.println("Order ID: " + orderId);  // Log the unique Order ID
+            }
+
+            String midtransTransactionResponse = "";
+
+            // If payment method is CASH, set midtransTransactionResponse to "settlement"
+            if (payment.getMethod() == Payments.PaymentMethod.CASH) {
+                midtransTransactionResponse = "settlement";
+            } else if (payment.getMethod() == Payments.PaymentMethod.QRIS) {
+                // If payment method is QRIS, set midtransTransactionResponse to the transaction status
+                if (payment.getOrder() != null && payment.getOrder().getIdOrder() != null) {
+                    midtransTransactionResponse = midtransService.getTransactionStatus(payment.getOrder().getIdOrder());
+                    updateOrderStatusBasedOnMidtrans(payment.getOrder(), midtransTransactionResponse);
+                }
+            }
+
+            // Set the midtrans status response
+            payment.setStatusMidtrans(midtransTransactionResponse);
+        }
+
+        // Save updated payments with statusMidtrans and persist them to the database
+        paymentsRepository.saveAll(payments.getContent());
+
+        return payments.map(this::convertToResponse);
+    }
+
+
+    private Payments processPaymentByMethod(Orders order, Payments.PaymentMethod paymentMethod, BigDecimal amount, BigDecimal totalPrice) {
+        switch (paymentMethod) {
+            case QRIS:
+                return processQrisPayment(order, amount, totalPrice);
+            case CASH:
+                return processCashPayment(order, amount, totalPrice);
+            default:
+                throw new IllegalArgumentException("Unsupported payment method: " + paymentMethod);
+        }
+    }
+
+    private Payments processQrisPayment(Orders order, BigDecimal amount, BigDecimal totalPrice) {
+        if (amount.compareTo(totalPrice) != 0) {
+            throw new IllegalArgumentException("QRIS payment amount must match the total order price.");
+        }
+
+        logger.info("Processing QRIS payment for orderId: {}", order.getIdOrder());
+
+        BigDecimal amountFee = amount.multiply(BigDecimal.valueOf(0.0075));  // 0.75% fee
+        BigDecimal totalAmount = amount.add(amountFee);
+
+        String qrisTransactionResponse = midtransService.createQrisTransaction(String.valueOf(order.getIdOrder()), totalAmount.longValue());
+
+        return Payments.builder()
+                .order(order)
+                .amount(amount.doubleValue())
+                .method(Payments.PaymentMethod.QRIS)
+                .paymentDate(LocalDateTime.now())
+                .qrisResponse(qrisTransactionResponse)
+                .statusMidtrans("pending")
+                .build();
+    }
+
+    private Payments processCashPayment(Orders order, BigDecimal amount, BigDecimal totalPrice) {
+        // Validate payment amount
+        if (amount.compareTo(totalPrice) < 0) {
+            throw new IllegalArgumentException("CASH payment amount cannot be less than the total order price.");
+        }
+
+        logger.info("Processing CASH payment for orderId: {}", order.getIdOrder());
+
+        // Simulate response for CASH payment
+        String midtransTransactionResponse = simulateCashPaymentResponse();
+
+        // Check response status and update order status
+        if ("settlement".equalsIgnoreCase(midtransTransactionResponse)) {
+            order.setStatus(Orders.OrderStatus.COMPLETED);
+            logger.info("Payment succeeded, orderId: {} marked as COMPLETED", order.getIdOrder());
+        } else {
+            order.setStatus(Orders.OrderStatus.CANCELED);
+            logger.warn("Payment failed, orderId: {} marked as CANCELED", order.getIdOrder());
+        }
+
+        // Save order status to database
+        ordersRepository.save(order);
+
+        return Payments.builder()
+                .order(order)
+                .amount(amount.doubleValue())
+                .method(Payments.PaymentMethod.CASH)
+                .paymentDate(LocalDateTime.now())
+                .statusMidtrans(midtransTransactionResponse)
+                .build();
+    }
+
+    // Simulate response for CASH payment (this should be replaced by real payment processing logic)
+    private String simulateCashPaymentResponse() {
+        boolean isPaymentSuccessful = Math.random() > 0.5;  // Simulate 50% chance of success
+        return isPaymentSuccessful ? "settlement" : "failure";
+    }
+
+    private void validatePaymentAmount(PaymentRequestDTO paymentRequestDTO, Orders order, Payments.PaymentMethod paymentMethod) {
+        if (paymentMethod == Payments.PaymentMethod.CASH && paymentRequestDTO.getAmount() < order.getTotalPrice()) {
+            throw new IllegalArgumentException("Payment amount for CASH must be greater than or equal to order total price.");
+        } else if (paymentMethod == Payments.PaymentMethod.QRIS && paymentRequestDTO.getAmount() <= 0) {
+            throw new IllegalArgumentException("Payment amount for QRIS must be greater than zero.");
+        }
+    }
+
+
+    private void updateOrderStatusBasedOnMidtrans(Orders order, String midtransTransactionResponse) {
         switch (midtransTransactionResponse) {
             case "settlement":
                 order.setStatus(Orders.OrderStatus.COMPLETED);
@@ -133,26 +222,13 @@ public class PaymentServiceImpl implements PaymentService {
                 order.setStatus(Orders.OrderStatus.PENDING);
                 break;
             default:
-                // Log the unknown transaction status
-                logger.error("Unknown transaction status received: {}", midtransTransactionResponse);
-//                order.setStatus(Orders.OrderStatus.CANCELED); // Optionally set it to "FAILED" or another default status
+                logger.warn("Unknown transaction status received for orderId {}: {}", order.getIdOrder(), midtransTransactionResponse);
+                order.setStatus(Orders.OrderStatus.CANCELED);
                 break;
         }
 
-        ordersRepository.save(order);
-    }
-
-    private void validatePaymentAmount(PaymentRequestDTO paymentRequestDTO, Orders order, Payments.PaymentMethod paymentMethod) {
-        // Validate payment amount based on the payment method
-        if (paymentMethod == Payments.PaymentMethod.CASH) {
-            if (paymentRequestDTO.getAmount() < order.getTotalPrice()) {
-                throw new IllegalArgumentException("Payment amount for CASH must be greater than or equal to order total price");
-            }
-        }  else if (paymentMethod == Payments.PaymentMethod.QRIS) {
-            if (paymentRequestDTO.getAmount() <= 0) {
-                throw new IllegalArgumentException("Payment amount for QRIS must be greater than zero");
-            }
-        }
+        ordersRepository.saveAndFlush(order);
+        logger.info("Order status updated to {} for orderId {}", order.getStatus(), order.getIdOrder());
     }
 
     public byte[] generatedReceipt(PaymentResponseDTO paymentResponseDTO) {
@@ -223,6 +299,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (!"CASH".equalsIgnoreCase(paymentResponseDTO.getMethod())) {
                 adminFee = totalPrice * 0.0075; // Admin fee 0.75% for non-cash
                 grandTotal = totalPrice + adminFee;
+                paidAmount=grandTotal;
             }
 
             if ("CASH".equalsIgnoreCase(paymentResponseDTO.getMethod())) {
@@ -309,11 +386,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResponseDTO getPaymentById(Long id) {
-        Payments payment = paymentsRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
+    public PaymentResponseDTO getPaymentById(String id, Orders order) {
+        Payments payment = paymentsRepository.getPaymentsByOrderId(order.getIdOrder());
         return convertToResponse(payment);
     }
+
 
     private PaymentResponseDTO convertToResponse(Payments payment) {
         return PaymentResponseDTO.builder()
@@ -322,7 +399,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .method(String.valueOf(payment.getMethod()))
                 .paymentDate(payment.getPaymentDate())
                 .order(convertToResponse(payment.getOrder()))
-                .qrisResponse(payment.getQrisResponse())
+                .linkQris(payment.getQrisResponse())
                 .statusMidtrans(String.valueOf(payment.getStatusMidtrans()))
                 .change(payment.getAmount()-payment.getOrder().getTotalPrice())
                 .build();
@@ -352,4 +429,5 @@ public class PaymentServiceImpl implements PaymentService {
                         .build()
         ).collect(Collectors.toList());
     }
+
 }

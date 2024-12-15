@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,8 +37,7 @@ public class MidtransServiceImpl implements MidtransService {
             Map<String, Object> chargeParams = new HashMap<>();
             Map<String, Object> transactionDetails = new HashMap<>();
 
-            LocalDate now = LocalDate.now();
-            transactionDetails.put("order_id",  now+"_UjiCoba2_"+orderId);
+            transactionDetails.put("order_id", "Order_" + orderId);
             transactionDetails.put("gross_amount", amount);
 
             chargeParams.put("transaction_details", transactionDetails);
@@ -54,37 +52,40 @@ public class MidtransServiceImpl implements MidtransService {
         }
     }
 
-    @Override
     public String getTransactionStatus(String orderId) {
+        System.out.println("Order ID: " + orderId);
         try {
             // Base64 encode the server key for authorization
             String encodedKey = Base64.getEncoder().encodeToString((serverKey + ":").getBytes());
+            System.out.println("Encoded Key: " + encodedKey);
 
             // Set the environment-specific URL
             String baseUrl = "https://api.sandbox.midtrans.com/v2/";
 
             // Build the request URL
-            String url = baseUrl + orderId + "/status";
+            String url = baseUrl + "Order_" + orderId + "/status";
 
             // Create request
             Request request = new Request.Builder()
                     .url(url)
                     .get()
                     .addHeader("Accept", "application/json")
-                    .addHeader("Content-Type", "application/json")
                     .addHeader("Authorization", "Basic " + encodedKey)
                     .build();
 
             // Execute request
             Response response = httpClient.newCall(request).execute();
+            System.out.println("Response: " + response);
 
             if (response.isSuccessful() && response.body() != null) {
                 // Parse the response body
                 String responseBody = response.body().string();
+
                 JSONObject jsonResponse = new JSONObject(responseBody);
 
                 // Extract the 'transaction_status' from the JSON response
-                String transactionStatus = jsonResponse.optString("transaction_status", "pending");
+                String transactionStatus = jsonResponse.optString("transaction_status","pending");
+                System.out.println("Transaction Status: " + transactionStatus);
 
                 // Return the transaction status
                 return transactionStatus;
@@ -98,3 +99,4 @@ public class MidtransServiceImpl implements MidtransService {
     }
 
 }
+

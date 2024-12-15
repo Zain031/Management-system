@@ -18,9 +18,9 @@ import java.util.List;
 @Data
 public class Orders {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_order")
-    private Long idOrder;
+    private String idOrder;
 
     @Column(name = "customer_name", nullable = false)
     private String customerName;
@@ -41,6 +41,12 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status;
+
+    @Column(name = "link_qris")
+    private String linkQris;
+
+    @Column(name = "method")
+    private String method;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetails> orderDetails;

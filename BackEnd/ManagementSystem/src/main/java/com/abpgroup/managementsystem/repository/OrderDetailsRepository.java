@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Long> {
     @Query("SELECT od FROM OrderDetails od WHERE od.order.idOrder = :id")
-    List<OrderDetails> findByOrderIdOrder(Long id);
+    List<OrderDetails> findByOrderIdOrder(String id);
 }

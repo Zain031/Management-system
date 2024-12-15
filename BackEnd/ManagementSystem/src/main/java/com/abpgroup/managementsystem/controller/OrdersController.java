@@ -41,7 +41,7 @@ public class OrdersController {
         }
     }
     @GetMapping("/{id_order}")
-    public ResponseEntity<CommonResponse<?>> getOrderById(@PathVariable (name = "id_order" ) Long id) {
+    public ResponseEntity<CommonResponse<?>> getOrderById(@PathVariable (name = "id_order" ) String id) {
         try {
             OrdersResponseDTO ordersResponseDTO = orderService.getOrderById(id);
             CommonResponse<OrdersResponseDTO> commonResponse = CommonResponse.<OrdersResponseDTO>builder()
@@ -70,10 +70,11 @@ public class OrdersController {
         }
     }
     @GetMapping("/month/{period}")
-    public ResponseEntity<CommonResponse<?>> getOrdersByMonth(@PathVariable(name = "period") String period,@RequestParam(name = "year",required = true ) long year) {
+    public ResponseEntity<CommonResponse<?>> getOrdersByMonth(@PathVariable(name = "period") String period,@RequestParam(name = "year",required = true ) long year, @RequestParam(name = "status",required = false ) String status,@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size) {
         try {
-            List<OrdersResponseDTO> ordersResponseDTO = orderService.getOrdersByPeriodAndYears(period.toUpperCase(),year);
-            CommonResponse<List<OrdersResponseDTO>> commonResponse = CommonResponse.<List<OrdersResponseDTO>>builder()
+            PageRequest pageable = PageRequest.of(page, size);
+            Page<OrdersResponseDTO> ordersResponseDTO = orderService.getOrdersByPeriodYearsAndStatus(period,year,status,pageable);
+            CommonResponse<Page<OrdersResponseDTO>> commonResponse = CommonResponse.<Page<OrdersResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved orders")
                     .data(Optional.of(ordersResponseDTO))

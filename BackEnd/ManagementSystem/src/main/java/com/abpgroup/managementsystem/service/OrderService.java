@@ -10,10 +10,12 @@ import java.util.List;
 
 public interface OrderService {
     OrdersResponseDTO createOrder(OrdersRequestDTO ordersRequestDTO);
-    OrdersResponseDTO getOrderById(Long id);
+    OrdersResponseDTO getOrderById(String id);
     Page<OrdersResponseDTO> getAllOrders(Pageable pageable);
-    List<OrdersResponseDTO> getOrdersByPeriodAndYears(String periodUpper, Long years);
+    Page<OrdersResponseDTO> getOrdersByPeriodYearsAndStatus(String periodUpper, Long years, String status, Pageable pageable);
     List<OrdersResponseDTO> getOrdersByDateOrders(LocalDate dateOrders);
     byte[] generatedPdfByDateOrders(List<OrdersResponseDTO> ordersResponseDTO, LocalDate dateOrders);
     byte[] generatedPdfByPeriodAndYears(List<OrdersResponseDTO> ordersResponseDTO, String periodUpper, Long years);
+
+    List<OrdersResponseDTO> getOrdersByPeriodAndYears(String upperCase, long year);
 }

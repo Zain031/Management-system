@@ -5,10 +5,13 @@ import com.abpgroup.managementsystem.model.dto.response.OrderDetailResponseDTO;
 import com.abpgroup.managementsystem.model.dto.response.OrdersResponseDTO;
 import com.abpgroup.managementsystem.model.entity.OrderDetails;
 import com.abpgroup.managementsystem.model.entity.Orders;
+import com.abpgroup.managementsystem.model.entity.Payments;
 import com.abpgroup.managementsystem.model.entity.Products;
 import com.abpgroup.managementsystem.repository.OrderDetailsRepository;
 import com.abpgroup.managementsystem.repository.OrdersRepository;
+import com.abpgroup.managementsystem.repository.PaymentsRepository;
 import com.abpgroup.managementsystem.repository.ProductsRepository;
+import com.abpgroup.managementsystem.service.MidtransService;
 import com.abpgroup.managementsystem.service.OrderService;
 import com.itextpdf.io.source.ByteArrayOutputStream;
 import com.itextpdf.kernel.geom.PageSize;
@@ -29,6 +32,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +42,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrdersRepository ordersRepository;
     private final OrderDetailsRepository orderDetailsRepository;
     private final ProductsRepository productsRepository;
+    private final PaymentsRepository paymentsRepository;
+    private final MidtransService midtransService;
+    private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Override
     @Transactional
@@ -84,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrdersResponseDTO getOrderById(Long id) {
+    public OrdersResponseDTO getOrderById(String id) {
         Orders order = ordersRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
         List<OrderDetails> orderDetails = orderDetailsRepository.findByOrderIdOrder(id);
@@ -100,21 +108,6 @@ public class OrderServiceImpl implements OrderService {
         );
     }
 
-    @Override
-    public List<OrdersResponseDTO> getOrdersByPeriodAndYears(String periodUpper, Long years) {
-        // Mengambil semua orders berdasarkan period dan tahun
-        List<Orders> ordersList = ordersRepository.getOrdersByPeriodAndYears(periodUpper.toUpperCase(), years);
-
-        if (ordersList.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // Konversi setiap order ke DTO response
-        return ordersList.stream().map(order -> {
-            List<OrderDetails> orderDetails = orderDetailsRepository.findByOrderIdOrder(order.getIdOrder());
-            return convertToResponse(order, orderDetails != null ? orderDetails : Collections.emptyList());
-        }).collect(Collectors.toList());
-    }
 
     @Override
     public List<OrdersResponseDTO> getOrdersByDateOrders(LocalDate dateOrders) {
@@ -358,17 +351,108 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public Page<OrdersResponseDTO> getOrdersByPeriodYearsAndStatus(
+            String periodUpper,
+            Long years,
+            String status,
+            Pageable pageable) {
+
+        Page<Orders> orders;
+
+        // Ambil data order berdasarkan status jika disediakan
+        if (status == null || status.isEmpty()) {
+            orders = ordersRepository.getOrdersAllByPeriodAndYears(periodUpper.toUpperCase(), years, pageable);
+        } else {
+            Orders.OrderStatus orderStatus;
+            try {
+                orderStatus = Orders.OrderStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid order status: " + status);
+            }
+            orders = ordersRepository.getOrdersByPeriodYearsAndStatus(
+                    periodUpper.toUpperCase(), years, orderStatus, pageable);
+        }
+
+        // Ambil orderIds untuk transaksi terkait
+        List<String> orderIds = orders.getContent().stream()
+                .map(Orders::getIdOrder)
+                .collect(Collectors.toList());
+
+        // Ambil status transaksi dari Midtrans secara paralel untuk efisiensi
+        Map<String, String> midtransTransactionStatuses = orderIds.stream()
+                .collect(Collectors.toMap(orderId -> orderId, orderId -> midtransService.getTransactionStatus(orderId)));
+
+        // Ambil semua metode pembayaran terkait dengan orderIds
+        Map<String, Payments> paymentMap = paymentsRepository.findMethodByOrderId(orderIds).stream()
+                .collect(Collectors.toMap(payment -> payment.getOrder().getIdOrder(), payment -> payment));
+
+        // Perbarui setiap order berdasarkan data pembayaran dan status Midtrans
+        orders.getContent().forEach(order -> {
+            Payments payment = paymentMap.get(order.getIdOrder());
+            if (payment != null) {
+                order.setLinkQris(payment.getQrisResponse()); // Set QRIS response
+                order.setMethod(String.valueOf(payment.getMethod())); // Set metode pembayaran
+
+                // Jika metode pembayaran "CASH", set status transaksi menjadi "settlement"
+                if (payment.getMethod() == Payments.PaymentMethod.CASH) {
+                    midtransTransactionStatuses.put(order.getIdOrder(), "settlement");
+                }
+            }
+
+            // Perbarui status order berdasarkan status transaksi Midtrans
+            updateOrderStatusBasedOnMidtrans(order, midtransTransactionStatuses.get(order.getIdOrder()));
+        });
+
+        // Simpan perubahan order yang diperbarui
+        ordersRepository.saveAll(orders.getContent());
+
+        // Konversi entitas ke DTO dan kembalikan hasil
+        return orders.map(order -> convertToResponse(order, order.getOrderDetails()));
+    }
 
 
+    private void updateOrderStatusBasedOnMidtrans(Orders order, String midtransTransactionResponse) {
+        switch (midtransTransactionResponse) {
+            case "settlement":
+                order.setStatus(Orders.OrderStatus.COMPLETED);
+                break;
+            case "deny":
+            case "cancel":
+            case "expire":
+                order.setStatus(Orders.OrderStatus.CANCELED);
+                break;
+            case "pending":
+                order.setStatus(Orders.OrderStatus.PENDING);
+                break;
+            default:
+                logger.warn("Unknown transaction status received for orderId {}: {}", order.getIdOrder(), midtransTransactionResponse);
+                order.setStatus(Orders.OrderStatus.CANCELED);
+                break;
+        }
+
+        // Menyimpan perubahan status ke database
+        ordersRepository.saveAndFlush(order);
+        logger.info("Order status updated to {} for orderId {}", order.getStatus(), order.getIdOrder());
+    }
+
+    @Override
+    public List<OrdersResponseDTO> getOrdersByPeriodAndYears(String upperCase, long year) {
+        List<Orders> orders = ordersRepository.getOrdersByPeriodAndYears(upperCase.toUpperCase(), year);
+        return orders.stream().map(order -> convertToResponse(order, order.getOrderDetails())).collect(Collectors.toList());
+    }
 
     private OrdersResponseDTO convertToResponse(Orders orders, List<OrderDetails> orderDetails) {
-        List<OrderDetailResponseDTO> orderDetailResponseDTOs = orderDetails.stream().map(detail -> OrderDetailResponseDTO.builder()
-                .idOrderDetail(detail.getIdOrderDetail())
-                .productName(detail.getProducts().getProductName())
-                .quantity(detail.getQuantity())
-                .pricePerUnit(detail.getPricePerUnit())
-                .subtotalPrice(detail.getSubtotalPrice())
-                .build()).collect(Collectors.toList());
+        List<OrderDetailResponseDTO> orderDetailResponseDTOs = orderDetails.stream()
+                .map(detail -> OrderDetailResponseDTO.builder()
+                        .idOrderDetail(detail.getIdOrderDetail())
+                        .productName(detail.getProducts().getProductName())
+                        .quantity(detail.getQuantity())
+                        .pricePerUnit(detail.getPricePerUnit())
+                        .subtotalPrice(detail.getSubtotalPrice())
+                        .build())
+                .collect(Collectors.toList());
+
 
         return OrdersResponseDTO.builder()
                 .idOrder(orders.getIdOrder())
@@ -379,6 +463,8 @@ public class OrderServiceImpl implements OrderService {
                 .orderDetails(orderDetailResponseDTOs)
                 .period(orders.getPeriod())
                 .years(orders.getYears())
+                .linkQris(orders.getLinkQris())
                 .build();
     }
+
 }
