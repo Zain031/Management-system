@@ -344,7 +344,7 @@ const Order = () => {
               data-tip="Details"
               onClick={() => onButtonShowDetailClick(item.id)}
             />
-            {item.status === "COMPLETED" && (
+            {item.status === "Completed" && (
               <ButtonExport
                 className="tooltip"
                 data-tip="Export"
