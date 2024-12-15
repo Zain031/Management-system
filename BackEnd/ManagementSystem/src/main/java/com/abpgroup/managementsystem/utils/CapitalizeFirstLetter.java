@@ -6,6 +6,20 @@ public class CapitalizeFirstLetter {
         if (input == null || input.isEmpty()) {
             return input;
         }
-        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+
+        String[] words = input.split(" ");
+        StringBuilder capitalizedString = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                capitalizedString.append(word.substring(0, 1).toUpperCase())
+                        .append(word.substring(1).toLowerCase())
+                        .append(" ");
+            }
+        }
+
+        // Menghapus spasi ekstra di akhir string
+        return capitalizedString.toString().trim();
     }
+
 }

@@ -256,6 +256,7 @@ const Order = () => {
     }
   };
 
+
   return (
     <PaginationLayout
       headerTitle={"Order"}
@@ -279,7 +280,8 @@ const Order = () => {
           onButtonAddClick={onButtonAddClick}
         />
       }
-      paging={paging}>
+      paging={paging}
+    >
       <ExportModal
         handleExport={handleExport}
         exportPer={exportPer}
@@ -323,7 +325,7 @@ const Order = () => {
           id: item.id_order,
           name: item.customer_name,
           orderDate: formatDate(item.order_date.split(" ")[0]),
-          status: item.status,
+          status: item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase(), 
           total: numberToIDR(item.total_price),
           method: item?.method,
           qrisResponse: item.link_qris,
@@ -331,7 +333,7 @@ const Order = () => {
         tableHeader={[
           "Customer Name",
           "Order Date",
-          "status",
+          "Status",
           "Total",
           "Action",
         ]}
@@ -346,7 +348,8 @@ const Order = () => {
               <ButtonExport
                 className="tooltip"
                 data-tip="Export"
-                onClick={() => dispatch(generateReceipt(item.id))}>
+                onClick={() => dispatch(generateReceipt(item.id))}
+              >
                 Export Receipt
               </ButtonExport>
             )}
@@ -364,7 +367,8 @@ const Order = () => {
                   } else {
                     alert("Redirect URL tidak ditemukan!");
                   }
-                }}>
+                }}
+              >
                 PAY
               </button>
             )}

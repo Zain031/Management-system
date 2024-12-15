@@ -13,6 +13,7 @@ import com.abpgroup.managementsystem.repository.PaymentsRepository;
 import com.abpgroup.managementsystem.repository.ProductsRepository;
 import com.abpgroup.managementsystem.service.MidtransService;
 import com.abpgroup.managementsystem.service.OrderService;
+import com.abpgroup.managementsystem.utils.CapitalizeFirstLetter;
 import com.itextpdf.io.source.ByteArrayOutputStream;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -33,7 +34,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
     public OrdersResponseDTO createOrder(OrdersRequestDTO ordersRequestDTO) {
         // Membuat entitas Order
         Orders order = Orders.builder()
-                .customerName(ordersRequestDTO.getCustomerName())
+                .customerName(CapitalizeFirstLetter.capitalizeFirstLetter(ordersRequestDTO.getCustomerName()))
                 .orderDate(LocalDateTime.now())
                 .status(Orders.OrderStatus.valueOf("PENDING"))
                 .totalPrice(0.0)

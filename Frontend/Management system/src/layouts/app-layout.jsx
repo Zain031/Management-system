@@ -48,13 +48,18 @@ function AppLayout() {
             <div className="my-5 "></div>
             <button
               className="btn btn-circle btn-ghost btn-sm lg:hidden"
-              onClick={() => setIsMenuOpen((open) => !open)}>
+              onClick={() => setIsMenuOpen((open) => !open)}
+            >
               <CloseSVG />
             </button>
           </div>
           <SidebarMenu />
           <li className="flex-1 justify-end">
-            <NavLink to="/login" onClick={() => dispatch(logout())}>
+            <NavLink
+              to="/login"
+              className="flex items-center space-x-3 text-gray-700 hover:text-white hover:bg-blue-500 dark:text-gray-300 dark:hover:text-white dark:hover:bg-blue-400 transition-all duration-200 rounded-lg p-3 text-base"
+              onClick={() => dispatch(logout())}
+            >
               <LogOut size={30} strokeWidth={1.5} />
               <span className="font-bold">Logout</span>
             </NavLink>
