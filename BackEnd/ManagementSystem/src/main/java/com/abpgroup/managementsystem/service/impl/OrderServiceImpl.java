@@ -64,8 +64,8 @@ public class OrderServiceImpl implements OrderService {
 
         // Memproses OrderDetails
         List<OrderDetails> orderDetails = ordersRequestDTO.getOrderDetailsRequestDTOList().stream().map(detailRequest -> {
-            Products menu = productsRepository.findById(detailRequest.getIdProduct())
-                    .orElseThrow(() -> new RuntimeException("Menu not found with ID: " + detailRequest.getIdProduct()));
+            Products menu = productsRepository.findByIdAndAvailable((detailRequest.getIdProduct()))
+                    .orElseThrow(() -> new RuntimeException("Product not found with ID: " + detailRequest.getIdProduct()));
 
             return OrderDetails.builder()
                     .order(savedOrder)
