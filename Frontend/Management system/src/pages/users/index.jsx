@@ -3,7 +3,7 @@ import Container from "../../components/container";
 import Header from "../../layouts/partials/header";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
-import { SquarePen, Trash2 } from "lucide-react";
+import { Eye, EyeOff, SquarePen, Trash2 } from "lucide-react";
 import { SquarePlus } from "lucide-react";
 import { useState } from "react";
 import {
@@ -18,6 +18,13 @@ import {
 import { Pagination } from "@nextui-org/pagination";
 import ButtonExport from "../../components/ButtonExport";
 import { exportUsers } from "../../redux/feature/exportSlice";
+import {
+  dynamicValidation,
+  isEmailValid,
+  isNotEmpty,
+  isStrongPassword,
+  validateName,
+} from "../../../utils/validation/inputValidation";
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -28,7 +35,11 @@ const Users = () => {
   const [role, setRole] = useState("");
   const [userId, setUserId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [errorPassword, setErrorPassword] = useState("");
+  const [errorEmail, setErrorEmail] = useState("");
+  const [errorName, setErrorName] = useState("");
+  const [errorRole, setErrorRole] = useState("");
+  const [key, setKey] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -56,6 +67,7 @@ const Users = () => {
     if (isEditing) {
       setName(userById?.name || "");
       setEmail(userById?.email || "");
+      setRole(userById?.role);
     }
   }, [userById, dispatch]);
 
@@ -63,6 +75,9 @@ const Users = () => {
     dispatch(fetchUsers({ page: page }));
   }, [page, dispatch]);
 
+  const handleKey = () => {
+    setKey(!key);
+  };
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -139,13 +154,56 @@ const Users = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    document.getElementById("modal_form_User").close();
     const data = {
       email,
       name,
       password,
       role,
     };
+    const validation = [
+      {
+        name: "name",
+        validator: (name) => {
+          return isNotEmpty(name) && validateName(name);
+        },
+        negativeImpact: () => setErrorName("Name cannot be blank"),
+        positiveImpact: () => setErrorName(""),
+      },
+      {
+        name: "password",
+        validator: (password) => {
+          return isStrongPassword(password);
+        },
+        negativeImpact: () =>
+          setErrorPassword(
+            "please enter strong password, include a number, and a special character"
+          ),
+        positiveImpact: () => setErrorPassword(""),
+      },
+      {
+        name: "email",
+        validator: (email) => {
+          return isNotEmpty(email) && isEmailValid(email);
+        },
+        negativeImpact: () =>
+          setErrorEmail("Email cannot be blank and must be valid"),
+        positiveImpact: () => setErrorEmail(""),
+      },
+      {
+        name: "role",
+        validator: (role) => {
+          return role.length > 0;
+        },
+        negativeImpact: () => setErrorRole("Role cannot be blank"),
+        positiveImpact: () => setErrorRole(""),
+      },
+    ];
+    let allValid = dynamicValidation(validation, data);
+    if (!allValid) {
+      return;
+    }
+    document.getElementById("modal_form_User").close();
+
     if (isEditing) {
       handleEdit({ id: userId, data });
     } else {
@@ -187,6 +245,9 @@ const Users = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
+              {errorName && (
+                <span className="text-red-500 text-sm">{errorName}</span>
+              )}
               <input
                 type="email"
                 placeholder="Email"
@@ -194,23 +255,56 @@ const Users = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
+              {errorEmail && (
+                <span className="text-red-500 text-sm">{errorEmail}</span>
+              )}
 
-              <input
-                type="password"
-                placeholder="Password"
-                className="input input-bordered input-ghost w-full my-2"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="flex gap-2">
+                <input
+                  type={key ? "text" : "password"}
+                  className="mb-5 w-full rounded-lg border px-3 py-3 text-sm focus:outline-none"
+                  placeholder="Password"
+                  value={password}
+                  required
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="off"
+                />
+                {key ? (
+                  <EyeOff
+                    onClick={handleKey}
+                    className="mt-2 cursor-pointer"
+                    size={30}
+                    color="#000000"
+                    strokeWidth={1.25}
+                  />
+                ) : (
+                  <Eye
+                    onClick={handleKey}
+                    className="mt-2 cursor-pointer"
+                    size={30}
+                    color="#000000"
+                    strokeWidth={1.25}
+                  />
+                )}
+              </div>
+
+              {errorPassword && (
+                <p className="mb-4 text-center text-sm text-red-600">
+                  {errorPassword}
+                </p>
+              )}
 
               <select
                 className="select select-bordered w-full my-2"
-                defaultValue={role}
+                value={role}
                 onChange={(e) => setRole(e.target.value)}>
                 <option value="">Select Role</option>
                 <option value="SUPER_ADMIN">Super Admin</option>
                 <option value="ADMIN">Admin</option>
               </select>
+              {errorRole && (
+                <span className="text-red-500 text-sm">{errorRole}</span>
+              )}
 
               <button className="btn btn-outline btn-primary w-full">
                 Submit

@@ -31,7 +31,7 @@ export const isNotEmpty = (value) => {
   if (!value) {
     return false;
   }
-  if (!value.trim()) {
+  if (!String(value).trim()) {
     return false;
   }
   return true;
