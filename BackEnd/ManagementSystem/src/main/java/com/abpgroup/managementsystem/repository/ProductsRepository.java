@@ -7,6 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ProductsRepository extends JpaRepository<Products, Long> {
     Page<Products> findProductsByCategories(Products.ProductCategory categories, Pageable pageable);
@@ -20,4 +24,8 @@ public interface ProductsRepository extends JpaRepository<Products, Long> {
             "SELECT p FROM Products p WHERE p.availableStock = :availableStock"
     )
     Page<Products> findAllByAvailableStock(Pageable sortedByPrice, Boolean availableStock);
+
+
+    @Query("SELECT p FROM Products p WHERE p.availableStock = true")
+    List<Products> findAllAvailableStock();
 }

@@ -34,6 +34,7 @@ import {
   validateName,
 } from "../../../utils/validation/inputValidation";
 import ButtonExport from "../../components/ButtonExport";
+import { s } from "framer-motion/client";
 
 const Order = () => {
   const dispatch = useDispatch();
@@ -106,6 +107,8 @@ const Order = () => {
           price: numberToIDR(detail.price_per_unit),
         })),
       });
+
+      console.log(selectedOrder.status);
     } else {
       console.error("Order not found for the given ID:", id);
     }
@@ -256,6 +259,7 @@ const Order = () => {
     }
   };
 
+
   return (
     <PaginationLayout
       headerTitle={"Order"}
@@ -279,7 +283,8 @@ const Order = () => {
           onButtonAddClick={onButtonAddClick}
         />
       }
-      paging={paging}>
+      paging={paging}
+    >
       <ExportModal
         handleExport={handleExport}
         exportPer={exportPer}
@@ -323,7 +328,7 @@ const Order = () => {
           id: item.id_order,
           name: item.customer_name,
           orderDate: formatDate(item.order_date.split(" ")[0]),
-          status: item.status,
+          status: item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase(), 
           total: numberToIDR(item.total_price),
           method: item?.method,
           qrisResponse: item.link_qris,
@@ -331,7 +336,7 @@ const Order = () => {
         tableHeader={[
           "Customer Name",
           "Order Date",
-          "status",
+          "Status",
           "Total",
           "Action",
         ]}
@@ -342,11 +347,12 @@ const Order = () => {
               data-tip="Details"
               onClick={() => onButtonShowDetailClick(item.id)}
             />
-            {item.status === "COMPLETED" && (
+            {item.status === "Completed" && (
               <ButtonExport
                 className="tooltip"
                 data-tip="Export"
-                onClick={() => dispatch(generateReceipt(item.id))}>
+                onClick={() => dispatch(generateReceipt(item.id))}
+              >
                 Export Receipt
               </ButtonExport>
             )}
@@ -364,7 +370,8 @@ const Order = () => {
                   } else {
                     alert("Redirect URL tidak ditemukan!");
                   }
-                }}>
+                }}
+              >
                 PAY
               </button>
             )}

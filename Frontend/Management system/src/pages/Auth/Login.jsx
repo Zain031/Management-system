@@ -89,31 +89,32 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-gradient-to-r from-indigo-500 via-[#acdeff] to-[#acdeff]">
-      <div className="mb-12 mt-16 flex items-center px-8 text-center md:px-12 lg:w-1/2 lg:text-left">
-        <div className="xs:p-0 mx-auto mt-10 rounded-lg bg-white p-4 shadow-md outline outline-1 outline-gray-300 md:w-3/4 opacity-80">
-          <h1 className="mb-5 mt-5 text-center text-xl md:text-2xl font-bold">
+    <div className="flex h-screen w-full bg-gradient-to-r from-indigo-600 via-indigo-400 to-indigo-300">
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="mx-auto mt-10 p-8 rounded-xl bg-white shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
+          <h1 className="text-center text-3xl font-semibold text-gray-800 mb-8">
             Login
           </h1>
-          <form className="px-5 py-7" onSubmit={handleSubmit}>
-            <input
-              type="text"
-              className="mb-5 w-full rounded-lg border px-3 py-3 text-sm focus:outline-none"
-              placeholder="Email"
-              value={email}
-              required
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="off"
-            />
-            {errorEmail && (
-              <p className="mb-4 text-center text-sm text-red-600">
-                {errorEmail}
-              </p>
-            )}
-            <div className="flex gap-2">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <input
+                type="text"
+                className="w-full p-4 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                placeholder="Email"
+                value={email}
+                required
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="off"
+              />
+              {errorEmail && (
+                <p className="mt-2 text-sm text-red-500">{errorEmail}</p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
               <input
                 type={key ? "text" : "password"}
-                className="mb-5 w-full rounded-lg border px-3 py-3 text-sm focus:outline-none"
+                className="w-full p-4 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                 placeholder="Password"
                 value={password}
                 required
@@ -123,57 +124,43 @@ const Login = () => {
               {key ? (
                 <LockKeyholeOpen
                   onClick={handleKey}
-                  className="mt-2 cursor-pointer"
+                  className="text-gray-700 cursor-pointer"
                   size={30}
-                  color="#000000"
-                  strokeWidth={1.25}
+                  strokeWidth={1.5}
                 />
               ) : (
                 <LockKeyhole
                   onClick={handleKey}
-                  className="mt-2 cursor-pointer"
+                  className="text-gray-700 cursor-pointer"
                   size={30}
-                  color="#000000"
-                  strokeWidth={1.25}
+                  strokeWidth={1.5}
                 />
               )}
             </div>
 
             {errorPassword && (
-              <p className="mb-4 text-center text-sm text-red-600">
-                {errorPassword}
-              </p>
+              <p className="mt-2 text-sm text-red-500">{errorPassword}</p>
             )}
 
-            <button className="w-full rounded-lg bg-blue-500 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-blue-600">
-              <span className="mr-2">Login</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="inline-block h-4 w-4">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
+            <button
+              type="submit"
+              className="w-full p-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 transition duration-200"
+            >
+              Login
             </button>
           </form>
         </div>
       </div>
 
+      {/* Gambar Background */}
       <div
-        className="relative hidden lg:flex lg:w-1/2 brightness-150"
+        className="relative hidden lg:flex w-full h-full bg-cover bg-center dark:bg-gray-800"
         style={{
-          clipPath: "polygon(10% 0, 100% 0%, 100% 100%, 0 100%)",
           backgroundImage: `url(${logo})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}>
-        <div className="absolute inset-0 bg-black opacity-30" />
+        }}
+      >
+        {/* Overlay Transparan untuk Memperjelas Gambar */}
+        <div className="absolute inset-0 bg-black opacity-40 dark:opacity-50" />
       </div>
     </div>
   );

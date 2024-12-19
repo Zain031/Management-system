@@ -222,7 +222,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponseDTO> getAllProducts() {
-        List<Products> products = productRepository.findAll();
+        List<Products> products = productRepository.findAllAvailableStock();
         return products.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 

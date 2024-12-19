@@ -170,16 +170,11 @@ public class PaymentServiceImpl implements PaymentService {
         logger.info("Processing CASH payment for orderId: {}", order.getIdOrder());
 
         // Simulate response for CASH payment
-        String midtransTransactionResponse = simulateCashPaymentResponse();
+        String midtransTransactionResponse = "settlement";
 
         // Check response status and update order status
-        if ("settlement".equalsIgnoreCase(midtransTransactionResponse)) {
-            order.setStatus(Orders.OrderStatus.COMPLETED);
-            logger.info("Payment succeeded, orderId: {} marked as COMPLETED", order.getIdOrder());
-        } else {
-            order.setStatus(Orders.OrderStatus.CANCELED);
-            logger.warn("Payment failed, orderId: {} marked as CANCELED", order.getIdOrder());
-        }
+        order.setStatus(Orders.OrderStatus.COMPLETED);
+        logger.info("Payment succeeded, orderId: {} marked as COMPLETED", order.getIdOrder());
 
         // Save order status to database
         ordersRepository.save(order);
@@ -193,11 +188,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
 
-    // Simulate response for CASH payment (this should be replaced by real payment processing logic)
-    private String simulateCashPaymentResponse() {
-        boolean isPaymentSuccessful = Math.random() > 0.5;  // Simulate 50% chance of success
-        return isPaymentSuccessful ? "settlement" : "failure";
-    }
 
     private void validatePaymentAmount(PaymentRequestDTO paymentRequestDTO, Orders order, Payments.PaymentMethod paymentMethod) {
         if (paymentMethod == Payments.PaymentMethod.CASH && paymentRequestDTO.getAmount() < order.getTotalPrice()) {
