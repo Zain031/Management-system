@@ -33,7 +33,7 @@ build/
 .vscode/
 
 # Environment files
-.env
+ManagementSystem/.env
 .env.local
 .env.development
 .env.production

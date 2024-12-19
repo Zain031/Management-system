@@ -15,5 +15,5 @@ export default function formatDate(inputDate) {
   ];
 
   const [year, month, day] = inputDate.split("-");
-  return `${day} ${monthNames[parseInt(month, 10) - 1].toLowerCase()} ${year}`;
+  return `${day} ${monthNames[parseInt(month, 10) - 1]} ${year}`;
 }

@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15.2
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5431:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./BackEnd/ManagementSystem
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./BackEnd/ManagementSystem/.env
+    depends_on:
+      - db
+    volumes:
+      - ./BackEnd/ManagementSystem/src/main/resources/static/assets:/app/src/main/resources/static/assets
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./Frontend/Management system
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    env_file:
+      - ./Frontend/Management system/.env
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

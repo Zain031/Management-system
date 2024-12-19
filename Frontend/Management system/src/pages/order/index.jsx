@@ -34,6 +34,7 @@ import {
   validateName,
 } from "../../../utils/validation/inputValidation";
 import ButtonExport from "../../components/ButtonExport";
+import { s } from "framer-motion/client";
 
 const Order = () => {
   const dispatch = useDispatch();
@@ -106,6 +107,8 @@ const Order = () => {
           price: numberToIDR(detail.price_per_unit),
         })),
       });
+
+      console.log(selectedOrder.status);
     } else {
       console.error("Order not found for the given ID:", id);
     }

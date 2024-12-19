@@ -64,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Memproses OrderDetails
         List<OrderDetails> orderDetails = ordersRequestDTO.getOrderDetailsRequestDTOList().stream().map(detailRequest -> {
-            Products menu = productsRepository.findByIdAndAvailable((detailRequest.getIdProduct()))
+            Products menu = productsRepository.findById((detailRequest.getIdProduct()))
                     .orElseThrow(() -> new RuntimeException("Product not found with ID: " + detailRequest.getIdProduct()));
 
             return OrderDetails.builder()
@@ -107,7 +107,6 @@ public class OrderServiceImpl implements OrderService {
                 order -> convertToResponse(order, orderDetailsRepository.findByOrderIdOrder(order.getIdOrder()))
         );
     }
-
 
     @Override
     public List<OrdersResponseDTO> getOrdersByDateOrders(LocalDate dateOrders) {

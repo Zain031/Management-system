@@ -31,7 +31,7 @@ const Table = ({
           .map(([key, value]) => (
             <td key={key}>
               {key === "status" ? (
-                <span className={`px-2 py-1 rounded-md text-base text-white ${statusColor}`}>
+                <span className={`px-2 py-1 rounded-md text-base text-gray-950 ${statusColor}`}>
                   {value}
                 </span>
               ) : (
