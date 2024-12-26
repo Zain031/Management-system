@@ -1,5 +1,6 @@
 package com.abpgroup.managementsystem.model.dto.response;
 
+import com.abpgroup.managementsystem.model.entity.Products;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +30,7 @@ public class ProductResponseDTO {
     private String categories;
 
     @JsonProperty("available_stock")
-    private Boolean availableStock;
+    private String availableStock;
 
     @JsonProperty("created_at")
     private LocalDateTime createdAt;

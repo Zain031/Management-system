@@ -1,5 +1,6 @@
 package com.abpgroup.managementsystem.model.dto.request;
 
+import com.abpgroup.managementsystem.model.entity.Products;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,9 @@ public class ProductRequestDTO {
     @JsonProperty("categories")
     private String categories;
 
+    @NotBlank(message = "Available stock cannot be blank")
     @JsonProperty("available_stock")
-    private Boolean availableStock;
+    @Pattern(regexp = "READY/NOT_READY", message = "Available stock must be READY or NOT_READY")
+    private Products.AvailableStock availableStock;
 
 }

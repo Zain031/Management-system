@@ -37,7 +37,12 @@ public class Products {
     private ProductCategory categories;
 
     @Column(name = "available_stock", nullable = false)
-    private Boolean availableStock;
+    private AvailableStock availableStock;
+
+    public enum AvailableStock {
+        READY,
+        NOT_READY
+    }
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

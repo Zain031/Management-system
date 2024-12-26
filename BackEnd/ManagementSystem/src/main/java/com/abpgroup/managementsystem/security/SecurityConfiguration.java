@@ -25,7 +25,6 @@ public class SecurityConfiguration {
     private final AuthTokenFilter authTokenFilter;
 
     private final String [] WHITE_LIST_URL={
-            APIUrl.BASE_URL_USER+"/**",
             APIUrl.BASE_URL_PAYMENT+"/**",
             APIUrl.BASE_URL_PURCHASE+"/**",
             APIUrl.BASE_URL_BUSINESS_PERFORMANCE+"/**",
@@ -63,16 +62,14 @@ public class SecurityConfiguration {
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URL).permitAll()
-//                        .requestMatchers(APIUrl.BASE_URL_USER+"/register").hasAnyAuthority("SUPER_ADMIN")
-//                        .requestMatchers(HttpMethod.GET,APIUrl.BASE_URL_USER+"/users").hasAnyAuthority("SUPER_ADMIN")
-//                        .requestMatchers(APIUrl.BASE_URL_USER+"/update/**").hasAnyAuthority("SUPER_ADMIN")
-//                        .requestMatchers(HttpMethod.GET,APIUrl.BASE_URL_USER+"/user/**").hasAnyAuthority("SUPER_ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE,APIUrl.BASE_URL_USER+"/user/**").hasAnyAuthority("SUPER_ADMIN")
-//                        .requestMatchers(APIUrl.BASE_URL_PRODUCT).hasAnyAuthority("SUPER_ADMIN","ADMIN")
-//                        .requestMatchers(HttpMethod.GET,APIUrl.BASE_URL_PRODUCT+"/category/**").hasAnyAuthority("SUPER_ADMIN","ADMIN")
-//                        .requestMatchers(APIUrl.BASE_URL_PRODUCT+"/create").hasAnyAuthority("SUPER_ADMIN","ADMIN")
-//                        .requestMatchers(APIUrl.BASE_URL_PRODUCT+"/update/**").hasAnyAuthority("SUPER_ADMIN","ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE,APIUrl.BASE_URL_PRODUCT+"/product/delete/**").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, APIUrl.BASE_URL_USER+"/login").permitAll()
+                        .requestMatchers(APIUrl.BASE_URL_USER+"/register").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers(APIUrl.BASE_URL_USER+"/update/**").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers(APIUrl.BASE_URL_USER+"/delete/**").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers(APIUrl.BASE_URL_USER+"/users").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers(APIUrl.BASE_URL_USER+"/user/**").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers(APIUrl.BASE_URL_USER+"/search/**").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers(APIUrl.BASE_URL_USER+"/export-pdf").hasAnyAuthority("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);

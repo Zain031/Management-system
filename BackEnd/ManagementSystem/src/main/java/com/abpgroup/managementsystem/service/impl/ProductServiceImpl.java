@@ -103,9 +103,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponseDTO> getAllProductsByAvailableStock(Pageable pageable, Boolean availableStock) {
+    public Page<ProductResponseDTO> getAllProductsByAvailableStock(Pageable pageable, String availableStock) {
         Pageable sortedByPrice = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "productPrice"));
-        Page<Products> products = productRepository.findAllByAvailableStock(sortedByPrice, availableStock);
+        Page<Products> products = productRepository.findAllByAvailableStock(sortedByPrice, Products.AvailableStock.valueOf(availableStock));
         return products.map(this::convertToResponse);
     }
 
@@ -188,12 +188,17 @@ public class ProductServiceImpl implements ProductService {
                     // Format category (capitalize first letter, lowercase the rest)
                     String categoryFormatted = product.getCategories().toString();
                     categoryFormatted = categoryFormatted.substring(0, 1).toUpperCase() + categoryFormatted.substring(1).toLowerCase();
+                    String availableStock = String.valueOf(product.getAvailableStock());
+                    String displayText = "Not Ready";
 
+                    if (availableStock.equals("READY")) {
+                        displayText = "Ready";
+                    }
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(index++))).setTextAlignment(TextAlignment.CENTER));
                     table.addCell(new Cell().add(new Paragraph(product.getProductName())).setTextAlignment(TextAlignment.CENTER));
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(productPrice))).setTextAlignment(TextAlignment.CENTER));
                     table.addCell(new Cell().add(new Paragraph(categoryFormatted)).setTextAlignment(TextAlignment.CENTER));
-                    table.addCell(new Cell().add(new Paragraph(product.getAvailableStock() ? "In Stock" : "Out of Stock")).setTextAlignment(TextAlignment.CENTER));
+                    table.addCell(new Cell().add(new Paragraph(displayText))).setTextAlignment(TextAlignment.CENTER);
                 }
 
                 document.add(table);
@@ -222,7 +227,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponseDTO> getAllProducts() {
-        List<Products> products = productRepository.findAllAvailableStock();
+        List<Products> products = productRepository.findAllAvailableStock(Products.AvailableStock.READY);
         return products.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 
@@ -233,7 +238,7 @@ public class ProductServiceImpl implements ProductService {
                 .productName(product.getProductName())
                 .productPrice(product.getProductPrice())
                 .categories(product.getCategories().name())
-                .availableStock(product.getAvailableStock())
+                .availableStock(String.valueOf(product.getAvailableStock()))
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .build();

@@ -16,7 +16,6 @@ RUN mvn clean package -DskipTests
 
 # Gunakan image OpenJDK untuk runtime tahap kedua
 FROM openjdk:17-oracle
-# FROM openjdk:17-jdk-slim
 
 # Set work directory di dalam container
 WORKDIR /app

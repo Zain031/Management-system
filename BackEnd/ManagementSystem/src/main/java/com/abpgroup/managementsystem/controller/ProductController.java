@@ -121,10 +121,10 @@ public class ProductController {
     }
 
     @GetMapping("/availability")
-    public ResponseEntity<CommonResponse<?>> getProductByAvailability(@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size, @RequestParam(name = "availability", defaultValue = "true", required = true ) boolean availability) {
+    public ResponseEntity<CommonResponse<?>> getProductByAvailability(@RequestParam(name = "page",defaultValue = "0",required = true ) int page, @RequestParam(name = "size", defaultValue = "10", required = true ) int size, @RequestParam(name = "availability",  required = true ) Products.AvailableStock availability) {
         try {
             PageRequest pageable = PageRequest.of(page, size);
-            Page<ProductResponseDTO> productResponseDTOList = productService.getAllProductsByAvailableStock(pageable, availability);
+            Page<ProductResponseDTO> productResponseDTOList = productService.getAllProductsByAvailableStock(pageable, String.valueOf(availability));
             CommonResponse<Page<ProductResponseDTO>> commonResponse = CommonResponse.<Page<ProductResponseDTO>>builder()
                     .statusCode(HttpStatus.OK.value())
                     .message("Successfully retrieved products")

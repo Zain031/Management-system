@@ -20,18 +20,19 @@ import ButtonExport from "../../components/ButtonExport";
 import { exportProducts } from "../../redux/feature/exportSlice";
 import {
   dynamicValidation,
-  isBoolean,
   isNotEmpty,
   isValidPositiveNumber,
   validateName,
 } from "../../../utils/validation/inputValidation";
+
 const Products = () => {
   const [productId, setProductId] = useState(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState("");
-  const [isStockAvailable, setIsStockAvailable] = useState("");
+  const [isStockAvailable, setIsStockAvailable] = useState("READY"); // Default to "READY"
+
   const tableHeaders = [
     "Name",
     "Category",
@@ -59,7 +60,6 @@ const Products = () => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
-
   const [searchByName, setSearchByName] = useState("");
   const { products, paging, productById, page } = useSelector(
     (state) => state.products
@@ -69,9 +69,9 @@ const Products = () => {
 
   useEffect(() => {
     setName(productById?.product_name || "");
-    setPrice(productById?.product_price) || "";
+    setPrice(productById?.product_price || "");
     setCategories(productById?.categories || "");
-    setIsStockAvailable(productById?.available_stock || false);
+    setIsStockAvailable(productById?.available_stock || "READY"); // Default to "READY" if undefined
   }, [productById]);
 
   const dispatch = useDispatch();
@@ -105,7 +105,7 @@ const Products = () => {
     setName("");
     setPrice("");
     setCategories("");
-    setIsStockAvailable("");
+    setIsStockAvailable("READY"); // Reset to default value
   };
 
   const handlePageChange = (newPage) => {
@@ -176,6 +176,7 @@ const Products = () => {
   const onButtonAddClick = () => {
     document.getElementById("modal_form_product").showModal();
   };
+
   const handleAdd = async (data) => {
     await dispatch(createProduct(data));
     Swal.fire({
@@ -195,15 +196,13 @@ const Products = () => {
       product_name: name,
       product_price: price,
       categories,
-      available_stock: isStockAvailable,
+      available_stock: isStockAvailable, // This will now be "READY" or "NOT_READY"
     };
 
-    console.log("data", data);
     const validation = [
       {
         name: "product_name",
         validator: (name) => {
-          console.log("debug name", name);
           return isNotEmpty(name) && validateName(name);
         },
         negativeImpact: () =>
@@ -241,25 +240,25 @@ const Products = () => {
           return isNotEmpty(categories);
         },
         negativeImpact: () =>
-          setValidateProductCategory({
+          setValidateProductCategory((prev) => ({
             valid: false,
             message: "Please select a valid category",
-          }),
+          })),
         positiveImpact: () =>
-          setValidateProductCategory({
+          setValidateProductCategory((prev) => ({
             valid: true,
             message: "",
-          }),
+          })),
       },
       {
         name: "available_stock",
         validator: (isStockAvailable) => {
-          return isBoolean(isStockAvailable);
+          return isNotEmpty(isStockAvailable);
         },
         negativeImpact: () =>
           setValidateAvailableStock({
             valid: false,
-            message: "Please select a valid available stock",
+            message: "Please select available stock",
           }),
         positiveImpact: () =>
           setValidateAvailableStock({
@@ -299,7 +298,8 @@ const Products = () => {
             <select
               className="select select-bordered"
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}>
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
               <option value="">All Categories</option>
               <option value="FOODS">Foods</option>
               <option value="DRINKS">Drinks</option>
@@ -311,7 +311,8 @@ const Products = () => {
           <button
             onClick={onButtonAddClick}
             className="tooltip"
-            data-tip="Add Product">
+            data-tip="Add Product"
+          >
             <SquarePlus size={50} color="#00d12a" />
           </button>
         </div>
@@ -344,7 +345,8 @@ const Products = () => {
               <select
                 className="select select-bordered w-full my-2"
                 value={categories}
-                onChange={(e) => setCategories(e.target.value)}>
+                onChange={(e) => setCategories(e.target.value)}
+              >
                 <option value="" disabled>
                   Select Category
                 </option>
@@ -357,15 +359,11 @@ const Products = () => {
 
               <select
                 className="select select-bordered w-full my-2"
-                value={isStockAvailable ? "true" : "false"}
-                onChange={(e) =>
-                  setIsStockAvailable(e.target.value === "true")
-                }>
-                <option value="" disabled selected>
-                  Available Stock
-                </option>
-                <option value="true">Ready</option>
-                <option value="false">Not Ready</option>
+                value={isStockAvailable}
+                onChange={(e) => setIsStockAvailable(e.target.value)}
+              >
+                <option value="READY">Ready</option>
+                <option value="NOT_READY">Not Ready</option>
               </select>
               {!validateAvailableStock.valid && (
                 <p className="text-error">{validateAvailableStock.message}</p>
@@ -382,7 +380,8 @@ const Products = () => {
                   onClick={() => {
                     setIsEditing(false);
                     resetForm();
-                  }}>
+                  }}
+                >
                   Close
                 </button>
               </form>
@@ -415,7 +414,8 @@ const Products = () => {
                             : item.categories === "DRINKS"
                             ? "bg-blue-600 w-14 px-2 py-1 text-white rounded-md text-center"
                             : ""
-                        } font-bold`}>
+                        } font-bold`}
+                      >
                         {item.categories === "FOODS"
                           ? "Food"
                           : item.categories === "DRINKS"
@@ -431,18 +431,26 @@ const Products = () => {
                     </td>
 
                     <td>{item.user.name}</td>
-                    <td>{item.available_stock ? "Ready" : "Not Ready"}</td>
+                    <td>
+                      {item.available_stock === "READY"
+                        ? "Ready"
+                        : item.available_stock === "NOT_READY"
+                        ? "Not Ready"
+                        : ""}
+                    </td>
                     <td className="flex gap-8">
                       <button
                         className="tooltip"
                         data-tip="Edit"
-                        onClick={() => onButtonEditClick(item.id_product)}>
+                        onClick={() => onButtonEditClick(item.id_product)}
+                      >
                         <SquarePen size={28} color="#00d15b" />
                       </button>
                       <button
                         onClick={() => handleDelete(item.id_product)}
                         className=" text-white tooltip"
-                        data-tip="Delete">
+                        data-tip="Delete"
+                      >
                         <Trash2 size={28} color="#d12a00" />
                       </button>
                     </td>

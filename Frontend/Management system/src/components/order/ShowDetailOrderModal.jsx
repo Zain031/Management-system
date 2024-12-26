@@ -32,7 +32,7 @@ const ShowDetailOrderModal = ({
           <h3 className="font-bold text-lg">Order details:</h3>
           <Table
             arrayData={selectedOrderForShowingDetail?.details}
-            tableHeader={["Product name", "quantity", "price"]}
+            tableHeader={["Product Name", "Quantity", "Price"]}
             excludeColumns={["id"]}
           />
         </section>

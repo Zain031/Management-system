@@ -10,7 +10,7 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy the rest of the application code, termasuk file .env
 COPY . .
 
 # Build the application for production
@@ -21,6 +21,9 @@ FROM nginx:alpine AS production
 
 # Salin konfigurasi nginx.conf yang sudah benar
 COPY nginx.conf /etc/nginx/nginx.conf
+
+# Salin file .env ke dalam container
+COPY .env /usr/share/nginx/html/.env
 
 # Copy the built application from the previous stage
 COPY --from=build /app/dist /usr/share/nginx/html
